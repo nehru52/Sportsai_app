@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SportsAI — The AI Coach That Sees Everything</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --ink:#0a0a12;--paper:#f5f4ef;--red:#e8172c;--gold:#f5a623;
+  --dim:#1a1a28;--muted:#888;
+  --sans:'DM Sans',sans-serif;--head:'Syne',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--ink);color:var(--paper);font-family:var(--sans);overflow-x:hidden;cursor:none;}
+
+/* CURSOR */
+.cursor{position:fixed;width:10px;height:10px;background:var(--red);border-radius:50%;pointer-events:none;z-index:9999;mix-blend-mode:difference;transition:transform .15s;}
+.cursor-ring{position:fixed;width:36px;height:36px;border:1px solid rgba(232,23,44,.4);border-radius:50%;pointer-events:none;z-index:9998;transition:all .08s;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:24px 48px;display:flex;align-items:center;justify-content:space-between;mix-blend-mode:difference;}
+.nav-logo{font-family:var(--head);font-size:18px;font-weight:800;letter-spacing:-0.5px;color:#fff;}
+.nav-logo span{color:var(--red);}
+.nav-links{display:flex;gap:32px;align-items:center;}
+.nav-links a{font-size:13px;color:rgba(255,255,255,.5);text-decoration:none;font-family:var(--mono);letter-spacing:.5px;transition:color .2s;}
+.nav-links a:hover{color:#fff;}
+.nav-cta{font-family:var(--mono);font-size:12px;color:#fff;border:1px solid rgba(255,255,255,.3);padding:8px 20px;border-radius:3px;text-decoration:none;letter-spacing:1px;text-transform:uppercase;transition:all .2s;}
+.nav-cta:hover{background:#fff;color:var(--ink);}
+
+/* CANVAS BACKGROUND */
+canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:.4;}
+
+/* HERO */
+#hero{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:0 48px;padding-top:80px;}
+.hero-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:28px;opacity:0;animation:fadeUp .8s .3s forwards;}
+h1{font-family:var(--head);font-size:clamp(52px,8vw,112px);font-weight:800;letter-spacing:-3px;line-height:.95;max-width:900px;margin-bottom:40px;opacity:0;animation:fadeUp .8s .5s forwards;}
+h1 em{font-style:normal;color:var(--red);}
+h1 .outline{-webkit-text-stroke:1px var(--paper);color:transparent;}
+.hero-sub{font-size:18px;color:rgba(245,244,239,.5);max-width:520px;line-height:1.65;margin-bottom:56px;font-weight:300;opacity:0;animation:fadeUp .8s .7s forwards;}
+
+/* WAITLIST FORM */
+.waitlist{display:flex;gap:0;max-width:480px;opacity:0;animation:fadeUp .8s .9s forwards;}
+.waitlist input{flex:1;background:rgba(245,244,239,.06);border:1px solid rgba(245,244,239,.15);border-right:none;color:var(--paper);font-size:15px;font-family:var(--sans);padding:16px 22px;outline:none;border-radius:3px 0 0 3px;transition:border-color .2s;}
+.waitlist input::placeholder{color:rgba(245,244,239,.3);}
+.waitlist input:focus{border-color:var(--red);}
+.waitlist button{background:var(--red);border:1px solid var(--red);color:#fff;font-family:var(--mono);font-size:12px;letter-spacing:2px;text-transform:uppercase;padding:16px 28px;cursor:pointer;border-radius:0 3px 3px 0;transition:all .2s;white-space:nowrap;}
+.waitlist button:hover{background:#c41020;}
+.hero-count{font-family:var(--mono);font-size:11px;color:rgba(245,244,239,.3);margin-top:16px;opacity:0;animation:fadeUp .8s 1.1s forwards;}
+.hero-count span{color:var(--gold);}
+
+/* DEMO REEL */
+.demo-reel{position:absolute;right:0;top:0;bottom:0;width:45%;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.skeleton-wrap{position:relative;width:320px;height:420px;}
+.skeleton-fig{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+.skeleton-svg{opacity:0;animation:skeletonReveal 1.2s 1.5s forwards;}
+@keyframes skeletonReveal{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+
+/* SCORE RING */
+.score-ring{position:absolute;top:30px;right:30px;width:80px;height:80px;opacity:0;animation:fadeUp .6s 2s forwards;}
+.ring-svg circle{transition:stroke-dashoffset 2s ease 2.2s;}
+
+/* ERROR MARKERS */
+.error-marker{position:absolute;background:rgba(232,23,44,.15);border:1px solid var(--red);border-radius:3px;font-family:var(--mono);font-size:9px;color:var(--red);padding:4px 8px;white-space:nowrap;opacity:0;}
+.em1{top:28%;left:-60px;animation:markerIn .4s 2.4s forwards;}
+.em2{top:52%;left:-80px;animation:markerIn .4s 2.6s forwards;}
+.em3{top:74%;left:-50px;animation:markerIn .4s 2.8s forwards;}
+@keyframes markerIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.error-line{position:absolute;height:1px;background:rgba(232,23,44,.4);right:0;transform-origin:right;}
+.el1{top:calc(28% + 10px);width:60px;left:-60px;opacity:0;animation:lineIn .3s 2.5s forwards;}
+.el2{top:calc(52% + 10px);width:80px;left:-80px;opacity:0;animation:lineIn .3s 2.7s forwards;}
+.el3{top:calc(74% + 10px);width:50px;left:-50px;opacity:0;animation:lineIn .3s 2.9s forwards;}
+@keyframes lineIn{from{opacity:0}to{opacity:1}}
+
+/* AURA EFFECT */
+.aura{position:absolute;inset:-30px;border-radius:50%;background:radial-gradient(ellipse,rgba(232,23,44,.12) 0%,transparent 70%);animation:auraPulse 3s ease-in-out infinite;}
+@keyframes auraPulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
+
+/* SECTIONS */
+section{position:relative;z-index:1;}
+
+/* MARQUEE */
+.marquee-wrap{border-top:1px solid rgba(245,244,239,.08);border-bottom:1px solid rgba(245,244,239,.08);padding:18px 0;overflow:hidden;position:relative;z-index:1;}
+.marquee{display:flex;gap:64px;animation:marquee 20s linear infinite;white-space:nowrap;}
+.marquee-item{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(245,244,239,.25);display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.marquee-item::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--red);}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* FEATURE SECTION */
+#features{padding:120px 48px;}
+.features-header{margin-bottom:80px;}
+.section-label{font-family:var(--mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:16px;}
+.features-header h2{font-family:var(--head);font-size:clamp(36px,5vw,64px);font-weight:800;letter-spacing:-2px;line-height:1.05;max-width:640px;}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(245,244,239,.08);}
+.feature{background:var(--ink);padding:40px;transition:background .2s;}
+.feature:hover{background:#0f0f1a;}
+.feature-num{font-family:var(--mono);font-size:11px;color:rgba(245,244,239,.2);margin-bottom:24px;}
+.feature-icon{font-size:32px;margin-bottom:20px;display:block;}
+.feature h3{font-family:var(--head);font-size:22px;font-weight:700;letter-spacing:-0.5px;margin-bottom:12px;}
+.feature p{font-size:14px;color:rgba(245,244,239,.45);line-height:1.65;}
+
+/* SPORTS SECTION */
+#sports{padding:120px 48px;background:#05050e;}
+.sports-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:60px;}
+.sport-card{border:1px solid rgba(245,244,239,.08);border-radius:4px;padding:32px 24px;position:relative;overflow:hidden;transition:all .3s;cursor:pointer;}
+.sport-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(232,23,44,.08),transparent);opacity:0;transition:opacity .3s;}
+.sport-card:hover::before{opacity:1;}
+.sport-card:hover{border-color:rgba(232,23,44,.3);}
+.sport-emoji{font-size:40px;margin-bottom:16px;display:block;}
+.sport-name{font-family:var(--head);font-size:20px;font-weight:700;margin-bottom:8px;}
+.sport-desc{font-size:13px;color:rgba(245,244,239,.4);line-height:1.5;}
+.sport-status{font-family:var(--mono);font-size:10px;margin-top:20px;padding:4px 10px;border-radius:3px;display:inline-block;}
+.ss-live{background:rgba(0,255,136,.1);color:#00ff88;border:1px solid rgba(0,255,136,.25);}
+.ss-soon{background:rgba(245,166,35,.1);color:var(--gold);border:1px solid rgba(245,166,35,.25);}
+
+/* HOW IT WORKS */
+#how{padding:120px 48px;}
+.how-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;margin-top:60px;}
+.how-steps{}
+.how-step{padding:28px 0;border-bottom:1px solid rgba(245,244,239,.08);display:flex;gap:20px;}
+.how-step:last-child{border-bottom:none;}
+.step-num{font-family:var(--mono);font-size:11px;color:var(--red);flex-shrink:0;padding-top:2px;}
+.step-body h3{font-family:var(--head);font-size:20px;font-weight:700;margin-bottom:8px;}
+.step-body p{font-size:14px;color:rgba(245,244,239,.4);line-height:1.6;}
+.how-visual{background:rgba(245,244,239,.03);border:1px solid rgba(245,244,239,.08);border-radius:8px;padding:40px;position:relative;overflow:hidden;}
+
+/* ANIMATED ANALYSIS DISPLAY */
+.analysis-mock{font-family:var(--mono);font-size:12px;}
+.am-row{padding:10px 0;border-bottom:1px solid rgba(245,244,239,.06);display:flex;justify-content:space-between;align-items:center;}
+.am-label{color:rgba(245,244,239,.35);}
+.am-bar{height:4px;background:rgba(245,244,239,.08);border-radius:2px;flex:1;margin:0 16px;overflow:hidden;}
+.am-fill{height:100%;border-radius:2px;animation:fillBar 2s ease forwards;}
+.f-g{background:var(--gold);}
+.f-r{background:var(--red);}
+.f-gr{background:#00ff88;}
+.am-val{font-size:11px;}
+@keyframes fillBar{from{width:0%}}
+
+/* FINAL CTA */
+#cta{padding:160px 48px;text-align:center;position:relative;overflow:hidden;}
+#cta::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(232,23,44,.12) 0%,transparent 70%);pointer-events:none;}
+#cta h2{font-family:var(--head);font-size:clamp(48px,7vw,96px);font-weight:800;letter-spacing:-3px;line-height:.95;margin-bottom:32px;}
+#cta .waitlist{margin:0 auto;justify-content:center;}
+
+/* FOOTER */
+footer{border-top:1px solid rgba(245,244,239,.08);padding:32px 48px;display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1;}
+.footer-logo{font-family:var(--head);font-size:16px;font-weight:800;}
+.footer-logo span{color:var(--red);}
+.footer-links{display:flex;gap:24px;}
+.footer-links a{font-family:var(--mono);font-size:11px;color:rgba(245,244,239,.3);text-decoration:none;letter-spacing:.5px;}
+.footer-note{font-family:var(--mono);font-size:10px;color:rgba(245,244,239,.2);}
+
+/* TOAST */
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(100px);background:#fff;color:var(--ink);font-family:var(--mono);font-size:12px;padding:12px 24px;border-radius:3px;z-index:1000;transition:transform .4s cubic-bezier(.34,1.56,.64,1);letter-spacing:.5px;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* SCROLL ANIMATIONS */
+.reveal{opacity:0;transform:translateY(30px);transition:all .7s cubic-bezier(.16,1,.3,1);}
+.reveal.in{opacity:1;transform:translateY(0);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* GRAIN OVERLAY */
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:999;opacity:.4;}
+
+@media(max-width:768px){
+  nav{padding:20px 24px;}
+  #hero{padding:0 24px;padding-top:80px;}
+  h1{font-size:52px;letter-spacing:-2px;}
+  .demo-reel{display:none;}
+  #features{padding:80px 24px;}
+  .features-grid{grid-template-columns:1fr;}
+  #sports{padding:80px 24px;}
+  .sports-grid{grid-template-columns:1fr 1fr;}
+  #how{padding:80px 24px;}
+  .how-grid{grid-template-columns:1fr;gap:40px;}
+  #cta{padding:100px 24px;}
+  footer{flex-direction:column;gap:16px;padding:24px;text-align:center;}
+  .waitlist{flex-direction:column;}
+  .waitlist input{border-right:1px solid rgba(245,244,239,.15);border-bottom:none;border-radius:3px;}
+  .waitlist button{border-radius:3px;}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<canvas id="bg"></canvas>
+
+<nav>
+  <div class="nav-logo">Sports<span>AI</span></div>
+  <div class="nav-links">
+    <a href="#features">How it works</a>
+    <a href="#sports">Sports</a>
+    <a href="#cta" class="nav-cta">Join waitlist</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-eyebrow">AI-powered combat sports coaching</div>
+  <h1>Your technique.<br><em>Exposed.</em><br><span class="outline">Corrected.</span></h1>
+  <p class="hero-sub">Upload a 30-second video. Get Olympic-grade biomechanical analysis in 20 seconds. The AI coach that films every mistake — before your opponent does.</p>
+  <form class="waitlist" onsubmit="handleSubmit(event)">
+    <input type="email" placeholder="Enter your email" id="emailInput" required>
+    <button type="submit">Get early access</button>
+  </form>
+  <div class="hero-count">Already <span id="counter">247</span> athletes waiting · Free for the first 500</div>
+
+  <!-- SKELETON DEMO -->
+  <div class="demo-reel">
+    <div class="skeleton-wrap">
+      <div class="aura"></div>
+
+      <!-- ERROR MARKERS -->
+      <div class="error-marker em1">Hip too high ↑</div>
+      <div class="error-line el1"></div>
+      <div class="error-marker em2">Head dropping ↓</div>
+      <div class="error-line el2"></div>
+      <div class="error-marker em3">No drive-through ✗</div>
+      <div class="error-line el3"></div>
+
+      <!-- SCORE RING -->
+      <div class="score-ring">
+        <svg viewBox="0 0 80 80" width="80" height="80">
+          <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(245,244,239,0.08)" stroke-width="3"/>
+          <circle cx="40" cy="40" r="34" fill="none" stroke="#e8172c" stroke-width="3"
+            stroke-dasharray="213.6" stroke-dashoffset="64" stroke-linecap="round"
+            transform="rotate(-90 40 40)" style="transition:stroke-dashoffset 2s ease 2.2s"/>
+          <text x="40" y="37" text-anchor="middle" fill="#f5f4ef" font-family="Syne" font-size="16" font-weight="800">64</text>
+          <text x="40" y="51" text-anchor="middle" fill="rgba(245,244,239,0.4)" font-family="JetBrains Mono" font-size="8">/100</text>
+        </svg>
+      </div>
+
+      <!-- SKELETON SVG -->
+      <svg class="skeleton-svg" viewBox="0 0 200 380" width="200" height="380" fill="none">
+        <!-- skeleton joints and bones -->
+        <!-- HEAD -->
+        <circle cx="100" cy="40" r="16" stroke="rgba(245,244,239,0.6)" stroke-width="1.5"/>
+        <!-- NECK -->
+        <line x1="100" y1="56" x2="100" y2="76" stroke="rgba(245,244,239,0.5)" stroke-width="1.5"/>
+        <!-- SHOULDERS -->
+        <line x1="60" y1="80" x2="140" y2="80" stroke="rgba(245,244,239,0.5)" stroke-width="1.5"/>
+        <!-- LEFT ARM -->
+        <line x1="60" y1="80" x2="36" y2="130" stroke="rgba(245,244,239,0.5)" stroke-width="1.5"/>
+        <line x1="36" y1="130" x2="24" y2="168" stroke="rgba(245,244,239,0.5)" stroke-width="1.5"/>
+        <!-- RIGHT ARM -->
+        <line x1="140" y1="80" x2="158" y2="130" stroke="rgba(245,244,239,0.5)" stroke-width="1.5"/>
+        <line x1="158" y1="130" x2="168" y2="168" stroke="rgba(245,244,239,0.5)" stroke-width="1.5"/>
+        <!-- TORSO -->
+        <line x1="100" y1="80" x2="100" y2="170" stroke="rgba(245,244,239,0.5)" stroke-width="1.5"/>
+        <!-- HIPS - highlighted red (error) -->
+        <line x1="68" y1="170" x2="132" y2="170" stroke="#e8172c" stroke-width="2"/>
+        <circle cx="68" cy="170" r="5" fill="rgba(232,23,44,0.3)" stroke="#e8172c" stroke-width="1.5"/>
+        <circle cx="132" cy="170" r="5" fill="rgba(232,23,44,0.3)" stroke="#e8172c" stroke-width="1.5"/>
+        <!-- LEFT LEG -->
+        <line x1="68" y1="175" x2="60" y2="270" stroke="rgba(245,244,239,0.5)" stroke-width="1.5"/>
+        <line x1="60" y1="270" x2="55" y2="355" stroke="rgba(245,244,239,0.5)" stroke-width="1.5"/>
+        <!-- RIGHT LEG -->
+        <line x1="132" y1="175" x2="145" y2="270" stroke="rgba(245,244,239,0.5)" stroke-width="1.5"/>
+        <line x1="145" y1="270" x2="152" y2="355" stroke="rgba(245,244,239,0.5)" stroke-width="1.5"/>
+        <!-- JOINTS -->
+        <circle cx="100" cy="76" r="3" fill="rgba(245,244,239,0.4)"/>
+        <circle cx="60" cy="80" r="4" fill="rgba(245,244,239,0.4)"/>
+        <circle cx="140" cy="80" r="4" fill="rgba(245,244,239,0.4)"/>
+        <circle cx="36" cy="130" r="4" fill="rgba(245,244,239,0.4)"/>
+        <circle cx="158" cy="130" r="4" fill="rgba(245,244,239,0.4)"/>
+        <circle cx="100" cy="170" r="4" fill="rgba(245,244,239,0.4)"/>
+        <circle cx="60" cy="270" r="4" fill="rgba(245,244,239,0.4)"/>
+        <circle cx="145" cy="270" r="4" fill="rgba(245,244,239,0.4)"/>
+        <!-- SCAN LINE ANIMATION -->
+        <rect x="0" y="0" width="200" height="4" fill="rgba(232,23,44,0.3)" opacity="0.5">
+          <animateTransform attributeName="transform" type="translate" from="0,0" to="0,380" dur="2.5s" repeatCount="indefinite"/>
+        </rect>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap" style="position:relative;z-index:1;">
+  <div class="marquee">
+    <span class="marquee-item">Wrestling</span>
+    <span class="marquee-item">MMA Analysis</span>
+    <span class="marquee-item">BJJ</span>
+    <span class="marquee-item">Volleyball</span>
+    <span class="marquee-item">Olympic-grade</span>
+    <span class="marquee-item">Real-time feedback</span>
+    <span class="marquee-item">1v1 Arena</span>
+    <span class="marquee-item">Technique unlocks</span>
+    <span class="marquee-item">Anime cinematics</span>
+    <span class="marquee-item">AI Coach chat</span>
+    <span class="marquee-item">Wrestling</span>
+    <span class="marquee-item">MMA Analysis</span>
+    <span class="marquee-item">BJJ</span>
+    <span class="marquee-item">Volleyball</span>
+    <span class="marquee-item">Olympic-grade</span>
+    <span class="marquee-item">Real-time feedback</span>
+    <span class="marquee-item">1v1 Arena</span>
+    <span class="marquee-item">Technique unlocks</span>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="features-header reveal">
+    <div class="section-label">What it does</div>
+    <h2>The AI that watches your form like an Olympic coach — at any hour.</h2>
+  </div>
+  <div class="features-grid reveal">
+    <div class="feature">
+      <div class="feature-num">01</div>
+      <span class="feature-icon">🎯</span>
+      <h3>Instant technique scoring</h3>
+      <p>Upload a 30-second clip. Get a 0–100 technique score with phase-by-phase breakdown — entry, execution, finish — in under 20 seconds. Every error timestamped to the exact frame.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-num">02</div>
+      <span class="feature-icon">👤</span>
+      <h3>Your avatar. Your mistakes.</h3>
+      <p>Watch your own 3D avatar perform your technique. Errors glow red in real-time on the exact body part that failed. Compare side-by-side with an Olympic athlete performing the same move.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-num">03</div>
+      <span class="feature-icon">⚔️</span>
+      <h3>1v1 Arena analysis</h3>
+      <p>Fight a training partner. Both fighters tracked simultaneously. Each receives a private analysis report. Tactical patterns detected. The AI spots your opponent's vulnerabilities before you do.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-num">04</div>
+      <span class="feature-icon">💬</span>
+      <h3>AI coach that knows your history</h3>
+      <p>Ask anything. "Why does my shot keep getting stuffed?" The AI answers with your specific data — your last 30 sessions, your persistent weaknesses, your improvement trajectory. Not generic advice.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-num">05</div>
+      <span class="feature-icon">🔓</span>
+      <h3>Technique unlock tree</h3>
+      <p>Progress from White Belt to Black Belt by mastering techniques in sequence. Each unlock requires demonstrated mastery — not just attempts. The Fireman's Carry is earned, not given.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-num">06</div>
+      <span class="feature-icon">🔥</span>
+      <h3>Anime fight cinematics</h3>
+      <p>Every session generates a shareable 30-second anime highlight reel. Your real technique, rendered in Dragon Ball Z style, with power effects triggered by your actual biomechanical data.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SPORTS -->
+<section id="sports">
+  <div class="reveal">
+    <div class="section-label">Supported sports</div>
+    <h2 style="font-family:var(--head);font-size:clamp(36px,5vw,64px);font-weight:800;letter-spacing:-2px;line-height:1.05;max-width:640px;">Built deep for combat. Expanding fast.</h2>
+  </div>
+  <div class="sports-grid reveal">
+    <div class="sport-card">
+      <span class="sport-emoji">🤼</span>
+      <div class="sport-name">Wrestling</div>
+      <div class="sport-desc">Single-leg, double-leg, high-crotch, scrambles, reversals. Full technique tree with 6 unlock levels.</div>
+      <span class="sport-status ss-live">Live at launch</span>
+    </div>
+    <div class="sport-card">
+      <span class="sport-emoji">🥊</span>
+      <div class="sport-name">MMA</div>
+      <div class="sport-desc">Striking analysis, takedown defense, clinch work. Power level system from stance to flying knee.</div>
+      <span class="sport-status ss-live">Live at launch</span>
+    </div>
+    <div class="sport-card">
+      <span class="sport-emoji">🥋</span>
+      <div class="sport-name">BJJ / Grappling</div>
+      <div class="sport-desc">Guard work, sweeps, submissions — coming after wrestling. Ground tracking pipeline in development.</div>
+      <span class="sport-status ss-soon">Coming month 3</span>
+    </div>
+    <div class="sport-card">
+      <span class="sport-emoji">🏐</span>
+      <div class="sport-name">Volleyball</div>
+      <div class="sport-desc">Serve mechanics, attack approach, block technique. Italy-first launch with national team data.</div>
+      <span class="sport-status ss-soon">Coming month 4</span>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="reveal">
+    <div class="section-label">How it works</div>
+    <h2 style="font-family:var(--head);font-size:clamp(36px,5vw,64px);font-weight:800;letter-spacing:-2px;line-height:1.05;max-width:640px;">From phone to coaching report in 20 seconds.</h2>
+  </div>
+  <div class="how-grid reveal">
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="step-num">01 —</div>
+        <div class="step-body">
+          <h3>Film your technique</h3>
+          <p>30 seconds. Side angle. The AR placement guide shows you exactly where to put your phone. Green zone = optimal data quality.</p>
+        </div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">02 —</div>
+        <div class="step-body">
+          <h3>AI extracts your biomechanics</h3>
+          <p>YOLO11 pose estimation — fine-tuned on 1.3 million athletic movement frames — maps 33 joint positions at 30fps. Every angle. Every velocity. Every phase.</p>
+        </div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">03 —</div>
+        <div class="step-body">
+          <h3>Rules engine scores every phase</h3>
+          <p>Your data runs through a sport-specific rules engine built with certified coaches. Each threshold validated against Olympic athlete baselines.</p>
+        </div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">04 —</div>
+        <div class="step-body">
+          <h3>Coach-level feedback delivered</h3>
+          <p>Specific. Timestamped. Actionable. Not "improve your form." "Your hip height at entry is 17% above elite average — here is the exact drill to fix it in 2 weeks."</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="how-visual">
+      <div class="section-label" style="margin-bottom:20px;">Live analysis output</div>
+      <div class="analysis-mock">
+        <div class="am-row">
+          <span class="am-label">Entry phase</span>
+          <div class="am-bar"><div class="am-fill f-r" style="width:48%;animation-delay:.2s;"></div></div>
+          <span class="am-val" style="color:#e8172c;">48</span>
+        </div>
+        <div class="am-row">
+          <span class="am-label">Execution</span>
+          <div class="am-bar"><div class="am-fill f-g" style="width:71%;animation-delay:.4s;"></div></div>
+          <span class="am-val" style="color:var(--gold);">71</span>
+        </div>
+        <div class="am-row">
+          <span class="am-label">Finish phase</span>
+          <div class="am-bar"><div class="am-fill f-r" style="width:38%;animation-delay:.6s;"></div></div>
+          <span class="am-val" style="color:#e8172c;">38</span>
+        </div>
+        <div class="am-row" style="margin-top:8px;">
+          <span class="am-label">Hip height</span>
+          <div class="am-bar"><div class="am-fill f-r" style="width:74%;animation-delay:.8s;"></div></div>
+          <span class="am-val" style="color:rgba(245,244,239,.4)">0.74</span>
+        </div>
+        <div class="am-row">
+          <span class="am-label">Elite avg</span>
+          <div class="am-bar"><div class="am-fill f-gr" style="width:63%;animation-delay:1s;"></div></div>
+          <span class="am-val" style="color:#00ff88;">0.63</span>
+        </div>
+        <div style="margin-top:28px;padding:16px;background:rgba(232,23,44,.08);border:1px solid rgba(232,23,44,.2);border-radius:4px;">
+          <div style="font-size:10px;color:var(--red);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Critical error · Entry phase</div>
+          <div style="font-size:13px;color:rgba(245,244,239,.7);line-height:1.6;">Hip height 17% above elite threshold at step-in. Level change occurring after contact — not before. This is why your shot gets stuffed against experienced opponents.</div>
+        </div>
+        <div style="margin-top:12px;padding:12px 16px;background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.15);border-radius:4px;">
+          <div style="font-size:10px;color:#00ff88;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Prescribed drill</div>
+          <div style="font-size:13px;color:rgba(245,244,239,.6);">Penetration step with resistance band × 50 reps daily. Film tomorrow — I'll track your progress.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section id="cta">
+  <h2 class="reveal" style="font-family:var(--head);">Train like<br>you fight.<br><em style="color:var(--red);">Win both.</em></h2>
+  <p class="reveal" style="color:rgba(245,244,239,.4);font-size:18px;margin-bottom:40px;max-width:480px;margin-left:auto;margin-right:auto;font-weight:300;">Free for the first 500 athletes. Launch in 8 weeks. Be the first to know.</p>
+  <form class="waitlist reveal" onsubmit="handleSubmit(event)" style="max-width:480px;margin:0 auto 16px;">
+    <input type="email" placeholder="Enter your email" required>
+    <button type="submit">Join the waitlist</button>
+  </form>
+  <div class="reveal" style="font-family:var(--mono);font-size:11px;color:rgba(245,244,239,.2);">No spam. Just launch day notification and early access.</div>
+</section>
+
+<footer>
+  <div class="footer-logo">Sports<span>AI</span></div>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">Contact</a>
+  </div>
+  <div class="footer-note">© 2025 SportsAI · Built in London, Rome, Dubai & India</div>
+</footer>
+
+<div class="toast" id="toast">✓ You're on the list — we'll be in touch.</div>
+
+<script>
+// Custom cursor
+const cur = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX - 5 + 'px';
+  cur.style.top = e.clientY - 5 + 'px';
+  ring.style.left = e.clientX - 18 + 'px';
+  ring.style.top = e.clientY - 18 + 'px';
+});
+document.querySelectorAll('a,button,input').forEach(el => {
+  el.addEventListener('mouseenter', () => cur.style.transform = 'scale(2.5)');
+  el.addEventListener('mouseleave', () => cur.style.transform = 'scale(1)');
+});
+
+// Canvas particle system
+const canvas = document.getElementById('bg');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [], lines = [];
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize(); window.addEventListener('resize', resize);
+
+class Particle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * W; this.y = Math.random() * H;
+    this.vx = (Math.random() - .5) * .4; this.vy = (Math.random() - .5) * .4;
+    this.life = Math.random(); this.maxLife = .3 + Math.random() * .7;
+    this.size = .5 + Math.random() * 1.5;
+    this.isJoint = Math.random() > .92;
+  }
+  update() {
+    this.x += this.vx; this.y += this.vy;
+    this.life += .002;
+    if(this.x < 0 || this.x > W || this.y < 0 || this.y > H || this.life > this.maxLife) this.reset();
+  }
+  draw() {
+    const a = Math.sin(this.life / this.maxLife * Math.PI) * .5;
+    ctx.beginPath();
+    if(this.isJoint) {
+      ctx.arc(this.x, this.y, this.size + 1, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(232,23,44,${a})`;
+      ctx.lineWidth = .8;
+      ctx.stroke();
+    } else {
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(245,244,239,${a * .4})`;
+      ctx.fill();
+    }
+  }
+}
+
+for(let i = 0; i < 120; i++) particles.push(new Particle());
+
+function animate() {
+  ctx.clearRect(0, 0, W, H);
+  particles.forEach(p => { p.update(); p.draw(); });
+
+  // Draw connection lines between nearby particles
+  for(let i = 0; i < particles.length; i++) {
+    for(let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if(dist < 80) {
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = `rgba(245,244,239,${(1 - dist/80) * .08})`;
+        ctx.lineWidth = .5;
+        ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(animate);
+}
+animate();
+
+// Counter animation
+let count = 247;
+setInterval(() => {
+  if(Math.random() > .7) {
+    count += Math.floor(Math.random() * 3) + 1;
+    const el = document.getElementById('counter');
+    if(el) el.textContent = count;
+  }
+}, 4000);
+
+// Form submission
+function handleSubmit(e) {
+  e.preventDefault();
+  const toast = document.getElementById('toast');
+  toast.classList.add('show');
+  count++;
+  const el = document.getElementById('counter');
+  if(el) el.textContent = count;
+  e.target.reset();
+  setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+// Scroll reveal
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: .1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

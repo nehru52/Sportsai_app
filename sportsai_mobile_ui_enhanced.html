@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SportsAI Elite Mobile — Three-Layer Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="frontend/enhanced.css">
+<style>
+/* Enhanced Mobile Variables */
+:root{
+  --ink:#07070f;--surface:#0d0d1c;--card:#121225;--raised:#17172e;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#ececff;--muted:#5c5c8a;--dim:#252545;
+  --red:#ff2d4e;--gold:#ffc22d;--green:#00e676;--blue:#4d8cff;--purple:#c084fc;
+  
+  /* Three-Layer Architecture Colors */
+  --layer1-tactical:#ff6b35;    /* Orange - Tactical */
+  --layer2-biomech:#00d4ff;     /* Cyan - Biomechanical */
+  --layer3-insights:#a855f7;    /* Purple - LLM Insights */
+  --integration:#10b981;        /* Green - Integration */
+  
+  /* Competition Readiness Colors */
+  --ready-elite:#10b981;
+  --ready-near:#f59e0b;
+  --ready-dev:#f97316;
+  --ready-work:#ef4444;
+  
+  --head:'Barlow Condensed',sans-serif;--sans:'DM Sans',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+
+body{background:var(--ink);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden;}
+
+/* MOBILE LAYOUT */
+.mobile-container{max-width:430px;margin:0 auto;background:var(--surface);min-height:100vh;position:relative;}
+
+/* STATUS BAR */
+.status-bar{display:flex;justify-content:space-between;align-items:center;padding:8px 20px 4px;font-family:var(--mono);font-size:9px;color:var(--muted);background:var(--ink);}
+.status-right{display:flex;gap:6px;align-items:center;}
+
+/* HEADER */
+.mobile-header{padding:16px 20px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.header-title{font-family:var(--head);font-size:20px;font-weight:800;letter-spacing:-0.5px;text-align:center;}
+.header-sub{font-size:11px;color:var(--muted);text-align:center;margin-top:2px;}
+
+/* NAVIGATION TABS */
+.nav-tabs{display:flex;background:var(--ink);border-bottom:1px solid var(--border);}
+.nav-tab{flex:1;padding:12px 0;text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:all .2s;position:relative;}
+.nav-tab.active{color:var(--text);background:var(--surface);}
+.nav-tab.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--red);}
+
+/* SCREEN CONTENT */
+.screen-content{padding:20px;display:none;}
+.screen-content.active{display:block;}
+
+/* THREE-LAYER CARDS */
+.layer-card-mobile{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;position:relative;}
+.layer-card-mobile::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0;}
+
+.layer-card-mobile.layer1::before{background:var(--layer1-tactical);}
+.layer-card-mobile.layer2::before{background:var(--layer2-biomech);}
+.layer-card-mobile.layer3::before{background:var(--layer3-insights);}
+
+.layer-header{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.layer-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.layer-icon.layer1{background:rgba(255,107,53,.1);color:var(--layer1-tactical);}
+.layer-icon.layer2{background:rgba(0,212,255,.1);color:var(--layer2-biomech);}
+.layer-icon.layer3{background:rgba(168,85,247,.1);color:var(--layer3-insights);}
+
+.layer-title{font-family:var(--head);font-size:15px;font-weight:700;}
+.layer-status{font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px;}
+
+.layer-progress{margin:12px 0;}
+.progress-bar{height:4px;background:var(--raised);border-radius:2px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:2px;transition:width .3s ease;}
+.progress-fill.layer1{background:var(--layer1-tactical);}
+.progress-fill.layer2{background:var(--layer2-biomech);}
+.progress-fill.layer3{background:var(--layer3-insights);}
+
+.layer-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px;}
+.stat-item{display:flex;flex-direction:column;}
+.stat-label{font-size:9px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;}
+.stat-value{font-size:13px;font-weight:600;color:var(--text);}
+
+/* COURT VISUALIZATION */
+.court-container{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin:16px 0;}
+.court-title{font-family:var(--head);font-size:14px;font-weight:700;margin-bottom:12px;}
+.court-diagram{position:relative;width:100%;height:200px;background:linear-gradient(135deg,rgba(255,107,53,.05),rgba(0,212,255,.05));border-radius:8px;overflow:hidden;}
+.court-svg{position:absolute;top:0;left:0;width:100%;height:100%;}
+.player-marker{position:absolute;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:bold;color:white;cursor:pointer;transition:all .2s;font-family:var(--mono);}
+.player-marker:hover{transform:scale(1.1);z-index:10;}
+.player-marker.tracked{background:var(--blue);}
+.player-marker.analyzed{background:var(--green);}
+.player-marker.focus{background:var(--red);}
+
+/* COMPETITION READINESS */
+.readiness-card-mobile{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin:16px 0;position:relative;}
+.readiness-card-mobile::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;border-radius:14px 14px 0 0;}
+
+.readiness-card-mobile.elite::before{background:var(--ready-elite);}
+.readiness-card-mobile.near::before{background:var(--ready-near);}
+.readiness-card-mobile.development::before{background:var(--ready-dev);}
+.readiness-card-mobile.work::before{background:var(--ready-work);}
+
+.readiness-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.readiness-score{font-family:var(--head);font-size:32px;font-weight:800;line-height:1;}
+.readiness-level{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+
+.readiness-breakdown{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px;}
+.readiness-metric{text-align:center;}
+.readiness-ring{width:60px;height:60px;margin:0 auto 6px;position:relative;}
+.readiness-ring svg{width:100%;height:100%;}
+.readiness-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--head);font-size:14px;font-weight:700;}
+.readiness-label{font-size:9px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;}
+
+/* ACTION TIMELINE */
+.timeline-container{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin:16px 0;}
+.timeline-title{font-family:var(--head);font-size:14px;font-weight:700;margin-bottom:12px;}
+.timeline-bar{height:40px;background:var(--raised);border-radius:8px;position:relative;overflow:hidden;}
+.timeline-fill{height:100%;background:linear-gradient(90deg,var(--layer1-tactical),var(--layer2-biomech),var(--layer3-insights));border-radius:8px;}
+.timeline-markers{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;justify-content:space-around;align-items:center;}
+.timeline-marker{width:6px;height:6px;border-radius:50%;background:white;position:relative;}
+
+/* UPLOAD ZONES */
+.upload-zone-mobile{background:var(--card);border:2px dashed var(--border);border-radius:12px;padding:20px;text-align:center;transition:all .2s;margin:16px 0;}
+.upload-zone-mobile.dragover{border-color:var(--gold);background:rgba(245,166,35,.05);}
+.upload-zone-mobile.processing{border-color:var(--blue);background:rgba(77,140,255,.05);}
+.upload-icon{font-size:32px;margin-bottom:8px;color:var(--muted);}
+.upload-title{font-size:13px;font-weight:600;margin-bottom:4px;}
+.upload-desc{font-size:10px;color:var(--muted);}
+
+/* BUTTONS */
+.btn-mobile{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border:none;border-radius:8px;font-family:var(--mono);font-size:11px;font-weight:500;text-decoration:none;cursor:pointer;transition:all .2s;margin:8px 0;}
+.btn-primary-mobile{background:linear-gradient(135deg,var(--red),var(--gold));color:white;}
+.btn-secondary-mobile{background:var(--raised);color:var(--text);border:1px solid var(--border);}
+
+/* BOTTOM NAVIGATION */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--ink);border-top:1px solid var(--border);display:flex;padding:8px 0;z-index:100;}
+.bottom-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;cursor:pointer;transition:all .2s;}
+.bottom-tab-icon{font-size:20px;color:var(--muted);}
+.bottom-tab-label{font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;}
+.bottom-tab.active .bottom-tab-icon,.bottom-tab.active .bottom-tab-label{color:var(--red);}
+
+/* NOTIFICATIONS */
+.notification-mobile{position:fixed;top:60px;left:20px;right:20px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;z-index:1000;transform:translateY(-100px);transition:transform .3s ease;}
+.notification-mobile.show{transform:translateY(0);}
+.notification-content{display:flex;align-items:center;gap:12px;}
+.notification-icon{font-size:16px;}
+.notification-text{flex:1;font-size:11px;}
+.notification-close{font-size:16px;color:var(--muted);cursor:pointer;}
+
+/* LOADING */
+.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(7,7,15,.95);display:flex;align-items:center;justify-content:center;z-index:2000;opacity:0;visibility:hidden;transition:all .3s;}
+.loading-overlay.active{opacity:1;visibility:visible;}
+.loading-content{text-align:center;}
+.loading-spinner{width:32px;height:32px;border:3px solid var(--border);border-top:3px solid var(--red);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;}
+.loading-text{font-family:var(--mono);font-size:11px;color:var(--muted);}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+
+/* RESPONSIVE */
+@media(max-width:375px){
+  .mobile-container{max-width:100%;}
+  .readiness-breakdown{grid-template-columns:1fr;}
+  .layer-stats{grid-template-columns:1fr;}
+}
+
+/* ENHANCED ANIMATIONS */
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+.slide-up{animation:slideUp .4s ease-out;}
+.fade-in{animation:fadeIn .3s ease-out;}
+
+/* UTILITY CLASSES */
+.hidden{display:none !important;}
+.text-center{text-align:center;}
+.mb-sm{margin-bottom:8px;}
+.mb-md{margin-bottom:16px;}
+.mt-sm{margin-top:8px;}
+.mt-md{margin-top:16px;}
+</style>
+</head>
+<body>
+
+<div class="mobile-container">
+
+<!-- Status Bar -->
+<div class="status-bar">
+  <div class="status-left">9:41</div>
+  <div class="status-right">
+    <span>📶</span>
+    <span>🔋</span>
+  </div>
+</div>
+
+<!-- Header -->
+<div class="mobile-header">
+  <div class="header-title">SportsAI Elite</div>
+  <div class="header-sub">Three-Layer Analysis</div>
+</div>
+
+<!-- Navigation Tabs -->
+<div class="nav-tabs">
+  <div class="nav-tab active" onclick="switchTab('overview')">Overview</div>
+  <div class="nav-tab" onclick="switchTab('layers')">Layers</div>
+  <div class="nav-tab" onclick="switchTab('court')">Court</div>
+  <div class="nav-tab" onclick="switchTab('readiness')">Ready</div>
+</div>
+
+<!-- Overview Screen -->
+<div id="overview" class="screen-content active">
+  <div class="layer-card-mobile layer1 slide-up">
+    <div class="layer-header">
+      <div class="layer-icon layer1">🎯</div>
+      <div>
+        <div class="layer-title">Tactical Analysis</div>
+        <div class="layer-status">Data Volley Integration</div>
+      </div>
+    </div>
+    <div class="layer-progress">
+      <div class="progress-bar">
+        <div class="progress-fill layer1" style="width: 85%"></div>
+      </div>
+    </div>
+    <div class="layer-stats">
+      <div class="stat-item">
+        <div class="stat-label">Actions</div>
+        <div class="stat-value">234</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Rallies</div>
+        <div class="stat-value">127</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Serve Quality</div>
+        <div class="stat-value">2.3</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Attack Variety</div>
+        <div class="stat-value">6</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="layer-card-mobile layer2 slide-up" style="animation-delay: 0.1s">
+    <div class="layer-header">
+      <div class="layer-icon layer2">🦴</div>
+      <div>
+        <div class="layer-title">Biomechanical Analysis</div>
+        <div class="layer-status">Multi-Player Tracking</div>
+      </div>
+    </div>
+    <div class="layer-progress">
+      <div class="progress-bar">
+        <div class="progress-fill layer2" style="width: 78%"></div>
+      </div>
+    </div>
+    <div class="layer-stats">
+      <div class="stat-item">
+        <div class="stat-label">Players Tracked</div>
+        <div class="stat-value">12</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Jerseys Detected</div>
+        <div class="stat-value">8</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Elite Alignment</div>
+        <div class="stat-value">68%</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Consistency</div>
+        <div class="stat-value">79%</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="layer-card-mobile layer3 slide-up" style="animation-delay: 0.2s">
+    <div class="layer-header">
+      <div class="layer-icon layer3">🧠</div>
+      <div>
+        <div class="layer-title">LLM Insights</div>
+        <div class="layer-status">AI Coaching Recommendations</div>
+      </div>
+    </div>
+    <div class="layer-progress">
+      <div class="progress-bar">
+        <div class="progress-fill layer3" style="width: 92%"></div>
+      </div>
+    </div>
+    <div class="layer-stats">
+      <div class="stat-item">
+        <div class="stat-label">Recommendations</div>
+        <div class="stat-value">12</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Training Plan</div>
+        <div class="stat-value">8 Weeks</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Readiness</div>
+        <div class="stat-value">Near Ready</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Confidence</div>
+        <div class="stat-value">High</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-mobile btn-primary-mobile" onclick="showUploadModal()">
+    📹 Upload Match Video
+  </button>
+</div>
+
+<!-- Layers Screen -->
+<div id="layers" class="screen-content">
+  <div class="layer-card-mobile layer1">
+    <div class="layer-header">
+      <div class="layer-icon layer1">🎯</div>
+      <div>
+        <div class="layer-title">Tactical Analysis Details</div>
+        <div class="layer-status">Serve Pattern Analysis</div>
+      </div>
+    </div>
+    <div class="tactical-details">
+      <div class="stat-item mb-sm">
+        <div class="stat-label">Zone Distribution</div>
+        <div class="stat-value">Zone 1: 25%, Zone 6: 35%, Zone 5: 20%</div>
+      </div>
+      <div class="stat-item mb-sm">
+        <div class="stat-label">Tempo Distribution</div>
+        <div class="stat-value">Float: 40%, Jump: 60%</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Effectiveness Score</div>
+        <div class="stat-value">0.72 (Above Average)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="layer-card-mobile layer2">
+    <div class="layer-header">
+      <div class="layer-icon layer2">🦴</div>
+      <div>
+        <div class="layer-title">Biomechanical Details</div>
+        <div class="layer-status">Joint Angle Analysis</div>
+      </div>
+    </div>
+    <div class="biomech-details">
+      <div class="stat-item mb-sm">
+        <div class="stat-label">Elbow Flexion</div>
+        <div class="stat-value">143.2° (Dev: -23.2°)</div>
+      </div>
+      <div class="stat-item mb-sm">
+        <div class="stat-label">Torso Extension</div>
+        <div class="stat-value">142.1° (Dev: -17.7°)</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Approach Angle</div>
+        <div class="stat-value">43.2° (Dev: -2.0°)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="layer-card-mobile layer3">
+    <div class="layer-header">
+      <div class="layer-icon layer3">🧠</div>
+      <div>
+        <div class="layer-title">LLM Recommendations</div>
+        <div class="layer-status">Coaching Insights</div>
+      </div>
+    </div>
+    <div class="llm-details">
+      <div class="recommendation-item mb-sm">
+        <div class="stat-label">Priority 1</div>
+        <div class="stat-value">Maintain 'bow and arrow' position longer</div>
+      </div>
+      <div class="recommendation-item mb-sm">
+        <div class="stat-label">Priority 2</div>
+        <div class="stat-value">Delay arm swing until last 0.2s</div>
+      </div>
+      <div class="recommendation-item">
+        <div class="stat-label">Drill</div>
+        <div class="stat-value">Wall blocks with delayed arm swing</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Court Screen -->
+<div id="court" class="screen-content">
+  <div class="court-container">
+    <div class="court-title">Multi-Player Tracking Visualization</div>
+    <div class="court-diagram">
+      <svg class="court-svg" viewBox="0 0 300 200">
+        <!-- Court boundaries -->
+        <rect x="15" y="20" width="270" height="160" fill="none" stroke="var(--border2)" stroke-width="1.5"/>
+        <!-- Net -->
+        <line x1="150" y1="20" x2="150" y2="180" stroke="var(--border2)" stroke-width="1"/>
+        <!-- Attack lines -->
+        <line x1="15" y1="60" x2="150" y2="60" stroke="var(--border2)" stroke-width="1"/>
+        <line x1="150" y1="120" x2="285" y2="120" stroke="var(--border2)" stroke-width="1"/>
+      </svg>
+      
+      <!-- Player markers -->
+      <div class="player-marker tracked" style="left: 12%; top: 25%;">1</div>
+      <div class="player-marker tracked" style="left: 32%; top: 25%;">3</div>
+      <div class="player-marker tracked" style="left: 52%; top: 25%;">7</div>
+      <div class="player-marker tracked" style="left: 72%; top: 25%;">11</div>
+      <div class="player-marker analyzed" style="left: 22%; top: 75%;">2</div>
+      <div class="player-marker analyzed" style="left: 42%; top: 75%;">5</div>
+      <div class="player-marker analyzed" style="left: 62%; top: 75%;">9</div>
+      <div class="player-marker analyzed" style="left: 82%; top: 75%;">12</div>
+    </div>
+    
+    <div class="formation-analysis mt-md">
+      <div class="stat-item mb-sm">
+        <div class="stat-label">Serve Receive Formation</div>
+        <div class="stat-value">5-1 Formation Detected</div>
+      </div>
+      <div class="stat-item mb-sm">
+        <div class="stat-label">Defensive Formation</div>
+        <div class="stat-value">Perimeter Defense</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Transition Pattern</div>
+        <div class="stat-value">Quick Transition Identified</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-mobile btn-secondary-mobile" onclick="showCourtAnalysis()">
+    🔍 Analyze Court Formation
+  </button>
+</div>
+
+<!-- Readiness Screen -->
+<div id="readiness" class="screen-content">
+  <div class="readiness-card-mobile elite">
+    <div class="readiness-header">
+      <div>
+        <div class="readiness-score">74%</div>
+        <div class="readiness-level">Near Ready</div>
+      </div>
+      <div class="readiness-ring">
+        <svg width="60" height="60">
+          <circle cx="30" cy="30" r="26" fill="none" stroke="var(--dim)" stroke-width="4"/>
+          <circle cx="30" cy="30" r="26" fill="none" stroke="var(--ready-elite)" stroke-width="4" 
+                  stroke-dasharray="163" stroke-dashoffset="42" transform="rotate(-90 30 30)"/>
+        </svg>
+        <div class="readiness-text">74%</div>
+      </div>
+    </div>
+    <div class="readiness-description text-center mb-md">
+      Close to competition standards with minor adjustments needed
+    </div>
+  </div>
+
+  <div class="readiness-breakdown">
+    <div class="readiness-metric">
+      <div class="readiness-ring">
+        <svg width="60" height="60">
+          <circle cx="30" cy="30" r="26" fill="none" stroke="var(--dim)" stroke-width="4"/>
+          <circle cx="30" cy="30" r="26" fill="none" stroke="var(--ready-near)" stroke-width="4" 
+                  stroke-dasharray="163" stroke-dashoffset="36" transform="rotate(-90 30 30)"/>
+        </svg>
+        <div class="readiness-text">78%</div>
+      </div>
+      <div class="readiness-label">Tactical</div>
+    </div>
+    
+    <div class="readiness-metric">
+      <div class="readiness-ring">
+        <svg width="60" height="60">
+          <circle cx="30" cy="30" r="26" fill="none" stroke="var(--dim)" stroke-width="4"/>
+          <circle cx="30" cy="30" r="26" fill="none" stroke="var(--ready-dev)" stroke-width="4" 
+                  stroke-dasharray="163" stroke-dashoffset="52" transform="rotate(-90 30 30)"/>
+        </svg>
+        <div class="readiness-text">68%</div>
+      </div>
+      <div class="readiness-label">Biomechanical</div>
+    </div>
+    
+    <div class="readiness-metric">
+      <div class="readiness-ring">
+        <svg width="60" cy="30" r="26" fill="none" stroke="var(--dim)" stroke-width="4"/>
+          <circle cx="30" cy="30" r="26" fill="none" stroke="var(--ready-near)" stroke-width="4" 
+                  stroke-dasharray="163" stroke-dashoffset="34" transform="rotate(-90 30 30)"/>
+        </svg>
+        <div class="readiness-text">79%</div>
+      </div>
+      <div class="readiness-label">Consistency</div>
+    </div>
+    
+    <div class="readiness-metric">
+      <div class="readiness-ring">
+        <svg width="60" height="60">
+          <circle cx="30" cy="30" r="26" fill="none" stroke="var(--dim)" stroke-width="4"/>
+          <circle cx="30" cy="30" r="26" fill="none" stroke="var(--ready-elite)" stroke-width="4" 
+                  stroke-dasharray="163" stroke-dashoffset="42" transform="rotate(-90 30 30)"/>
+        </svg>
+        <div class="readiness-text">74%</div>
+      </div>
+      <div class="readiness-label">Overall</div>
+    </div>
+  </div>
+
+  <div class="timeline-container">
+    <div class="timeline-title">Timeline to Competition Ready</div>
+    <div class="timeline-bar">
+      <div class="timeline-fill" style="width: 60%"></div>
+    </div>
+    <div class="timeline-markers">
+      <div class="timeline-marker" title="Assessment Complete"></div>
+      <div class="timeline-marker" title="Technique Refinement"></div>
+      <div class="timeline-marker" title="Integration Phase"></div>
+      <div class="timeline-marker" title="Competition Ready"></div>
+    </div>
+  </div>
+
+  <button class="btn-mobile btn-primary-mobile" onclick="showTrainingPlan()">
+    📅 View 8-Week Training Plan
+  </button>
+</div>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+  <div class="bottom-tab active" onclick="switchTab('overview')">
+    <div class="bottom-tab-icon">🏠</div>
+    <div class="bottom-tab-label">Overview</div>
+    <div class="bottom-tab-dot"></div>
+  </div>
+  <div class="bottom-tab" onclick="switchTab('layers')">
+    <div class="bottom-tab-icon">🎯</div>
+    <div class="bottom-tab-label">Layers</div>
+    <div class="bottom-tab-dot"></div>
+  </div>
+  <div class="bottom-tab" onclick="switchTab('court')">
+    <div class="bottom-tab-icon">🏐</div>
+    <div class="bottom-tab-label">Court</div>
+    <div class="bottom-tab-dot"></div>
+  </div>
+  <div class="bottom-tab" onclick="switchTab('readiness')">
+    <div class="bottom-tab-icon">🏆</div>
+    <div class="bottom-tab-label">Ready</div>
+    <div class="bottom-tab-dot"></div>
+  </div>
+</div>
+
+</div>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="loading-content">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Processing analysis...</div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="frontend/enhanced.js"></script>
+<script>
+// Mobile-specific functionality
+let currentTab = 'overview';
+
+function switchTab(tabName) {
+  // Hide all screens
+  document.querySelectorAll('.screen-content').forEach(screen => {
+    screen.classList.remove('active');
+  });
+  
+  // Remove active class from all tabs
+  document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  document.querySelectorAll('.bottom-tab').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  
+  // Show selected screen
+  document.getElementById(tabName).classList.add('active');
+  
+  // Activate corresponding tabs
+  const navTab = document.querySelector(`.nav-tab:nth-child(${getTabIndex(tabName)})`);
+  const bottomTab = document.querySelector(`.bottom-tab:nth-child(${getTabIndex(tabName)})`);
+  
+  if (navTab) navTab.classList.add('active');
+  if (bottomTab) bottomTab.classList.add('active');
+  
+  currentTab = tabName;
+  
+  // Add slide animation to cards in the new tab
+  const cards = document.querySelectorAll(`#${tabName} .layer-card-mobile, #${tabName} .court-container, #${tabName} .readiness-card-mobile, #${tabName} .timeline-container`);
+  cards.forEach((card, index) => {
+    card.style.animationDelay = `${index * 0.1}s`;
+    card.classList.add('slide-up');
+  });
+}
+
+function getTabIndex(tabName) {
+  const tabOrder = ['overview', 'layers', 'court', 'readiness'];
+  return tabOrder.indexOf(tabName) + 1;
+}
+
+function showUploadModal() {
+  showNotification('📹 Upload feature coming soon!', 'info');
+}
+
+function showCourtAnalysis() {
+  showNotification('🔍 Court formation analysis initiated', 'success');
+}
+
+function showTrainingPlan() {
+  showNotification('📅 8-week training plan loading...', 'info');
+}
+
+function showNotification(message, type = 'info') {
+  const notification = document.createElement('div');
+  notification.className = 'notification-mobile fade-in';
+  
+  const icons = {
+    info: 'ℹ️',
+    success: '✅',
+    warning: '⚠️',
+    error: '❌'
+  };
+  
+  notification.innerHTML = `
+    <div class="notification-content">
+      <div class="notification-icon">${icons[type]}</div>
+      <div class="notification-text">${message}</div>
+      <div class="notification-close" onclick="this.parentElement.parentElement.remove()">&times;</div>
+    </div>
+  `;
+  
+  document.body.appendChild(notification);
+  
+  // Show notification
+  setTimeout(() => {
+    notification.classList.add('show');
+  }, 100);
+  
+  // Auto remove after 3 seconds
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
+}
+
+function showLoading(message = 'Processing...') {
+  const overlay = document.getElementById('loadingOverlay');
+  const text = overlay.querySelector('.loading-text');
+  text.textContent = message;
+  overlay.classList.add('active');
+}
+
+function hideLoading() {
+  document.getElementById('loadingOverlay').classList.remove('active');
+}
+
+// Simulate real-time updates
+function simulateUpdates() {
+  setInterval(() => {
+    // Update progress bars randomly
+    const progressBars = document.querySelectorAll('.progress-fill');
+    progressBars.forEach(bar => {
+      const currentWidth = parseInt(bar.style.width) || 0;
+      const newWidth = Math.min(currentWidth + Math.random() * 2, 100);
+      bar.style.width = `${newWidth}%`;
+    });
+    
+    // Update readiness scores
+    const readinessScores = document.querySelectorAll('.readiness-text');
+    readinessScores.forEach(score => {
+      const currentScore = parseInt(score.textContent) || 0;
+      const newScore = Math.min(currentScore + Math.random() * 0.5, 100);
+      score.textContent = `${Math.round(newScore)}%`;
+    });
+  }, 2000);
+}
+
+// Initialize mobile app
+document.addEventListener('DOMContentLoaded', function() {
+  // Add touch feedback
+  document.querySelectorAll('.btn-mobile, .nav-tab, .bottom-tab, .player-marker').forEach(element => {
+    element.addEventListener('touchstart', function() {
+      this.style.transform = 'scale(0.95)';
+    });
+    
+    element.addEventListener('touchend', function() {
+      this.style.transform = 'scale(1)';
+    });
+  });
+  
+  // Initialize player marker interactions
+  document.querySelectorAll('.player-marker').forEach(marker => {
+    marker.addEventListener('click', function() {
+      const playerNumber = this.textContent;
+      const position = this.classList.contains('tracked') ? 'Tracked' : 'Analyzed';
+      showNotification(`Player #${playerNumber} - ${position} Position`, 'info');
+    });
+  });
+  
+  // Start simulation
+  simulateUpdates();
+  
+  // Show welcome notification
+  setTimeout(() => {
+    showNotification('🏐 SportsAI Elite Mobile Ready!', 'success');
+  }, 1000);
+});
+
+// Handle swipe gestures
+let touchStartX = 0;
+let touchEndX = 0;
+
+document.addEventListener('touchstart', e => {
+  touchStartX = e.changedTouches[0].screenX;
+});
+
+document.addEventListener('touchend', e => {
+  touchEndX = e.changedTouches[0].screenX;
+  handleSwipe();
+});
+
+function handleSwipe() {
+  const swipeThreshold = 50;
+  const swipeDistance = touchEndX - touchStartX;
+  
+  if (Math.abs(swipeDistance) > swipeThreshold) {
+    const tabs = ['overview', 'layers', 'court', 'readiness'];
+    const currentIndex = tabs.indexOf(currentTab);
+    
+    if (swipeDistance > 0 && currentIndex > 0) {
+      // Swipe right - go to previous tab
+      switchTab(tabs[currentIndex - 1]);
+    } else if (swipeDistance < 0 && currentIndex < tabs.length - 1) {
+      // Swipe left - go to next tab
+      switchTab(tabs[currentIndex + 1]);
+    }
+  }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SportsAI — Game Layer & Team Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080810;
+  --bg2: #0e0e1a;
+  --bg3: #141425;
+  --bg4: #1a1a2e;
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.1);
+  --text: #f0f0ff;
+  --muted: #8888aa;
+  --dim: #44445a;
+  --p1c: #a78bfa; /* Person 1 - purple */
+  --p2c: #34d399; /* Person 2 - green */
+  --p3c: #fb923c; /* Person 3 - orange */
+  --gold: #fbbf24;
+  --xp: #60a5fa;
+  --danger: #f87171;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Space Grotesk', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 15px; line-height: 1.7; }
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; width: 220px; height: 100vh;
+  background: var(--bg2); border-right: 1px solid var(--border);
+  overflow-y: auto; padding: 28px 0; z-index: 100;
+}
+.logo { font-size: 16px; font-weight: 700; padding: 0 20px 24px; border-bottom: 1px solid var(--border); }
+.logo em { font-style: normal; color: var(--p1c); }
+.logo span { font-size: 10px; font-family: var(--mono); color: var(--muted); display: block; margin-top: 2px; }
+nav ul { list-style: none; padding: 16px 0; }
+nav a { display: block; padding: 7px 20px; color: var(--muted); text-decoration: none; font-size: 11px; font-family: var(--mono); border-left: 2px solid transparent; transition: all .15s; }
+nav a:hover, nav a.on { color: var(--text); border-left-color: var(--p1c); background: rgba(167,139,250,0.06); }
+.nav-sec { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); padding: 14px 20px 4px; font-family: var(--mono); }
+.p1-nav { border-left-color: var(--p1c) !important; color: var(--p1c) !important; }
+.p2-nav { border-left-color: var(--p2c) !important; color: var(--p2c) !important; }
+.p3-nav { border-left-color: var(--p3c) !important; color: var(--p3c) !important; }
+
+main { margin-left: 220px; }
+section { padding: 72px 56px; border-bottom: 1px solid var(--border); max-width: 920px; }
+section.wide { max-width: none; }
+
+/* HERO */
+#hero {
+  padding: 96px 56px 80px; max-width: none;
+  background: radial-gradient(ellipse at 70% 40%, rgba(167,139,250,0.07) 0%, transparent 60%),
+              radial-gradient(ellipse at 20% 80%, rgba(52,211,153,0.05) 0%, transparent 50%);
+}
+.hero-pill { display: inline-flex; align-items: center; gap: 8px; background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.25); border-radius: 20px; padding: 5px 14px; font-size: 11px; font-family: var(--mono); color: var(--p1c); margin-bottom: 28px; }
+.hero-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--p1c); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+h1 { font-size: 54px; font-weight: 700; letter-spacing: -2px; line-height: 1.05; max-width: 740px; margin-bottom: 20px; }
+h1 .hi { color: var(--p1c); }
+h1 .hi2 { color: var(--p2c); }
+h1 .hi3 { color: var(--p3c); }
+.hero-sub { font-size: 17px; color: var(--muted); max-width: 560px; margin-bottom: 40px; line-height: 1.6; font-weight: 400; }
+.person-strip { display: flex; gap: 12px; flex-wrap: wrap; }
+.person-pill { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 10px; border: 1px solid; font-size: 12px; font-weight: 500; }
+.pp1 { border-color: rgba(167,139,250,0.4); background: rgba(167,139,250,0.08); color: var(--p1c); }
+.pp2 { border-color: rgba(52,211,153,0.4); background: rgba(52,211,153,0.08); color: var(--p2c); }
+.pp3 { border-color: rgba(251,146,60,0.4); background: rgba(251,146,60,0.08); color: var(--p3c); }
+.dot { width: 8px; height: 8px; border-radius: 50%; }
+.d1 { background: var(--p1c); }
+.d2 { background: var(--p2c); }
+.d3 { background: var(--p3c); }
+
+/* SECTION HEADERS */
+.sec-tag { font-family: var(--mono); font-size: 11px; color: var(--p1c); letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 10px; }
+.sec-tag.g { color: var(--p2c); }
+.sec-tag.o { color: var(--p3c); }
+h2 { font-size: 34px; font-weight: 700; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 8px; }
+.lead { font-size: 16px; color: var(--muted); border-left: 2px solid var(--p1c); padding-left: 16px; margin-bottom: 36px; line-height: 1.6; max-width: 680px; }
+
+/* CARDS */
+.card { background: var(--bg3); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px; margin-bottom: 14px; }
+.card.p1 { border-left: 3px solid var(--p1c); }
+.card.p2 { border-left: 3px solid var(--p2c); }
+.card.p3 { border-left: 3px solid var(--p3c); }
+.card.gold { border-left: 3px solid var(--gold); }
+.card.xp { border-left: 3px solid var(--xp); }
+.card h3 { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.card h4 { font-family: var(--mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+.card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.card p strong { color: var(--text); font-weight: 500; }
+
+/* CALLOUT */
+.callout { border-radius: 10px; padding: 14px 18px; margin: 18px 0; font-size: 13px; line-height: 1.6; }
+.callout.info { background: rgba(96,165,250,0.08); border: 1px solid rgba(96,165,250,0.2); color: rgba(96,165,250,0.9); }
+.callout.warn { background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2); color: rgba(251,191,36,0.9); }
+.callout.danger { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.2); color: rgba(248,113,113,0.9); }
+.callout.success { background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.2); color: rgba(52,211,153,0.9); }
+.callout strong { font-weight: 600; }
+
+/* GAME CARD */
+.game-card {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 16px;
+  padding: 24px; margin-bottom: 16px; position: relative; overflow: hidden;
+}
+.game-card::before {
+  content: ''; position: absolute; top: 0; right: 0; width: 120px; height: 120px;
+  border-radius: 50%; opacity: 0.06; transform: translate(30px, -30px);
+}
+.game-card.xp-card::before { background: var(--xp); }
+.game-card.gold-card::before { background: var(--gold); }
+.game-card.danger-card::before { background: var(--danger); }
+.game-card.green-card::before { background: var(--p2c); }
+.game-icon { font-size: 28px; margin-bottom: 12px; display: block; }
+.game-card h3 { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.game-card .mechanic-label { font-family: var(--mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; display: block; }
+.game-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.game-card .xp-badge { display: inline-flex; align-items: center; gap: 4px; background: rgba(96,165,250,0.12); border: 1px solid rgba(96,165,250,0.25); border-radius: 6px; padding: 3px 8px; font-family: var(--mono); font-size: 11px; color: var(--xp); margin-top: 10px; }
+
+/* PROGRESS BAR */
+.xp-bar { background: var(--bg4); border-radius: 4px; height: 6px; margin: 8px 0; overflow: hidden; }
+.xp-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--xp), var(--p1c)); }
+
+/* GRID */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin: 16px 0; }
+@media(max-width: 700px) { .two-col,.three-col { grid-template-columns: 1fr; } }
+
+/* PERSON SECTION */
+.person-header {
+  display: flex; align-items: flex-start; gap: 20px; padding: 24px 28px;
+  border-radius: 16px; margin-bottom: 28px; border: 1px solid;
+}
+.person-header.ph1 { background: rgba(167,139,250,0.05); border-color: rgba(167,139,250,0.2); }
+.person-header.ph2 { background: rgba(52,211,153,0.05); border-color: rgba(52,211,153,0.2); }
+.person-header.ph3 { background: rgba(251,146,60,0.05); border-color: rgba(251,146,60,0.2); }
+.person-num { font-size: 52px; font-weight: 700; line-height: 1; opacity: 0.15; }
+.person-num.c1 { color: var(--p1c); }
+.person-num.c2 { color: var(--p2c); }
+.person-num.c3 { color: var(--p3c); }
+.person-info h2 { font-size: 22px; margin-bottom: 4px; }
+.person-info .role { font-family: var(--mono); font-size: 12px; margin-bottom: 8px; }
+.role.c1 { color: var(--p1c); }
+.role.c2 { color: var(--p2c); }
+.role.c3 { color: var(--p3c); }
+.person-info p { font-size: 13px; color: var(--muted); line-height: 1.5; max-width: 560px; }
+
+/* WEEK STRIPS */
+.week-strip { display: flex; gap: 0; margin: 20px 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+.week-block { flex: 1; padding: 12px 10px; text-align: center; background: var(--bg3); border-right: 1px solid var(--border); }
+.week-block:last-child { border-right: none; }
+.week-block .wnum { font-family: var(--mono); font-size: 9px; color: var(--dim); text-transform: uppercase; margin-bottom: 6px; }
+.week-block .wtask { font-size: 11px; color: var(--muted); line-height: 1.4; }
+.week-block.active { background: rgba(167,139,250,0.08); }
+.week-block.active .wnum { color: var(--p1c); }
+.week-block.active .wtask { color: var(--text); }
+.week-block.g-active { background: rgba(52,211,153,0.08); }
+.week-block.g-active .wnum { color: var(--p2c); }
+.week-block.g-active .wtask { color: var(--text); }
+.week-block.o-active { background: rgba(251,146,60,0.08); }
+.week-block.o-active .wnum { color: var(--p3c); }
+.week-block.o-active .wtask { color: var(--text); }
+
+/* TASK LIST */
+.task-list { list-style: none; }
+.task-list li { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--muted); }
+.task-list li:last-child { border-bottom: none; }
+.task-list .t-check { width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; font-size: 9px; }
+.tc1 { background: rgba(167,139,250,0.15); border: 1px solid rgba(167,139,250,0.3); color: var(--p1c); }
+.tc2 { background: rgba(52,211,153,0.15); border: 1px solid rgba(52,211,153,0.3); color: var(--p2c); }
+.tc3 { background: rgba(251,146,60,0.15); border: 1px solid rgba(251,146,60,0.3); color: var(--p3c); }
+.task-list strong { color: var(--text); }
+.task-list .t-week { font-family: var(--mono); font-size: 10px; margin-left: auto; flex-shrink: 0; padding-left: 12px; color: var(--dim); }
+
+/* TABLE */
+table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; }
+th { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--dim); padding: 8px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; }
+td:first-child { color: var(--text); }
+tr:last-child td { border-bottom: none; }
+.td-p1 { color: var(--p1c) !important; font-family: var(--mono); font-size: 11px; }
+.td-p2 { color: var(--p2c) !important; font-family: var(--mono); font-size: 11px; }
+.td-p3 { color: var(--p3c) !important; font-family: var(--mono); font-size: 11px; }
+
+/* UNLOCK TREE */
+.unlock-tree { position: relative; padding-left: 28px; margin: 20px 0; }
+.unlock-tree::before { content: ''; position: absolute; left: 10px; top: 10px; bottom: 10px; width: 1px; background: linear-gradient(to bottom, var(--p1c), var(--xp), var(--p2c)); }
+.unlock-item { position: relative; margin-bottom: 22px; }
+.unlock-item::before { content: attr(data-level); position: absolute; left: -34px; top: 2px; width: 22px; height: 22px; border-radius: 50%; background: var(--bg); border: 2px solid var(--p1c); font-family: var(--mono); font-size: 9px; color: var(--p1c); display: flex; align-items: center; justify-content: center; }
+.unlock-item h4 { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.unlock-item p { font-size: 12px; color: var(--muted); line-height: 1.5; margin: 0; }
+
+/* MILESTONE ROW */
+.milestone { display: grid; grid-template-columns: 80px 1fr; gap: 16px; align-items: start; padding: 14px 0; border-bottom: 1px solid var(--border); }
+.milestone:last-child { border-bottom: none; }
+.m-week { font-family: var(--mono); font-size: 11px; color: var(--xp); font-weight: 500; }
+.m-body h4 { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.m-body p { font-size: 12px; color: var(--muted); margin: 0; line-height: 1.5; }
+
+/* DEPENDENCY */
+.dep-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; font-size: 12px; color: var(--muted); border-bottom: 1px solid var(--border); }
+.dep-row:last-child { border-bottom: none; }
+.dep-arrow { color: var(--dim); font-family: var(--mono); }
+.dep-name { background: var(--bg4); border-radius: 4px; padding: 2px 8px; font-family: var(--mono); font-size: 11px; }
+.dep-p1 { border: 1px solid rgba(167,139,250,0.3); color: var(--p1c); }
+.dep-p2 { border: 1px solid rgba(52,211,153,0.3); color: var(--p2c); }
+.dep-p3 { border: 1px solid rgba(251,146,60,0.3); color: var(--p3c); }
+
+h4.sub { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--xp); margin: 26px 0 14px; }
+p { margin-bottom: 10px; font-size: 14px; color: var(--muted); line-height: 1.7; }
+ul, ol { padding-left: 20px; margin-bottom: 12px; }
+li { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 3px; }
+li strong { color: var(--text); font-weight: 500; }
+hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Sports<em>AI</em> <span>Game Layer + Team Plan</span></div>
+  <ul>
+    <div class="nav-sec">Overview</div>
+    <li><a href="#hero">Introduction</a></li>
+    <li><a href="#why">Why gamification works</a></li>
+    <li><a href="#gamedesign">Game design system</a></li>
+    <li><a href="#mechanics">All game mechanics</a></li>
+    <li><a href="#unlock">Technique unlock tree</a></li>
+    <li><a href="#leaderboards">Leaderboard system</a></li>
+    <li><a href="#db">Database schema</a></li>
+
+    <div class="nav-sec">3-Person Team</div>
+    <li><a href="#split">Team split overview</a></li>
+    <li><a href="#p1" class="p1-nav">● Person 1 — AI + Backend</a></li>
+    <li><a href="#p2" class="p2-nav">● Person 2 — Mobile App</a></li>
+    <li><a href="#p3" class="p3-nav">● Person 3 — Game + Data</a></li>
+
+    <div class="nav-sec">Execution</div>
+    <li><a href="#timeline">Week-by-week timeline</a></li>
+    <li><a href="#dependencies">Dependency map</a></li>
+    <li><a href="#meetings">Sync protocol</a></li>
+  </ul>
+</nav>
+
+<main>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-pill">SportsAI Game Layer + Team Blueprint</div>
+  <h1>Turn training into<br>a <span class="hi">game</span> people<br>can't <span class="hi2">quit</span></h1>
+  <p class="hero-sub">The complete gamification design system + exact work split for 3 people to ship this as fast as humanly possible.</p>
+  <div class="person-strip">
+    <div class="person-pill pp1"><span class="dot d1"></span>Person 1 — AI Engineer + Backend</div>
+    <div class="person-pill pp2"><span class="dot d2"></span>Person 2 — Mobile App (React Native)</div>
+    <div class="person-pill pp3"><span class="dot d3"></span>Person 3 — Game Design + Data Collection</div>
+  </div>
+</section>
+
+<!-- WHY GAMIFICATION -->
+<section id="why">
+  <span class="sec-tag">Research backing</span>
+  <h2>Why gamification isn't optional</h2>
+  <p class="lead">This isn't about making the app "fun." It's about solving the retention problem that kills every sports training app.</p>
+
+  <div class="three-col">
+    <div class="card gold">
+      <h4>Engagement boost</h4>
+      <h3>+150% engagement</h3>
+      <p>Gamified apps show up to 150% higher engagement compared to non-gamified equivalents. The brain's reward system responds to progress, achievement, and competition the same way it responds to actual sports.</p>
+    </div>
+    <div class="card xp">
+      <h4>Retention improvement</h4>
+      <h3>+22% retention</h3>
+      <p>Brands using gamification see an average 22% improvement in 30-day retention. Without gamification, Android apps retain just 2.1% of users by day 30. With it, you can hit 20–25%.</p>
+    </div>
+    <div class="card p2">
+      <h4>The research warning</h4>
+      <h3>Excessive gamification backfires</h3>
+      <p>2025 research found that over-gamification causes stress and emotional exhaustion. The rule: gamify the progress journey, not every single interaction. Rewards must feel earned — not handed out.</p>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <strong>The single most important insight from research:</strong> Leaderboards and status were the most popular gamification features across all sports app studies. Streak mechanics create the strongest daily return behavior. Technique unlocks tap into intrinsic motivation (self-development) which is the only motivation that drives long-term retention — external rewards alone wear off.
+  </div>
+</section>
+
+<!-- GAME DESIGN SYSTEM -->
+<section id="gamedesign">
+  <span class="sec-tag">Core design</span>
+  <h2>The SportsAI game design system</h2>
+  <p class="lead">Six interlocking systems. Each one reinforces the others. Together they create a loop athletes can't easily leave.</p>
+
+  <div class="two-col">
+    <div class="game-card xp-card">
+      <span class="game-icon">⚡</span>
+      <span class="mechanic-label">System 1 — Core currency</span>
+      <h3>XP (Technique Points)</h3>
+      <p>Earned by uploading videos, improving scores, completing coach reviews, hitting streaks, and unlocking techniques. XP is the universal currency that powers all other systems. <strong>Critically: XP must be earned through actual technique improvement, not just uploading.</strong> A video that scores 10% better than your last earns bonus XP. Stagnation earns baseline XP only.</p>
+      <div class="xp-badge">+50 XP — upload + analyze</div>
+      <div class="xp-badge">+120 XP — score improved ≥10%</div>
+      <div class="xp-badge">+200 XP — coach review completed</div>
+    </div>
+    <div class="game-card gold-card">
+      <span class="game-icon">🏅</span>
+      <span class="mechanic-label">System 2 — Identity</span>
+      <h3>Belt / Rank System</h3>
+      <p>Instead of generic "Level 1, Level 2" — borrow from martial arts. <strong>White → Yellow → Orange → Green → Blue → Purple → Brown → Black belt.</strong> Each belt requires specific technique scores, XP thresholds, and coach-verified milestones. Your belt appears on your profile, in the leaderboard, next to your avatar. It's the single most motivating status signal in combat sports culture.</p>
+      <div class="xp-badge">White belt — getting started</div>
+      <div class="xp-badge">Black belt — elite verified</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="game-card green-card">
+      <span class="game-icon">🔥</span>
+      <span class="mechanic-label">System 3 — Daily habit</span>
+      <h3>Training Streaks</h3>
+      <p>Upload at least one video per week to keep your streak alive. A 4-week streak unlocks a bonus technique drill. An 8-week streak unlocks a free coach review. A 16-week streak earns a "Dedicated Athlete" badge visible on leaderboards. <strong>Weekly not daily</strong> — sports training doesn't happen daily, and unrealistic streaks cause users to quit when they miss one day. Weekly is achievable and still habit-forming.</p>
+    </div>
+    <div class="game-card danger-card">
+      <span class="game-icon">🎯</span>
+      <span class="mechanic-label">System 4 — Direction</span>
+      <h3>Weekly Challenges</h3>
+      <p>Every Monday, 3 new challenges appear. Examples: "Upload a single-leg shot and score above 70," "Get your hip height within 5% of elite average," "Complete a coach review this week," "Improve your entry phase score by 15%." Challenges expire Sunday. Completing all 3 earns a Challenge Champion badge for that week. This creates urgency and direction — athletes know exactly what to work on.</p>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="game-card xp-card">
+      <span class="game-icon">🗺️</span>
+      <span class="mechanic-label">System 5 — Progression</span>
+      <h3>Technique Unlock Tree</h3>
+      <p>Athletes don't have access to all techniques from day one. They unlock them by demonstrating mastery at lower levels first. You cannot unlock "Flying Knee" in MMA until your basic striking form scores above 65 consistently. This creates a progression narrative — "I'm working toward unlocking the double-leg" is a more compelling motivation than "I'm improving my wrestling." See full tree in next section.</p>
+    </div>
+    <div class="game-card gold-card">
+      <span class="game-icon">👑</span>
+      <span class="mechanic-label">System 6 — Competition</span>
+      <h3>Leaderboards (3 types)</h3>
+      <p><strong>Global:</strong> all athletes by XP — ambition for the top 1%. <strong>Regional:</strong> athletes in your city/school/club — actually competitive and reachable. <strong>Friends:</strong> the most motivating — seeing someone you know just ahead of you. Research confirms that regional and social leaderboards drive more behavior change than global ones because the gap feels closeable.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ALL MECHANICS -->
+<section id="mechanics">
+  <span class="sec-tag">Full mechanic list</span>
+  <h2>Every game mechanic — complete list</h2>
+  <p class="lead">What ships in Phase 1 vs what gets added in Phase 2. Don't build everything at once.</p>
+
+  <h4 class="sub">Phase 1 — Ship with the MVP (weeks 1–10)</h4>
+  <div class="card p1">
+    <h4>Must ship first</h4>
+    <h3>These 5 mechanics are the foundation — nothing else works without them</h3>
+    <ul style="margin-top:10px;">
+      <li><strong>XP system:</strong> Points for every action. Shown on home screen, profile, leaderboard. No XP = nothing else is meaningful.</li>
+      <li><strong>Technique score history:</strong> Line graph showing your score over sessions. The most motivating thing you can show an athlete is their own improvement. Zero-effort retention.</li>
+      <li><strong>Weekly streak counter:</strong> Simple counter on home screen. Breaks if no upload in 7 days. Push notification on day 5: "Your streak ends in 2 days."</li>
+      <li><strong>Belt rank display:</strong> Shown on profile and next to avatar. White → Yellow → Orange unlockable in Phase 1. Higher belts gated to Phase 2+.</li>
+      <li><strong>Friends leaderboard:</strong> Top 20 friends ranked by weekly XP. The single highest-retention feature you can ship. Build this before the global leaderboard.</li>
+    </ul>
+  </div>
+
+  <h4 class="sub">Phase 2 — Add after first 200 paying users (months 4–9)</h4>
+  <div class="card p2">
+    <h4>Growth mechanics</h4>
+    <h3>Add these once you have data on what's working</h3>
+    <ul style="margin-top:10px;">
+      <li><strong>Weekly challenges:</strong> Auto-generated from the athlete's weak phase data. "Your entry phase is your weakness — score above 70 on entry this week."</li>
+      <li><strong>Technique unlock tree:</strong> Full sport-specific progression map. Unlocking a new technique sends a push notification to all the athlete's followers.</li>
+      <li><strong>Team/club system:</strong> Athletes create or join a team (school team, gym, training group). Team XP aggregates. Team leaderboard. Team challenges. This is the social glue.</li>
+      <li><strong>Achievement badges:</strong> "First Perfect Entry," "10-Week Streak," "Elite Hip Height Achieved," "Faster Than Your Coach" (when you outscore your coach's demo). Display on profile.</li>
+      <li><strong>Global leaderboard:</strong> Top 100 athletes by technique score per sport. Resets monthly. Top 3 get a "Champion" badge that month.</li>
+      <li><strong>XP multiplier events:</strong> "Double XP Weekend" — announced Tuesday, runs Saturday–Sunday. Creates urgency, drives uploads. Zero engineering cost.</li>
+    </ul>
+  </div>
+
+  <h4 class="sub">Phase 3 — Elite and Olympic tier</h4>
+  <div class="card p3">
+    <h4>Elite engagement</h4>
+    <h3>For serious athletes and team contracts</h3>
+    <ul style="margin-top:10px;">
+      <li><strong>Season mode:</strong> 12-week competitive seasons with rankings, playoffs, and a "Season Champion" title. Mirrors real competitive sports seasons.</li>
+      <li><strong>Coach endorsements:</strong> Coaches can "endorse" athletes, which adds a badge to their profile. Valued by serious athletes for credibility.</li>
+      <li><strong>Technique records:</strong> Highest score ever recorded for each technique per sport. Shown on the technique page. "Current record: 97/100 — @elitewrestler." Drives aspiration.</li>
+      <li><strong>Avatar cosmetics:</strong> Earn exclusive avatar outfits, belt colors, animations for high-level achievements. Pure vanity, but research confirms it drives retention through ownership.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- UNLOCK TREE -->
+<section id="unlock">
+  <span class="sec-tag">Technique progression</span>
+  <h2>Technique unlock tree</h2>
+  <p class="lead">This is the narrative spine of the game. Athletes are always working toward something. Each sport has its own tree — here's wrestling as the example.</p>
+
+  <div class="callout info">
+    <strong>Design rule:</strong> Each technique requires a minimum average score on its prerequisites — not just that you attempted them. You cannot unlock the double-leg by uploading one mediocre single-leg. You must average 65+ across 3 sessions. This prevents farming and makes each unlock feel genuinely earned.
+  </div>
+
+  <div class="two-col">
+    <div>
+      <h4 class="sub">Wrestling unlock tree</h4>
+      <div class="unlock-tree">
+        <div class="unlock-item" data-level="1">
+          <h4>Stance &amp; Movement 🔓 (starts unlocked)</h4>
+          <p>Basic stance, level change, circle step. Every new user starts here. Score 60+ average to proceed.</p>
+        </div>
+        <div class="unlock-item" data-level="2">
+          <h4>Single-Leg Shot</h4>
+          <p>Requires: Stance avg ≥60 across 3 sessions. The core takedown — most wrestlers start here.</p>
+        </div>
+        <div class="unlock-item" data-level="3">
+          <h4>Double-Leg Shot</h4>
+          <p>Requires: Single-Leg avg ≥65. More explosive, higher reward, harder to execute correctly.</p>
+        </div>
+        <div class="unlock-item" data-level="4">
+          <h4>High-Crotch</h4>
+          <p>Requires: Single-Leg ≥70. The high-percentage NCAA technique — unlocked by serious athletes.</p>
+        </div>
+        <div class="unlock-item" data-level="5">
+          <h4>Scramble Defense</h4>
+          <p>Requires: Double-Leg ≥65. Counter-wrestling. Only athletes with solid fundamentals reach here.</p>
+        </div>
+        <div class="unlock-item" data-level="6">
+          <h4>Fireman's Carry 🏆</h4>
+          <p>Requires: High-Crotch ≥75 + Black Belt rank. Prestige technique. Fewer than 5% of users unlock this.</p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h4 class="sub">MMA unlock tree</h4>
+      <div class="unlock-tree">
+        <div class="unlock-item" data-level="1">
+          <h4>Fighting Stance 🔓 (starts unlocked)</h4>
+          <p>Guard position, footwork, head movement. Baseline for all striking analysis.</p>
+        </div>
+        <div class="unlock-item" data-level="2">
+          <h4>Jab-Cross Combo</h4>
+          <p>Requires: Stance avg ≥60. Foundation of striking. Most uploaded technique in MMA tier.</p>
+        </div>
+        <div class="unlock-item" data-level="3">
+          <h4>Body Hook</h4>
+          <p>Requires: Jab-Cross ≥65. Hip rotation analysis unlocks here.</p>
+        </div>
+        <div class="unlock-item" data-level="4">
+          <h4>Takedown Defense</h4>
+          <p>Requires: Stance ≥65. Sprawl mechanics, base defense — grappling layer begins.</p>
+        </div>
+        <div class="unlock-item" data-level="5">
+          <h4>Clinch Work</h4>
+          <p>Requires: Takedown Defense ≥65 + Body Hook ≥65. Upper-intermediate MMA.</p>
+        </div>
+        <div class="unlock-item" data-level="6">
+          <h4>Flying Knee 🏆</h4>
+          <p>Requires: Clinch ≥75 + 12-week streak. Prestige. A notification goes to all followers when unlocked.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout success">
+    <strong>The social unlock mechanic:</strong> When an athlete unlocks a prestigious technique (level 5+), their followers get a push notification: "🔓 @username just unlocked Flying Knee — tap to see their latest analysis." This is free viral growth. Every prestigious unlock is a social event.
+  </div>
+</section>
+
+<!-- LEADERBOARDS -->
+<section id="leaderboards">
+  <span class="sec-tag">Competition layer</span>
+  <h2>Leaderboard system design</h2>
+  <p class="lead">Three leaderboard types. Each serves a different psychological need. All three must exist — removing any one breaks the system.</p>
+
+  <table>
+    <thead><tr><th>Type</th><th>Scope</th><th>Resets</th><th>Ranked by</th><th>Why it works</th></tr></thead>
+    <tbody>
+      <tr><td>Friends</td><td>Users you follow</td><td>Never (cumulative)</td><td>Weekly XP</td><td>The gap to the person above you feels closeable. Seeing a friend 200 XP ahead triggers competition. Most effective at driving uploads.</td></tr>
+      <tr><td>Regional</td><td>Same city / school / gym</td><td>Monthly</td><td>Technique score improvement %</td><td>Ranked by improvement (not absolute score) means beginners can compete with advanced athletes. Reachable, not discouraging.</td></tr>
+      <tr><td>Global</td><td>All users, per sport</td><td>Monthly seasons</td><td>Cumulative XP + technique milestones</td><td>Top 100 visible. Top 3 get a "Champion" badge for that month. Most users won't reach it — but seeing the #1 athlete's score is aspirational.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn">
+    <strong>Anti-cheat rule:</strong> XP cannot be earned from repeated identical uploads (same video re-uploaded), scores that don't match pose detection confidence thresholds, or accounts with no coach interaction in 30 days. Gaming the leaderboard destroys it for everyone — build the detection from day one.
+  </div>
+
+  <h4 class="sub">Database schema — gamification tables</h4>
+  <pre style="background:#0d0d18;border:1px solid var(--border);border-radius:10px;padding:20px 24px;font-family:var(--mono);font-size:12px;color:#b0b0d0;line-height:1.7;overflow-x:auto;margin:16px 0;"><span style="color:#44445a">-- XP and ranking system</span>
+CREATE TABLE athlete_xp (
+  athlete_id UUID REFERENCES users(id),
+  total_xp INTEGER DEFAULT 0,
+  weekly_xp INTEGER DEFAULT 0,     <span style="color:#44445a">-- resets every Monday</span>
+  current_belt TEXT DEFAULT 'white',
+  belt_progress_pct INTEGER DEFAULT 0,
+  current_streak_weeks INTEGER DEFAULT 0,
+  longest_streak_weeks INTEGER DEFAULT 0,
+  last_upload_date DATE,
+  PRIMARY KEY (athlete_id)
+);
+
+CREATE TABLE xp_transactions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  athlete_id UUID REFERENCES users(id),
+  amount INTEGER NOT NULL,
+  reason TEXT NOT NULL,            <span style="color:#44445a">-- 'upload', 'score_improvement', 'coach_review', etc</span>
+  source_id UUID,                  <span style="color:#44445a">-- video_id or review_id that triggered this</span>
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE technique_unlocks (
+  athlete_id UUID REFERENCES users(id),
+  sport TEXT,
+  technique_name TEXT,
+  unlocked_at TIMESTAMPTZ,
+  unlock_score INTEGER,            <span style="color:#44445a">-- score that triggered the unlock</span>
+  is_prestige BOOLEAN DEFAULT false,
+  PRIMARY KEY (athlete_id, sport, technique_name)
+);
+
+CREATE TABLE weekly_challenges (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  week_start DATE,
+  sport TEXT,
+  challenge_type TEXT,             <span style="color:#44445a">-- 'score_threshold', 'improvement', 'consistency'</span>
+  target_technique TEXT,
+  target_value DECIMAL,
+  xp_reward INTEGER,
+  description TEXT
+);
+
+CREATE TABLE challenge_completions (
+  athlete_id UUID REFERENCES users(id),
+  challenge_id UUID REFERENCES weekly_challenges(id),
+  completed_at TIMESTAMPTZ,
+  PRIMARY KEY (athlete_id, challenge_id)
+);
+
+CREATE TABLE leaderboard_snapshots (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  snapshot_date DATE,
+  leaderboard_type TEXT,           <span style="color:#44445a">-- 'friends', 'regional', 'global'</span>
+  sport TEXT,
+  athlete_id UUID REFERENCES users(id),
+  rank INTEGER,
+  score DECIMAL,
+  snapshot_period TEXT             <span style="color:#44445a">-- 'weekly', 'monthly'</span>
+);</pre>
+</section>
+
+<!-- TEAM SPLIT OVERVIEW -->
+<section id="split">
+  <span class="sec-tag g">3-person team</span>
+  <h2>The team split</h2>
+  <p class="lead">Three people, zero overlap, maximum parallel work. Every person owns a complete vertical — they can ship their piece without waiting on anyone else except at defined integration points.</p>
+
+  <div class="callout info">
+    <strong>The golden rule of the split:</strong> Person 1 builds the engine. Person 2 builds the interface. Person 3 builds the game layer AND collects the data the engine needs. At weeks 6, 10, and 14 they integrate. Between those points, all three work independently.
+  </div>
+
+  <table>
+    <thead><tr><th>Person</th><th>Role</th><th>Owns 100%</th><th>Delivers to</th><th>Skill required</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="td-p1">Person 1</td>
+        <td>AI Engineer + Backend</td>
+        <td>Pose service · Rules engine · API · Database · Auth · Payments</td>
+        <td>REST API that P2 and P3 consume</td>
+        <td>Python (ML/CV) · Node.js · Postgres · DevOps</td>
+      </tr>
+      <tr>
+        <td class="td-p2">Person 2</td>
+        <td>Mobile App Developer</td>
+        <td>React Native app · Annotation player · Avatar system · Coach web dashboard</td>
+        <td>The product athletes and coaches actually touch</td>
+        <td>React Native · TypeScript · Three.js · UI/UX</td>
+      </tr>
+      <tr>
+        <td class="td-p3">Person 3</td>
+        <td>Game Designer + Data Engineer</td>
+        <td>Gamification system · Data collection pipeline · Coach recruitment · Labeling</td>
+        <td>XP/challenge API endpoints · Labeled training dataset</td>
+        <td>Game design · Python · Sports domain knowledge · People skills</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn">
+    <strong>Person 3 is the most critical hire and the hardest to find.</strong> This person needs sports domain expertise (ideally played the sport), can write basic Python for the data pipeline, understands game design enough to spec the XP system, and has the personality to recruit coaches and athletes for the dataset. A pure developer won't do. A pure sports person won't do. Find the hybrid.
+  </div>
+</section>
+
+<!-- PERSON 1 -->
+<section id="p1">
+  <div class="person-header ph1">
+    <div class="person-num c1">01</div>
+    <div class="person-info">
+      <h2>Person 1 — AI Engineer + Backend</h2>
+      <div class="role c1">Python · Node.js · Postgres · GPU inference · DevOps</div>
+      <p>Owns the entire engine. Nobody touches their code except at integration points. They are responsible for: the pose extraction microservice, the rules engine, the full Node.js API, Supabase schema, Stripe Connect, video upload pipeline, and moderation. Everything Person 2 and 3 build depends on this layer working.</p>
+    </div>
+  </div>
+
+  <h4 class="sub">Week-by-week deliverables</h4>
+  <div class="week-strip">
+    <div class="week-block active"><div class="wnum">Wk 1–2</div><div class="wtask">Infra setup<br>Supabase + Railway + R2 + Stripe</div></div>
+    <div class="week-block active"><div class="wnum">Wk 3–4</div><div class="wtask">Pose service<br>YOLO11 + AthletePose3D running</div></div>
+    <div class="week-block active"><div class="wnum">Wk 5–6</div><div class="wtask">Rules engine v1<br>Wrestling: 2 techniques</div></div>
+    <div class="week-block active"><div class="wnum">Wk 7–8</div><div class="wtask">Full API<br>Auth + upload + analysis endpoints</div></div>
+    <div class="week-block active"><div class="wnum">Wk 9–10</div><div class="wtask">Integration<br>P2 + P3 APIs wired up</div></div>
+  </div>
+
+  <h4 class="sub">Complete task list — Person 1</h4>
+  <ul class="task-list">
+    <li><span class="t-check tc1">P1</span><div><strong>Supabase project setup</strong> — schema, auth, RLS policies, storage buckets</div><span class="t-week">Wk 1</span></li>
+    <li><span class="t-check tc1">P1</span><div><strong>Cloudflare R2 + Stream</strong> — bucket config, upload signed URLs, stream player setup</div><span class="t-week">Wk 1</span></li>
+    <li><span class="t-check tc1">P1</span><div><strong>Railway API server</strong> — Node.js/Express, GitHub CI/CD, env vars, health checks</div><span class="t-week">Wk 1</span></li>
+    <li><span class="t-check tc1">P1</span><div><strong>Stripe Connect</strong> — coach Express accounts, payment intents, webhook handlers</div><span class="t-week">Wk 2</span></li>
+    <li><span class="t-check tc1">P1</span><div><strong>AWS Rekognition CSAM scan</strong> — integrated into upload flow, blocks before storage</div><span class="t-week">Wk 2</span></li>
+    <li><span class="t-check tc1">P1</span><div><strong>Modal GPU service setup</strong> — FastAPI Python microservice, YOLO11-Pose loaded</div><span class="t-week">Wk 3</span></li>
+    <li><span class="t-check tc1">P1</span><div><strong>AthletePose3D fine-tuning</strong> — download dataset, run fine-tuning on YOLO11, validate on test clips</div><span class="t-week">Wk 3–4</span></li>
+    <li><span class="t-check tc1">P1</span><div><strong>Skeleton extractor pipeline</strong> — pose JSON output, confidence filtering, R2 storage</div><span class="t-week">Wk 4</span></li>
+    <li><span class="t-check tc1">P1</span><div><strong>Technique classifier</strong> — detects which technique is in the video (wrestling v1: 3 techniques)</div><span class="t-week">Wk 5</span></li>
+    <li><span class="t-check tc1">P1</span><div><strong>Rules engine v1</strong> — threshold-based, wrestling single-leg + double-leg, coach-validated thresholds from P3</div><span class="t-week">Wk 5–6</span></li>
+    <li><span class="t-check tc1">P1</span><div><strong>Claude API integration</strong> — feedback generator, system prompt, athlete history context</div><span class="t-week">Wk 6</span></li>
+    <li><span class="t-check tc1">P1</span><div><strong>XP calculation service</strong> — awards XP on video events, stores transactions, updates belt progress</div><span class="t-week">Wk 7</span></li>
+    <li><span class="t-check tc1">P1</span><div><strong>Leaderboard API endpoints</strong> — friends/regional/global queries, weekly reset cron job</div><span class="t-week">Wk 7</span></li>
+    <li><span class="t-check tc1">P1</span><div><strong>Technique unlock API</strong> — checks prerequisites, awards unlock, triggers social notification</div><span class="t-week">Wk 7–8</span></li>
+    <li><span class="t-check tc1">P1</span><div><strong>Weekly challenges engine</strong> — generates challenges from athlete weak-phase data, tracks completions</div><span class="t-week">Wk 8</span></li>
+    <li><span class="t-check tc1">P1</span><div><strong>Push notifications</strong> — Expo Push tokens, streak warnings, unlock alerts, challenge deadlines</div><span class="t-week">Wk 9</span></li>
+    <li><span class="t-check tc1">P1</span><div><strong>Integration week</strong> — API contract review with P2, fix all endpoint mismatches, load testing</div><span class="t-week">Wk 10</span></li>
+  </ul>
+</section>
+
+<!-- PERSON 2 -->
+<section id="p2">
+  <div class="person-header ph2">
+    <div class="person-num c2">02</div>
+    <div class="person-info">
+      <h2>Person 2 — Mobile App Developer</h2>
+      <div class="role c2">React Native · TypeScript · Three.js · expo-av · Skia</div>
+      <p>Owns everything the user sees and touches. This person does NOT touch the backend — they consume Person 1's API only. They are responsible for the athlete mobile app, the annotation player (the most important screen), the Ready Player Me avatar system, the game UI (XP bars, belt display, leaderboards), and the coach web dashboard in Next.js.</p>
+    </div>
+  </div>
+
+  <h4 class="sub">Week-by-week deliverables</h4>
+  <div class="week-strip">
+    <div class="week-block g-active"><div class="wnum">Wk 1–2</div><div class="wtask">App scaffold<br>Navigation + auth screens</div></div>
+    <div class="week-block g-active"><div class="wnum">Wk 3–4</div><div class="wtask">Record + upload<br>Camera + video flow</div></div>
+    <div class="week-block g-active"><div class="wnum">Wk 5–6</div><div class="wtask">Annotation player<br>The core product screen</div></div>
+    <div class="week-block g-active"><div class="wnum">Wk 7–8</div><div class="wtask">Game UI<br>XP, belts, leaderboards</div></div>
+    <div class="week-block g-active"><div class="wnum">Wk 9–10</div><div class="wtask">Coach dashboard<br>Next.js web + integration</div></div>
+  </div>
+
+  <h4 class="sub">Complete task list — Person 2</h4>
+  <ul class="task-list">
+    <li><span class="t-check tc2">P2</span><div><strong>Expo project setup</strong> — React Native, TypeScript, React Navigation, EAS Build configured</div><span class="t-week">Wk 1</span></li>
+    <li><span class="t-check tc2">P2</span><div><strong>Auth screens</strong> — Supabase Auth (email + Google), onboarding flow, sport selection</div><span class="t-week">Wk 1</span></li>
+    <li><span class="t-check tc2">P2</span><div><strong>Ready Player Me avatar creator</strong> — WebView embed on onboarding, GLB URL stored to profile</div><span class="t-week">Wk 2</span></li>
+    <li><span class="t-check tc2">P2</span><div><strong>Home screen</strong> — recent analyses, streak counter, weekly XP progress bar, active challenge widget</div><span class="t-week">Wk 2</span></li>
+    <li><span class="t-check tc2">P2</span><div><strong>Record screen</strong> — Expo Camera, sport/technique picker, upload with progress, moderation feedback</div><span class="t-week">Wk 3</span></li>
+    <li><span class="t-check tc2">P2</span><div><strong>Analysis waiting screen</strong> — animated progress stages ("Extracting movement data..."), 12–20s realistic timing</div><span class="t-week">Wk 3</span></li>
+    <li><span class="t-check tc2">P2</span><div><strong>Annotation player — video + skeleton overlay</strong> — Cloudflare Stream + Skia canvas, error markers on timeline</div><span class="t-week">Wk 4–5</span></li>
+    <li><span class="t-check tc2">P2</span><div><strong>Annotation player — 5 interactions</strong> — tap error → jump -2s, slow-mo, elite toggle, swipe between errors, pinch zoom</div><span class="t-week">Wk 5–6</span></li>
+    <li><span class="t-check tc2">P2</span><div><strong>3D avatar renderer</strong> — expo-gl + Three.js, GLB load, bone retargeting via Kalidokit, error body part color</div><span class="t-week">Wk 6</span></li>
+    <li><span class="t-check tc2">P2</span><div><strong>Share mechanic</strong> — 5-sec clip of athlete vs elite, watermark, react-native-view-shot export</div><span class="t-week">Wk 6</span></li>
+    <li><span class="t-check tc2">P2</span><div><strong>XP + belt UI</strong> — animated XP bar on home, belt badge on profile, level-up animation</div><span class="t-week">Wk 7</span></li>
+    <li><span class="t-check tc2">P2</span><div><strong>Friends leaderboard screen</strong> — ranked list, weekly XP, your position highlighted, add friends flow</div><span class="t-week">Wk 7</span></li>
+    <li><span class="t-check tc2">P2</span><div><strong>Technique unlock tree screen</strong> — visual tree map, locked/unlocked states, unlock celebration animation</div><span class="t-week">Wk 8</span></li>
+    <li><span class="t-check tc2">P2</span><div><strong>Weekly challenges screen</strong> — 3 active challenges, progress indicators, completion states</div><span class="t-week">Wk 8</span></li>
+    <li><span class="t-check tc2">P2</span><div><strong>Progress screen</strong> — score history graph per technique, phase breakdown, before/after skeleton comparison</div><span class="t-week">Wk 9</span></li>
+    <li><span class="t-check tc2">P2</span><div><strong>Coach web dashboard</strong> — Next.js, pending reviews queue, video player, annotation tools, payout display</div><span class="t-week">Wk 9–10</span></li>
+    <li><span class="t-check tc2">P2</span><div><strong>Integration + polish</strong> — connect all screens to live P1 API, fix UX gaps, TestFlight build</div><span class="t-week">Wk 10</span></li>
+  </ul>
+</section>
+
+<!-- PERSON 3 -->
+<section id="p3">
+  <div class="person-header ph3">
+    <div class="person-num c3">03</div>
+    <div class="person-info">
+      <h2>Person 3 — Game Designer + Data Engineer</h2>
+      <div class="role c3">Sports domain · Game design · Python · Coach recruitment · Labeling</div>
+      <p>The most unique role. This person runs in parallel on two separate tracks: (1) designing and speccing the full gamification system so P1 and P2 have exact specs to build against, and (2) doing the real-world work of filming labeled training data, recruiting coaches, and running the knowledge extraction sessions. Without their data, P1's rules engine has no thresholds. Without their game specs, P1 and P2 don't know what XP values, unlock requirements, or challenge types to build.</p>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <strong>Person 3's work unlocks everyone else.</strong> In week 2, they deliver: XP values per action, belt XP thresholds, unlock prerequisites per technique, and challenge templates. P1 can then build the game API. If P3 is late, P1 and P2 have nothing to wire the game layer to.
+  </div>
+
+  <h4 class="sub">Week-by-week deliverables</h4>
+  <div class="week-strip">
+    <div class="week-block o-active"><div class="wnum">Wk 1–2</div><div class="wtask">Game spec doc<br>All XP values + unlock tree</div></div>
+    <div class="week-block o-active"><div class="wnum">Wk 3–4</div><div class="wtask">Coach recruitment<br>5 coaches signed, filming starts</div></div>
+    <div class="week-block o-active"><div class="wnum">Wk 5–6</div><div class="wtask">Data collection<br>300+ labeled clips</div></div>
+    <div class="week-block o-active"><div class="wnum">Wk 7–8</div><div class="wtask">Threshold extraction<br>Rules engine values from coaches</div></div>
+    <div class="week-block o-active"><div class="wnum">Wk 9–10</div><div class="wtask">Beta testers<br>20 athletes using the app</div></div>
+  </div>
+
+  <h4 class="sub">Complete task list — Person 3</h4>
+  <ul class="task-list">
+    <li><span class="t-check tc3">P3</span><div><strong>Game spec document</strong> — exact XP per action, belt XP thresholds, unlock prerequisites, challenge types. Delivered to P1 by end of week 2.</div><span class="t-week">Wk 1–2</span></li>
+    <li><span class="t-check tc3">P3</span><div><strong>Technique unlock tree — all sports</strong> — prerequisite graph for wrestling, MMA, volleyball. Exact score thresholds per unlock. P2 uses this to build the UI.</div><span class="t-week">Wk 2</span></li>
+    <li><span class="t-check tc3">P3</span><div><strong>Recruit 5 wrestling coaches</strong> — college wrestlers, high school coaches, club coaches. Offer: $500 flat + revenue share. Sign NDAs. Schedule filming sessions.</div><span class="t-week">Wk 1–3</span></li>
+    <li><span class="t-check tc3">P3</span><div><strong>Coach knowledge sessions — Session 1 (error taxonomy)</strong> — per coach, 2 hours, record everything, produce error vocabulary document</div><span class="t-week">Wk 3–4</span></li>
+    <li><span class="t-check tc3">P3</span><div><strong>Film labeled dataset — 150 clips</strong> — single-leg shot, double-leg, sprawl. 3 skill levels, 2 angles each. Coach scores each clip 1–10 while filming.</div><span class="t-week">Wk 3–5</span></li>
+    <li><span class="t-check tc3">P3</span><div><strong>Run skeleton extractor on filmed clips</strong> — Python script from P1, produces pose JSON for every clip. Upload to Roboflow for annotation.</div><span class="t-week">Wk 4–5</span></li>
+    <li><span class="t-check tc3">P3</span><div><strong>Extract elite skeleton sequences</strong> — use skeleton extractor on YouTube/broadcast wrestling footage, store coordinate JSON only (no video frames)</div><span class="t-week">Wk 4–6</span></li>
+    <li><span class="t-check tc3">P3</span><div><strong>Coach knowledge sessions — Session 2 (biomechanical translation)</strong> — convert error vocabulary to measurable joint metrics. Deliver threshold values to P1 for rules engine.</div><span class="t-week">Wk 5–6</span></li>
+    <li><span class="t-check tc3">P3</span><div><strong>Rules engine threshold document</strong> — per technique, per phase, per metric: elite range, error_if_above/below values. P1 hard codes these into rules engine.</div><span class="t-week">Wk 6</span></li>
+    <li><span class="t-check tc3">P3</span><div><strong>Coach knowledge sessions — Session 3 (elite calibration)</strong> — coaches rate elite skeleton clips 1–10, validates P1's threshold ranges</div><span class="t-week">Wk 7</span></li>
+    <li><span class="t-check tc3">P3</span><div><strong>Recruit 20 beta athlete testers</strong> — real wrestlers, MMA fighters. Mix of skill levels. Will use app from week 10 onward and give weekly feedback.</div><span class="t-week">Wk 6–8</span></li>
+    <li><span class="t-check tc3">P3</span><div><strong>Film 150 more clips — MMA techniques</strong> — jab-cross, takedown defense, clinch. Same protocol. Adds second sport to dataset.</div><span class="t-week">Wk 7–9</span></li>
+    <li><span class="t-check tc3">P3</span><div><strong>Weekly challenge templates</strong> — write 20 challenge templates per sport, parameterized for P1's challenge engine to use</div><span class="t-week">Wk 8</span></li>
+    <li><span class="t-check tc3">P3</span><div><strong>Beta launch coordination</strong> — onboard 20 athletes onto TestFlight, run feedback sessions, document UX issues for P2, rules engine errors for P1</div><span class="t-week">Wk 10+</span></li>
+  </ul>
+</section>
+
+<!-- TIMELINE -->
+<section id="timeline">
+  <span class="sec-tag">Execution</span>
+  <h2>Week-by-week master timeline</h2>
+  <p class="lead">All 3 people, all 10 weeks, side by side. Integration points are fixed — everything else is parallel.</p>
+
+  <table>
+    <thead><tr><th>Week</th><th style="color:var(--p1c)">Person 1 — AI/Backend</th><th style="color:var(--p2c)">Person 2 — Mobile</th><th style="color:var(--p3c)">Person 3 — Game/Data</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td class="td-p1">Supabase + Railway + R2 + Rekognition</td><td class="td-p2">Expo scaffold + auth screens + RPM avatar</td><td class="td-p3">Game spec doc + coach recruitment starts</td></tr>
+      <tr><td>2</td><td class="td-p1">Stripe Connect + upload pipeline</td><td class="td-p2">Home screen + camera flow</td><td class="td-p3">Deliver XP/belt/unlock specs to P1+P2</td></tr>
+      <tr><td>3</td><td class="td-p1">Modal GPU + YOLO11 pose service</td><td class="td-p2">Upload flow + analysis waiting screen</td><td class="td-p3">Coach session 1 + filming begins</td></tr>
+      <tr><td>4</td><td class="td-p1">AthletePose3D fine-tuning</td><td class="td-p2">Annotation player v1 (video + skeleton)</td><td class="td-p3">150 clips filmed + skeleton extraction</td></tr>
+      <tr><td>5</td><td class="td-p1">Technique classifier + rules engine v1</td><td class="td-p2">Annotation player — 5 interactions</td><td class="td-p3">Coach session 2 (biomechanical translation)</td></tr>
+      <tr><td>6</td><td class="td-p1">Claude feedback API + XP service</td><td class="td-p2">3D avatar renderer + share mechanic</td><td class="td-p3">Threshold document → P1 ✓ Integration pt 1</td></tr>
+      <tr><td>7</td><td class="td-p1">Leaderboard + unlock API endpoints</td><td class="td-p2">XP/belt UI + friends leaderboard</td><td class="td-p3">Coach session 3 + elite skeleton extraction</td></tr>
+      <tr><td>8</td><td class="td-p1">Weekly challenges engine + push notifs</td><td class="td-p2">Technique tree UI + challenges screen</td><td class="td-p3">150 MMA clips + challenge templates</td></tr>
+      <tr><td>9</td><td class="td-p1">API hardening + load testing</td><td class="td-p2">Progress screen + coach web dashboard</td><td class="td-p3">20 beta athletes recruited</td></tr>
+      <tr><td>10</td><td colspan="3" style="text-align:center;color:var(--xp);font-weight:600;font-family:var(--mono)">🔗 INTEGRATION WEEK — All 3 meet daily. Wire everything together. Fix mismatches. TestFlight build. Beta launch with 20 real athletes.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- DEPENDENCIES -->
+<section id="dependencies">
+  <span class="sec-tag">Execution</span>
+  <h2>Dependency map</h2>
+  <p class="lead">What each person needs from the others, and when. These are the only points where someone is blocked.</p>
+
+  <h4 class="sub">Person 2 needs from Person 1</h4>
+  <div class="dep-row"><span class="dep-name dep-p1">Week 2</span><span class="dep-arrow">→</span><span>API contract doc: all endpoint URLs, request/response schemas. P2 builds against mocks until week 6.</span></div>
+  <div class="dep-row"><span class="dep-name dep-p1">Week 6</span><span class="dep-arrow">→</span><span>Live analysis endpoint working. P2 wires annotation player to real AI output for the first time.</span></div>
+  <div class="dep-row"><span class="dep-name dep-p1">Week 7</span><span class="dep-arrow">→</span><span>XP, leaderboard, and unlock endpoints live. P2 connects game UI screens.</span></div>
+
+  <h4 class="sub">Person 1 needs from Person 3</h4>
+  <div class="dep-row"><span class="dep-name dep-p3">Week 2</span><span class="dep-arrow">→</span><span>Game spec document: XP values per action, belt thresholds, unlock prerequisites. P1 builds to these exact numbers.</span></div>
+  <div class="dep-row"><span class="dep-name dep-p3">Week 6</span><span class="dep-arrow">→</span><span>Rules engine threshold document: joint metrics, elite ranges, error conditions per technique. P1 hard-codes these values.</span></div>
+  <div class="dep-row"><span class="dep-name dep-p3">Week 8</span><span class="dep-arrow">→</span><span>Weekly challenge templates: 20 parameterized templates per sport for the challenge engine to use.</span></div>
+
+  <h4 class="sub">Person 3 needs from Person 1</h4>
+  <div class="dep-row"><span class="dep-name dep-p1">Week 4</span><span class="dep-arrow">→</span><span>Skeleton extractor script (Python). P3 runs this on all filmed clips to generate training data.</span></div>
+
+  <div class="callout success">
+    <strong>The critical path:</strong> P3 game spec → P1 XP API → P2 game UI. This chain takes 7 weeks end to end. P3 must deliver the spec in week 2 or the game layer slips. This is the most likely delay point — protect it.
+  </div>
+</section>
+
+<!-- MEETINGS -->
+<section id="meetings">
+  <span class="sec-tag">Execution</span>
+  <h2>Team sync protocol</h2>
+  <p class="lead">Maximum parallelism requires minimum meetings. Three rules.</p>
+
+  <div class="three-col">
+    <div class="card p1">
+      <h4>Daily</h4>
+      <h3>Async standup — 3 bullets each</h3>
+      <p>In a shared Slack/Discord channel, every morning: (1) what I shipped yesterday, (2) what I'm building today, (3) any blocker. Read-only. No replies unless it's a blocker. Keeps everyone aware without meetings.</p>
+    </div>
+    <div class="card p2">
+      <h4>Weekly — 45 min</h4>
+      <h3>Monday sync call</h3>
+      <p>Review the dependency map. Confirm each person's deliverable for the week. Resolve any interface disagreements between P1 API and P2 app. That's it. No status updates — those are async. This call is decisions only.</p>
+    </div>
+    <div class="card p3">
+      <h4>Weeks 6 + 10</h4>
+      <h3>Integration sprints — 3 days full sync</h3>
+      <p>All three people working together in person or on a call all day. Week 6: wire P2 annotation player to live P1 AI output. Week 10: full app integration, TestFlight build, beta launch. These two sprints are non-negotiable calendar blocks from day one.</p>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <strong>The one thing that kills 3-person teams:</strong> unclear API contracts. P1 must publish a Postman collection or OpenAPI spec by end of week 2. P2 builds against mocked responses until the real endpoints are live. If P2 waits for P1 to finish before building screens, you lose 4 weeks. Build against mocks from day one.
+  </div>
+</section>
+
+</main>
+
+<script>
+const links = document.querySelectorAll('nav a')
+const secs = document.querySelectorAll('section[id]')
+window.addEventListener('scroll', () => {
+  let cur = ''
+  secs.forEach(s => { if (window.scrollY >= s.offsetTop - 130) cur = s.id })
+  links.forEach(l => { l.classList.remove('on'); if (l.getAttribute('href') === '#'+cur) l.classList.add('on') })
+})
+links.forEach(l => l.addEventListener('click', e => {
+  e.preventDefault()
+  document.querySelector(l.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}))
+</script>
+</body>
+</html>

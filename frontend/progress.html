@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SportsAI — Progress</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .progress-page { max-width: 900px; margin: 0 auto; padding: 100px 20px 60px; }
+    .athlete-form { display: flex; gap: 12px; margin-bottom: 40px; flex-wrap: wrap; }
+    .input-field {
+      flex: 1; min-width: 200px; 
+      padding: 12px 16px; 
+      border-radius: 10px;
+      background: var(--raised); 
+      border: 1px solid var(--border); 
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif; 
+      font-size: 14px; 
+      outline: none;
+      transition: all 0.2s;
+    }
+    .input-field:focus { 
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(255,45,78,0.1);
+    }
+    .sessions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 24px; }
+    .session-card {
+      background: var(--card); 
+      border: 1px solid var(--border); 
+      border-radius: 14px; 
+      padding: 20px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      transition: all 0.2s;
+    }
+    .session-card:hover {
+      border-color: var(--border2);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .session-date { 
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; 
+      color: var(--muted); 
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .session-verdict { 
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 18px; 
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px; 
+    }
+    .trend-row { 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+      font-size: 14px; 
+      padding: 8px 0; 
+      border-bottom: 1px solid var(--border); 
+    }
+    .trend-row:last-child { border-bottom: none; }
+    .trend-up   { 
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--green); 
+      font-weight: 600;
+    }
+    .trend-down { 
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--red); 
+      font-weight: 600;
+    }
+    .trend-flat { 
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--muted); 
+      font-weight: 600;
+    }
+    .injury-alert {
+      background: rgba(255,45,78,0.08); 
+      border: 1px solid rgba(255,45,78,0.3);
+      border-radius: 10px; 
+      padding: 12px 16px; 
+      margin-top: 16px; 
+      font-size: 14px;
+    }
+    .injury-alert h4 { 
+      font-family: 'Barlow Condensed', sans-serif;
+      color: var(--red); 
+      margin-bottom: 4px; 
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+    .empty-state .icon { font-size: 3rem; margin-bottom: 16px; }
+    .tech-tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Sports<em>AI</em><sup>BETA</sup></div>
+  <div class="nav-right">
+    <a class="nav-pill" href="home.html">Home</a>
+    <a class="nav-pill" href="index.html">Analysis</a>
+    <a class="nav-pill" href="compare.html">Compare</a>
+    <a class="nav-pill active" href="progress.html">Progress</a>
+    <a class="nav-pill" href="chat.html">AI Coach</a>
+  </div>
+</nav>
+
+<div class="progress-page">
+  <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:48px;font-weight:800;letter-spacing:-1px;margin-bottom:8px;">Athlete Progress</h2>
+  <p style="color:var(--muted);margin-bottom:32px;font-size:14px;">Track improvement across sessions for any athlete.</p>
+
+  <div class="athlete-form">
+    <input class="input-field" id="athleteId" placeholder="Athlete ID (e.g. player_1)" />
+    <div class="tech-tabs" id="techTabs">
+      <button class="tech-pill active" data-tech="spike">Spike</button>
+      <button class="tech-pill" data-tech="serve">Serve</button>
+      <button class="tech-pill" data-tech="block">Block</button>
+      <button class="tech-pill" data-tech="dig">Dig</button>
+    </div>
+    <button class="btn btn-primary" onclick="loadProgress()">Load Progress</button>
+  </div>
+
+  <div id="progressContent">
+    <div class="empty-state">
+      <div class="icon">📈</div>
+      <p>Enter an athlete ID and select a technique to view their progress history.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:8001';
+let selectedTech = 'spike';
+
+document.querySelectorAll('.tech-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tech-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedTech = btn.dataset.tech;
+  });
+});
+
+async function loadProgress() {
+  const id = document.getElementById('athleteId').value.trim();
+  if (!id) { alert('Enter an athlete ID'); return; }
+
+  const content = document.getElementById('progressContent');
+  content.innerHTML = '<p style="color:var(--muted);padding:20px">Loading...</p>';
+
+  try {
+    const res = await fetch(`${API}/progress/${id}/${selectedTech}`);
+    if (!res.ok) { content.innerHTML = '<p style="color:var(--accent);padding:20px">No data found for this athlete.</p>'; return; }
+    const data = await res.json();
+    renderProgress(data, id);
+  } catch (e) {
+    content.innerHTML = '<p style="color:var(--accent);padding:20px">Could not connect to server.</p>';
+  }
+}
+
+function renderProgress(data, id) {
+  const content = document.getElementById('progressContent');
+  if (!data.sessions_total) {
+    content.innerHTML = '<div class="empty-state"><div class="icon">🏐</div><p>No sessions recorded yet for this athlete.</p></div>';
+    return;
+  }
+
+  let html = `
+    <div style="display:flex;gap:24px;margin-bottom:28px;flex-wrap:wrap">
+      <div class="score-hero" style="flex:1;min-width:280px">
+        <div class="score-info">
+          <div class="score-verdict">${id}</div>
+          <div class="score-desc">${data.sessions_total} session${data.sessions_total !== 1 ? 's' : ''} recorded · ${selectedTech}</div>
+          <div class="score-meta">
+            <div class="score-meta-item"><div class="score-meta-label">Sessions</div><div class="score-meta-val">${data.sessions_total}</div></div>
+            <div class="score-meta-item"><div class="score-meta-label">Best score</div><div class="score-meta-val">${data.best_score || '—'}</div></div>
+            <div class="score-meta-item"><div class="score-meta-label">Last verdict</div><div class="score-meta-val">${data.last_verdict || '—'}</div></div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  // Trends
+  if (data.trends && Object.keys(data.trends).length) {
+    html += '<div class="metrics-card" style="margin-bottom:20px"><div class="card-title">Metric Trends</div>';
+    for (const [metric, trend] of Object.entries(data.trends)) {
+      const icon = trend === 'improving' ? '↑' : trend === 'declining' ? '↓' : '→';
+      const cls  = trend === 'improving' ? 'trend-up' : trend === 'declining' ? 'trend-down' : 'trend-flat';
+      html += `<div class="trend-row"><span style="text-transform:capitalize">${metric.replace(/_/g,' ')}</span><span class="${cls}">${icon} ${trend}</span></div>`;
+    }
+    html += '</div>';
+  }
+
+  // Injury risk
+  if (data.injury_risk && data.injury_risk.length) {
+    html += '<div class="injury-alert"><h4>⚠ INJURY RISK FLAGS</h4>';
+    data.injury_risk.forEach(r => { html += `<div>${r}</div>`; });
+    html += '</div>';
+  }
+
+  // Session history
+  if (data.history && data.history.length) {
+    html += '<div style="margin-top:24px"><div class="card-title">Session History</div><div class="sessions-grid">';
+    data.history.slice().reverse().forEach((s, i) => {
+      const date = s.timestamp ? new Date(s.timestamp).toLocaleDateString() : `Session ${data.history.length - i}`;
+      const vClass = s.verdict === 'ELITE' ? 'v-ELITE' : s.verdict === 'GOOD' ? 'v-GOOD' : 'v-NEEDS-WORK';
+      html += `
+        <div class="session-card">
+          <div class="session-date">${date}</div>
+          <div class="session-verdict verdict-chip ${vClass}" style="display:inline-block;margin-bottom:12px">${s.verdict || '—'}</div>
+          <div style="font-size:0.85rem;color:var(--muted)">Score: ${s.score || '—'}</div>
+        </div>`;
+    });
+    html += '</div></div>';
+  }
+
+  content.innerHTML = html;
+}
+</script>
+</body>
+</html>

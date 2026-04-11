@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SportsAI — Volleyball Coach</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Sports<em>AI</em><sup>BETA</sup></div>
+  <div class="nav-right">
+    <a class="nav-pill" href="home.html">Home</a>
+    <a class="nav-pill active" href="index.html">Analysis</a>
+    <a class="nav-pill" href="compare.html">Compare</a>
+    <a class="nav-pill" href="progress.html">Progress</a>
+    <a class="nav-pill" href="chat.html">AI Coach</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-eyebrow">⚡ Olympic-grade biomechanics analysis</div>
+  <h1>
+    Train smarter.
+    <span class="line2">Spike harder.</span>
+  </h1>
+  <p>Upload any volleyball video. Get instant AI coaching with feel cues, drills, and a frame-by-frame skeleton analysis — compared to elite athletes.</p>
+  <div class="hero-cta">
+    <button class="btn btn-primary" onclick="scrollToUpload()">▶ &nbsp;Analyse my video</button>
+    <a class="btn btn-ghost" href="http://localhost:8001/docs" target="_blank">API Docs →</a>
+  </div>
+  <div class="stats-strip">
+    <div class="stat"><div class="stat-num">47<span>+</span></div><div class="stat-label">Elite sequences</div></div>
+    <div class="stat"><div class="stat-num">92<span>%</span></div><div class="stat-label">Action detection accuracy</div></div>
+    <div class="stat"><div class="stat-num">4</div><div class="stat-label">Techniques analysed</div></div>
+    <div class="stat"><div class="stat-num">&lt;60<span>s</span></div><div class="stat-label">Analysis time</div></div>
+  </div>
+</section>
+
+<!-- UPLOAD -->
+<section id="uploadSection" style="padding-top:40px;">
+  <div style="max-width:720px;margin:0 auto;padding:0 20px 100px;">
+    <!-- Technique Selection - OUTSIDE upload zone -->
+    <div style="margin-bottom: 20px;">
+      <div class="tech-section">
+        <button class="tech-pill active" data-tech="spike">Spike</button>
+        <button class="tech-pill" data-tech="serve">Serve</button>
+        <button class="tech-pill" data-tech="block">Block</button>
+        <button class="tech-pill" data-tech="dig">Dig</button>
+      </div>
+
+      <!-- Advanced Options -->
+      <div class="advanced-options">
+        <button class="tech-pill special" data-tech="match" style="border-color:#a855f7;color:#a855f7">🏆 Full Match</button>
+        <button class="tech-pill special" data-tech="team" style="border-color:#4d9fff;color:#4d9fff">👥 Team Tracking</button>
+      </div>
+    </div>
+
+    <div class="section-label">Upload your video</div>
+
+    <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+      <div class="upload-icon-wrap">🏐</div>
+      <h3>Drop your video here</h3>
+      <p>MP4, MOV, or any format · 480p or higher · Any length</p>
+      <button class="btn btn-primary" onclick="event.stopPropagation(); document.getElementById('fileInput').click()">
+        Choose Video
+      </button>
+      <input type="file" id="fileInput" accept="video/*" />
+    </div>
+
+    <div class="file-preview" id="filePreview">
+      <div class="file-thumb">🎬</div>
+      <div class="file-info">
+        <div class="file-name" id="fileName">—</div>
+        <div class="file-size" id="fileSize">—</div>
+      </div>
+      <button class="btn-icon" onclick="resetUpload()">✕</button>
+    </div>
+
+    <button class="btn btn-primary analyse-btn" id="analyseBtn" onclick="startAnalysis()">
+      ▶ &nbsp; Analyse Video
+    </button>
+
+    <div class="error-box" id="errorBox">
+      <h4>⚠ Video Issue</h4>
+      <p id="errorMsg">—</p>
+    </div>
+  </div>
+</section>
+
+<!-- PROGRESS -->
+<section id="progressSection">
+  <div style="max-width:560px;margin:0 auto;padding:0 20px 100px;">
+    <div class="progress-card">
+      <div class="spinner-wrap"><div class="spinner"></div></div>
+      <h3>Analysing your video</h3>
+      <p>Sit tight — this takes 30–90 seconds</p>
+      <ul class="steps" id="stepsList">
+        <li class="active" id="s1"><span class="step-icon">1</span> Checking video quality</li>
+        <li id="s2"><span class="step-icon">2</span> Detecting technique & timing</li>
+        <li id="s3"><span class="step-icon">3</span> Extracting 3D pose skeleton</li>
+        <li id="s4"><span class="step-icon">4</span> Comparing to elite athletes</li>
+        <li id="s5"><span class="step-icon">5</span> Generating AI coaching</li>
+        <li id="s6"><span class="step-icon">6</span> Rendering annotated video</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section id="resultsSection">
+  <div style="max-width:1200px;margin:0 auto;padding:0 20px 100px;">
+
+    <!-- Score hero -->
+    <div class="score-hero">
+      <div class="score-ring-wrap">
+        <svg class="score-ring" width="100" height="100" viewBox="0 0 100 100">
+          <circle class="score-ring-bg" cx="50" cy="50" r="42"/>
+          <circle class="score-ring-fill" id="scoreRingFill" cx="50" cy="50" r="42"
+            stroke-dasharray="264" stroke-dashoffset="264"/>
+        </svg>
+        <div class="score-ring-text">
+          <div class="score-big" id="scoreBig">—</div>
+          <div class="score-denom" id="scoreDenom">/ 5</div>
+        </div>
+      </div>
+      <div class="score-info">
+        <div class="score-verdict" id="scoreVerdict">—</div>
+        <div class="score-desc" id="scoreDesc">—</div>
+        <div class="score-meta">
+          <div class="score-meta-item">
+            <div class="score-meta-label">Technique</div>
+            <div class="score-meta-val" id="mTech">—</div>
+          </div>
+          <div class="score-meta-item">
+            <div class="score-meta-label">Analysis time</div>
+            <div class="score-meta-val" id="mTime">—</div>
+          </div>
+          <div class="score-meta-item">
+            <div class="score-meta-label">Confidence</div>
+            <div class="score-meta-val" id="mConf">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="verdict-chip" id="verdictChip">—</div>
+    </div>
+
+    <div class="results-layout">
+      <!-- Video -->
+      <div class="video-card">
+        <video id="resultVideo" controls playsinline></video>
+        <div class="video-footer">
+          <div class="vf-item"><div class="vf-label">Score</div><div class="vf-value" id="mScore">—</div></div>
+          <div class="vf-item"><div class="vf-label">Technique</div><div class="vf-value" id="mTech2">—</div></div>
+          <div class="vf-item"><div class="vf-label">Time</div><div class="vf-value" id="mTime2">—</div></div>
+        </div>
+        <div class="video-actions">
+          <!-- Download button removed - videos now play inline only -->
+        </div>
+      </div>
+
+      <!-- Coaching -->
+      <div class="coaching-col" id="coachingCol"></div>
+    </div>
+
+    <div class="reset-row">
+      <button class="btn-outline" onclick="resetAll()">↩ &nbsp; Analyse another video</button>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<div class="features-strip">
+  <div class="feat"><div class="feat-icon">🦴</div><h4>3D Skeleton</h4><p>17-joint pose on every frame</p></div>
+  <div class="feat"><div class="feat-icon">🏅</div><h4>Elite Benchmark</h4><p>Compared to Olympic athletes</p></div>
+  <div class="feat"><div class="feat-icon">🧠</div><h4>AI Coaching</h4><p>Feel cues, not just numbers</p></div>
+  <div class="feat"><div class="feat-icon">📈</div><h4>Progress</h4><p>Track improvement over time</p></div>
+  <div class="feat"><div class="feat-icon">⚡</div><h4>Fast</h4><p>Results in under 60 seconds</p></div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

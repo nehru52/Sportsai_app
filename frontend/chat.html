@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Coach — SportsAI</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="chat.css" />
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Sports<em>AI</em><sup>BETA</sup></div>
+  <div class="nav-right">
+    <a class="nav-pill" href="home.html">Home</a>
+    <a class="nav-pill" href="index.html">Analysis</a>
+    <a class="nav-pill" href="compare.html">Compare</a>
+    <a class="nav-pill" href="progress.html">Progress</a>
+    <a class="nav-pill active" href="chat.html">AI Coach</a>
+  </div>
+</nav>
+
+<!-- CHAT CONTAINER -->
+<div class="chat-container">
+  
+  <!-- Chat Header -->
+  <div class="chat-header">
+    <div class="coach-avatar">🤖</div>
+    <div class="coach-info">
+      <h2 class="coach-name">AI Coach</h2>
+      <div class="coach-status">
+        <div class="status-dot"></div>
+        <span>Online · knows your last 30 sessions</span>
+      </div>
+    </div>
+    <div class="questions-remaining">
+      <div class="questions-count">3</div>
+      <div class="questions-label">Questions Left Today</div>
+    </div>
+  </div>
+
+  <!-- Chat Messages -->
+  <div class="chat-messages" id="chatMessages">
+    
+    <!-- Welcome Message -->
+    <div class="message-group ai">
+      <div class="message-avatar">🤖</div>
+      <div class="message-content">
+        <div class="message-label">AI COACH · your data</div>
+        <div class="message-bubble">
+          <p>Hey! I've analyzed your last session. Your spike entry phase averaged 0.74 — elite athletes are at 0.63. Want to know how to close that gap?</p>
+        </div>
+        <div class="message-time">Just now</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Quick Prompts -->
+  <div class="quick-prompts" id="quickPrompts">
+    <button class="quick-prompt" onclick="sendQuickPrompt(this)">
+      Why does my shot keep getting stuffed?
+    </button>
+    <button class="quick-prompt" onclick="sendQuickPrompt(this)">
+      What should I work on this week?
+    </button>
+    <button class="quick-prompt" onclick="sendQuickPrompt(this)">
+      How do I beat bigger wrestlers?
+    </button>
+    <button class="quick-prompt" onclick="sendQuickPrompt(this)">
+      Analyze my last 5 sessions
+    </button>
+  </div>
+
+  <!-- Chat Input -->
+  <div class="chat-input-container">
+    <div class="chat-input-wrapper">
+      <input 
+        type="text" 
+        class="chat-input" 
+        id="chatInput" 
+        placeholder="Ask your coach anything..."
+        onkeypress="handleKeyPress(event)"
+      />
+      <button class="btn-send" id="btnSend" onclick="sendMessage()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M2 10L18 2L10 18L8 11L2 10Z" fill="currentColor"/>
+        </svg>
+      </button>
+    </div>
+    <div class="input-hint">
+      Press Enter to send · Shift+Enter for new line
+    </div>
+  </div>
+
+</div>
+
+<!-- Upgrade Modal (shown after 3 questions) -->
+<div class="modal" id="upgradeModal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeUpgradeModal()">✕</button>
+    <div class="modal-icon">⭐</div>
+    <h2>You've used your 3 daily questions</h2>
+    <p>Upgrade to Pro for unlimited AI coaching, advanced analytics, and priority support.</p>
+    <div class="modal-features">
+      <div class="feature-item">
+        <div class="feature-icon">💬</div>
+        <div class="feature-text">Unlimited AI questions</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">📊</div>
+        <div class="feature-text">Advanced analytics</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🎯</div>
+        <div class="feature-text">Personalized training plans</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🏆</div>
+        <div class="feature-text">1v1 Arena access</div>
+      </div>
+    </div>
+    <button class="btn-upgrade">Upgrade to Pro — $9.99/month</button>
+    <button class="btn-maybe-later" onclick="closeUpgradeModal()">Maybe later</button>
+  </div>
+</div>
+
+<script src="chat.js"></script>
+</body>
+</html>

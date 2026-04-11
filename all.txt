@@ -1,0 +1,271 @@
+# SportsAI — Architecture & Data Strategy
+
+## How to Make This Useful to a Common User — The Improvement Loop
+
+### The core insight
+Users don't improve from numbers ("your arm angle is 87°").
+They improve from three things, in this order:
+1. SEEING themselves vs correct movement (visual comparison)
+2. Knowing what it should FEEL like (body cue, not a number)
+3. A specific drill that isolates the exact failure pattern
+
+Use BOTH the 3D skeleton overlay AND verbal cues. The skeleton shows WHAT is wrong
+spatially. The feel cue tells them HOW to fix it with a mental model they can use
+in real time during practice. Numbers alone are useless to a common user.
+
+### The feedback loop that actually produces improvement
+Session → annotated video → feel cue → drill → next session → compare
+
+1. User uploads video
+2. /analyse/video returns an annotated MP4 they can watch immediately:
+   - Green joints = correct, Red joints = problem
+   - Grey ghost skeleton = where elite athletes are at that same moment
+   - Key moment highlighted with the feel cue as text overlay
+   - HUD panel showing all metrics + next session focus
+3. Claude generates: headline + strengths + max 3 fixes with:
+   - What is actually happening in their body (1 sentence)
+   - What it should FEEL like (sensation language, not angle numbers)
+   - Exact drill with sets/reps
+   - Why the drill works biomechanically
+4. If same metric is bad for 3 sessions → drill prescription escalates
+5. Progress tracker shows trend (improving/plateau/declining) per metric
+6. Injury risk flags trigger before they get hurt
+
+### Why this works better than Balltime
+- Balltime shows you what happened. This shows you what to DO about it.
+- Feel cues work in real-time during practice — you can't check an angle mid-jump
+- Drill library is technique-specific, not generic
+- Persistent problem detection means the system notices when you're stuck
+- Ghost overlay = direct visual comparison, not abstract numbers
+
+### Skill level adaptation
+- Beginner: everyday language, simple cues ("pull your elbow back like drawing a bow")
+- Intermediate: coaching language, phase references ("load your hips on the penultimate step")
+- Advanced: biomechanical language ("increase shoulder abduction angle at arm cocking phase")
+
+## Why Volleyball First
+- Court is flat, camera angles are mostly fixed (sideline or endzone)
+- Actions are discrete and well-defined: serve → pass → set → attack → block → dig
+- This makes the CV pipeline dramatically simpler to train and validate vs. basketball or soccer
+
+Balltime AI (acquired by Hudl) proved the market — 67K+ users, App Store top charts. Their weaknesses:
+- Misidentifies the correct player ~50% of the time
+- Aggressive watermarks
+- Poor customer support
+
+Our opening: better accuracy + better UX + team video focus they don't do well.
+
+"Volleyball first, then expand" is textbook product discipline. One rules engine that works extremely
+well for one sport → revenue → fund the next sport. Launching 5 sports at once guarantees mediocrity.
+
+---
+
+## System Architecture (5 Layers)
+
+### Layer 1 — Shared Pose Backbone (train ONCE, use for all sports)
+- MMPose (OpenMMLab) — multi-person, 133-keypoint whole-body, 3D mesh recovery, Apache 2.0
+- AlphaPose — 70+ mAP on COCO, 60+ mAP on PoseTrack, efficient online multi-person tracker
+- MediaPipe — 33 keypoints, 30fps, on-device, zero training needed — plug in directly
+- Pre-trained on 200M+ human poses
+- Status: Currently using YOLO11x-pose → upgrade path is MMPose + AlphaPose for multi-person
+
+### Layer 2 — Biomechanics Engine (fine-tune per sport category)
+- Joint angles, velocity, acceleration, symmetry, balance — computed from keypoints
+- ~3 categories: individual precision, team ball, combat
+- ~500–2K labeled clips each
+- Status: Built for spike (arm_cock_angle, jump_height, approach_speed, contact_point, follow_through)
+  Serve/block/dig biomechanics extraction implemented, thresholds pending data collection
+
+### Layer 3 — Sport-Specific Rules Engine (one per sport)
+- What does "correct form" mean for THIS sport?
+- Written by coaches + sports scientists
+- Only this layer is unique per sport — everything else is shared infrastructure
+- Status: Spike analyser built. Unified analyser.py covers all 4 techniques.
+  Team video needs: jersey re-ID, formation recognition (P1–P6 rotations), rally segmentation
+
+### Layer 4 — AI Coach Feedback (Claude API)
+- Takes biomechanics scores + athlete history → generates personalized coaching
+- Example: "Your left knee collapsed 12° on the third rep — classic fatigue pattern. Here's the fix..."
+- Status: Not built yet
+
+### Layer 5 — Progress Loop
+- Track specific metrics over time, score each session
+- Compare to elite reference models
+- Prescribe drills, detect plateaus, flag injury risk patterns
+- Adapt to the athlete
+- Status: Not built yet
+
+---
+
+## Training Strategy — Fastest Path to Olympic-Grade
+
+Do NOT train from scratch (12–18 months). Use this path instead:
+
+### Week 1–2 — Plug in pre-trained backbones
+- MMPose as skeleton backbone (multi-person, state-of-the-art, Apache 2.0)
+- AlphaPose for real-time multi-person tracking layer
+- Both work out of the box — zero labeling needed at this stage
+
+### Week 2–4 — Fine-tune on volleyball-specific data
+- VolleyVision: 14K-image volleyball actions dataset, YOLOv8m, 7 classes
+  (defense-move, attack, block, reception, service, setting, stand)
+- volleyball_analytics repo: end-to-end FastAPI pipeline, VideoMAE game state,
+  6-action detection (serve, receive, set, spike, block, ball), court segmentation
+- Roboflow Universe: volleyball actions dataset with code, models, metrics
+
+### Week 4–8 — Team video additions
+These are NOT covered by the above repos and must be built:
+- Jersey number + player re-identification across camera cuts (hardest part)
+  → Use PaddleOCR (free, fast) for jersey OCR
+- Formation recognition — detecting rotation positions (P1–P6)
+- Ball trajectory tracking with speed estimation
+  → Use TrackNet (open source, designed for fast-moving small balls in sports)
+- Rally segmentation — detecting when ball is in/out of play
+
+### Full stack
+- YOLOv8-pose → fine-tune on Roboflow volleyball dataset
+- DeepSORT or ByteTrack → multi-player tracking (need 12-person: 6v6)
+- PaddleOCR → jersey number recognition
+- TrackNet → ball trajectory
+- Claude API → intelligent feedback generation (Layer 4)
+
+Realistic timeline:
+- Working demo: 6–8 weeks using open-source repos above
+- Olympic-grade accuracy (rival broadcast analytics tools): 4–6 months iterative fine-tuning
+
+---
+
+## Architecture Gap: 1v1 vs Team Video
+
+Current system is designed for individual technique analysis (1 athlete per video).
+Team video is a different architecture:
+- Replace 2-person tracker with 12-person tracker (6v6)
+- Add volleyball scoring logic (rotations, faults, libero rules)
+- Add rally segmentation and game-state detection (SERVICE / PLAY / NO-PLAY)
+- Formation recognition per rotation position
+
+---
+
+## Free Data Sources — Use Immediately
+
+| Source | Sports | What You Get | Size |
+|--------|--------|--------------|------|
+| MediaPipe | All | Google pre-trained, 33 keypoints, 30fps, on-device | 200M+ poses |
+| MMPose | All (multi-person) | SOTA, better than MediaPipe for complex movements, Apache 2.0 | COCO 250K+ |
+| Roboflow Universe | Volleyball, Basketball, Soccer, Swimming | Pre-labeled, YOLO-ready. Volleyball: 14K images, 7 action classes | 14K–50K clips |
+| VolleyVision GitHub | Volleyball | YOLOv8 weights, court segmentation, action detection | 14K images |
+| volleyball_analytics | Volleyball | FastAPI pipeline, VideoMAE, 6-action detection, court segmentation | Production-ready |
+| openvolley/ovml | Volleyball | Ball detection YOLO models tuned for volleyball, court coordinate tools | 67K+ matches |
+| AlphaPose | All | Multi-person tracking, 70+ mAP COCO, commercial-friendly | PoseTrack 60+ mAP |
+| FitVid / r/formcheck | Weightlifting, Powerlifting, CrossFit | 2M+ posts with video + expert correction labels | 2M+ videos |
+| FIG Gymnastics Archive | Gymnastics | 8,000 routines, D-score + E-score breakdown label schema | 8,000 routines |
+| World Athletics Open Data | Sprinting, Long jump, Hurdles, Throws | Biomechanics studies, Olympic finals in 4K, side-view = clean keypoints | 100K+ clips |
+
+### Key GitHub Repos
+
+| Repo | What You Get | Link |
+|------|--------------|------|
+| VolleyVision | 14K labeled volleyball action images, YOLOv8 weights, court segmentation | github.com/shukkkur/VolleyVision |
+| volleyball_analytics | Full FastAPI pipeline, VideoMAE game state, 6-action detection | github.com/masouduut94/volleyball_analytics |
+| openvolley/ovml | Ball detection YOLO models for volleyball, court coordinate tools | github.com/openvolley/ovml |
+| openvolley org | R packages for volleyball analytics, DVW match format support | github.com/openvolley |
+| MMPose | Pose backbone, SOTA, Apache 2.0 | github.com/open-mmlab/mmpose |
+| AlphaPose | Multi-person tracking, commercial-friendly | github.com/MVIG-SJTU/AlphaPose |
+| Roboflow Universe | Volleyball actions dataset with code, models, metrics | universe.roboflow.com/actions-players/volleyball-actions |
+
+---
+
+## Partner / Apply Sources (2–8 weeks)
+
+| Source | Sports | How to Access |
+|--------|--------|---------------|
+| NCAA Open Data | Swimming, Wrestling, Gymnastics, Track | Email 3–5 university sports science departments, offer free app access for labeled footage |
+| National Olympic Committees | Any Olympic sport | Many NOCs (Italy, Hungary, Japan especially open) have footage but no AI tools. Offer free elite analysis software for labeled data |
+| USA Swimming / USAG / USATF | Swimming, Gymnastics, Track | Approach as technology partner offering free tools to youth development programs |
+
+---
+
+## Generate Your Own Data — The Flywheel
+
+| Method | Sports | Details | Scale |
+|--------|--------|---------|-------|
+| Your own users | All | Every upload = training data (ToS consent). 1,000 users = ~3,000 labeled clips/week. "Was this feedback helpful?" = label signal. Compounds forever | Grows forever |
+| Coach labeling program | All | 5–10 certified coaches per sport at $20–30/hr, 500 clips each. Cost: ~$5,000/sport. Exact approach Hudl and CoachAI used early on | 500–2K/sport |
+| Scale AI / Label Studio | Any | Crowdsource annotation. Schema: joint angles, action class, quality score 1–10. Cost: $0.50–2/clip | On demand |
+
+---
+
+## Minimum Viable Data Per Sport to Launch
+
+| Category | Examples | Minimum Clips | Notes |
+|----------|----------|---------------|-------|
+| Individual precision | Swimming, Gymnastics, Track, Weightlifting | 1,500 (500/skill level) | Enough for v1 at 80%+ accuracy |
+| Team ball | Volleyball, Basketball, Soccer | 2,000–5,000 | VolleyVision's 14K reduces this for volleyball |
+| Combat | Wrestling, Judo, Boxing | 3,000–8,000 | Hardest due to occlusion — build last |
+
+---
+
+## Balltime AI — Can You Get Their Data?
+
+No. Balltime was acquired by Hudl. Their training data, model weights, and datasets are completely
+proprietary. Hudl Assist (powered by Balltime AI) is available for club/college volleyball now,
+high school coming 2026.
+
+You don't need their data. The GitHub repos above give you a free equivalent starting point.
+
+---
+
+## Current Status
+
+### Done
+- [x] skeleton_overlay.py — annotated video renderer: colour-coded joints, elite ghost overlay, HUD panel, peak moment highlight, feel cue text
+- [x] coach_feedback.py — rebuilt: structured JSON output, feel cues, drill library (19 drills), persistent problem detection, skill level adaptation, rule-based fallback without API
+- [x] /analyse/video — main user endpoint, returns annotated MP4 + coaching in headers
+- [x] Spike data collection — 47 videos processed
+- [x] Unified analyser.py — spike, serve, block, dig
+- [x] pose_3d_lifter.py — MotionAGFormer WIRED IN (correct path, exact config: n_layers=26, dim_feat=64, n_frames=81, stride=27)
+- [x] pose_extractor.py — YOLO cached, real 3D via MotionAGFormer, kinematics merged
+- [x] kinematics.py — AthletePose3D Butterworth-filtered joint angles + velocities (8 joints)
+- [x] action_detector.py — VolleyVision YOLOv8m (92.31% mAP50, 5 classes, sliding window)
+- [x] court_detector.py — Roboflow API (key set), frame sampling, polygon extraction
+- [x] player_tracker.py — YOLO11x-pose + ByteTrack, 12-person 6v6, team A/B assignment
+- [x] ball_tracker.py — VolleyVision YOLOv7-tiny ball weights, trajectory, speed, rally segmentation
+- [x] coach_feedback.py — Claude API Layer 4, technique-specific prompts, session history context
+- [x] progress_tracker.py — Layer 5, per-athlete JSON history, trend detection, injury risk flags
+- [x] api.py — 8 endpoints: /analyse/{technique}, /action, /court, /players, /ball, /full, /progress
+- [x] /analyse/full — single call runs entire olympic pipeline end-to-end
+
+### Endpoint map
+POST /analyse/{technique}   — biomechanics JSON + optional AI feedback + progress
+POST /analyse/video         — annotated MP4 with skeleton overlay + feel cues (main user endpoint)
+POST /analyse/compare       — side-by-side MP4: athlete vs phase-matched elite reference
+POST /analyse/action        — VolleyVision action detection
+POST /analyse/court         — Roboflow court segmentation
+POST /analyse/players       — ByteTrack 12-person tracking
+POST /analyse/ball          — ball trajectory + rally segmentation
+POST /analyse/full          — full pipeline in one call
+GET  /progress/{id}/{tech}  — athlete progress report
+
+- [x] reference_library.py — loads all 17 elite spike .npy sequences, time-normalises to 100 frames, root-centres + scale-normalises, averages to canonical elite sequence. Cached after first call.
+- [x] phase_detector.py — kinematic phase detection for all 4 techniques (spike: APPROACH/TAKEOFF/ARM_COCK/CONTACT/FOLLOW_THROUGH). Phase-proportional athlete→elite frame mapping.
+- [x] skeleton_overlay.render_side_by_side() — LEFT: athlete video + colour-coded skeleton. RIGHT: elite reference skeleton animated + athlete skeleton at 60% alpha + orange divergence arrows. Phase banner + progress bar. Bottom HUD with metric pills + focus cue.
+- [x] /analyse/compare — new endpoint, returns side-by-side MP4 + X-Phases / X-Elite-Clips headers
+
+### Next
+- [ ] Serve / block / dig data collection (add URLs to volleyball_urls.csv, run batch_processor)
+- [ ] Set ANTHROPIC_API_KEY env var to activate Layer 4 coach feedback
+- [ ] Jersey OCR — PaddleOCR (player re-ID across camera cuts)
+- [ ] Formation recognition — P1–P6 rotation detection
+- [ ] Frontend / mobile app
+
+---
+
+## Competitor Gap Analysis
+
+**Balltime AI (acquired by Hudl)**
+- 67K+ users
+- Weaknesses: misidentifies correct player ~50% of the time, aggressive watermarks, poor customer support
+- Your opening: better accuracy + better UX + team video focus
+
+**Your advantage:** Building 12-person multi-player tracking from day one using ByteTrack + MMPose
+addresses their biggest weakness directly. Jersey re-ID solves the misidentification problem at the root.

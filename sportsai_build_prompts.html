@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SportsAI — Complete Build Prompts for Trae + Claude Code</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#030308;--bg2:#07070f;--bg3:#0b0b16;--bg4:#0f0f1e;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);
+  --text:#e8e8ff;--muted:#6060a0;--dim:#1e1e40;
+  --g:#00ff88;--b:#3d8bff;--r:#ff3d6e;--y:#ffc800;--p:#c084fc;--c:#00d4ff;
+  --mono:'JetBrains Mono',monospace;--sans:'DM Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.7;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;width:230px;height:100vh;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;padding:20px 0;z-index:100;}
+.logo{padding:0 18px 18px;border-bottom:1px solid var(--border);}
+.logo h1{font-family:var(--mono);font-size:13px;color:var(--g);letter-spacing:1px;}
+.logo p{font-size:9px;color:var(--muted);margin-top:2px;}
+.ns{font-size:8px;letter-spacing:2.5px;text-transform:uppercase;color:var(--dim);padding:12px 18px 2px;}
+nav a{display:block;padding:5px 18px;color:var(--muted);text-decoration:none;font-size:10px;font-family:var(--mono);border-left:2px solid transparent;transition:all .1s;}
+nav a:hover,nav a.on{color:var(--g);border-left-color:var(--g);background:rgba(0,255,136,.04);}
+main{margin-left:230px;}
+section{padding:56px 48px;border-bottom:1px solid var(--border);max-width:960px;}
+section.wide{max-width:none;}
+
+/* HERO */
+#hero{padding:72px 48px 56px;max-width:none;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(0,255,136,.015) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(0,255,136,.015) 40px);}
+.kicker{font-family:var(--mono);font-size:10px;color:var(--g);letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;display:block;}
+h1{font-size:44px;font-weight:700;letter-spacing:-2px;line-height:1.05;max-width:760px;margin-bottom:14px;}
+h1 .g{color:var(--g);}h1 .b{color:var(--b);}
+.sub{font-size:15px;color:var(--muted);max-width:560px;line-height:1.7;margin-bottom:28px;}
+.ide-row{display:flex;gap:12px;flex-wrap:wrap;}
+.ide-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:6px;border:1px solid;font-family:var(--mono);font-size:11px;}
+.ip-trae{border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.06);color:var(--g);}
+.ip-claude{border-color:rgba(61,139,255,.3);background:rgba(61,139,255,.06);color:var(--b);}
+.ip-cursor{border-color:rgba(192,132,252,.3);background:rgba(192,132,252,.06);color:var(--p);}
+
+/* SECTION LABELS */
+.sl{font-family:var(--mono);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--g);display:block;margin-bottom:8px;}
+h2{font-size:28px;font-weight:700;letter-spacing:-1px;line-height:1.05;margin-bottom:10px;}
+.lead{font-size:13px;color:var(--muted);border-left:2px solid var(--g);padding-left:14px;margin-bottom:28px;line-height:1.65;max-width:680px;}
+
+/* PROMPT BLOCKS */
+.prompt-block{margin:16px 0;}
+.pb-header{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border2);border-bottom:none;border-radius:8px 8px 0 0;padding:10px 16px;}
+.pb-ide{font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;font-weight:600;}
+.pb-trae{background:rgba(0,255,136,.12);border:1px solid rgba(0,255,136,.25);color:var(--g);}
+.pb-claude{background:rgba(61,139,255,.12);border:1px solid rgba(61,139,255,.25);color:var(--b);}
+.pb-both{background:rgba(192,132,252,.12);border:1px solid rgba(192,132,252,.25);color:var(--p);}
+.pb-title{font-family:var(--mono);font-size:11px;color:var(--text);}
+.pb-desc{font-size:11px;color:var(--muted);margin-left:auto;}
+.pb-body{background:#020208;border:1px solid var(--border2);border-radius:0 0 8px 8px;padding:20px 22px;font-family:var(--mono);font-size:12px;line-height:1.8;color:#9999cc;white-space:pre-wrap;overflow-x:auto;}
+.pb-body .cg{color:var(--g);}
+.pb-body .cb{color:var(--b);}
+.pb-body .cy{color:var(--y);}
+.pb-body .cp{color:var(--p);}
+.pb-body .cc{color:var(--c);}
+.pb-body .cr{color:var(--r);}
+.pb-body .cm{color:var(--muted);}
+.pb-copy{cursor:pointer;background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.2);border-radius:4px;padding:2px 10px;font-family:var(--mono);font-size:9px;color:var(--g);transition:all .15s;margin-left:auto;}
+.pb-copy:hover{background:rgba(0,255,136,.2);}
+.pb-copy.copied{color:var(--y);}
+
+/* CALLOUT */
+.note{border-radius:6px;padding:12px 14px;margin:14px 0;font-size:12px;line-height:1.6;}
+.ng{background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.16);color:rgba(0,255,136,.85);}
+.nb{background:rgba(61,139,255,.06);border:1px solid rgba(61,139,255,.16);color:rgba(130,175,255,.9);}
+.ny{background:rgba(255,200,0,.06);border:1px solid rgba(255,200,0,.16);color:rgba(255,220,80,.9);}
+.nr{background:rgba(255,61,110,.06);border:1px solid rgba(255,61,110,.16);color:rgba(255,130,150,.9);}
+.note strong{font-weight:600;}
+
+/* STEP FLOW */
+.steps{position:relative;padding-left:28px;margin:16px 0;}
+.steps::before{content:'';position:absolute;left:9px;top:8px;bottom:8px;width:1px;background:linear-gradient(to bottom,var(--g),var(--b),transparent);}
+.step{position:relative;margin-bottom:20px;}
+.step::before{content:attr(data-n);position:absolute;left:-34px;top:1px;width:20px;height:20px;border-radius:50%;background:var(--bg3);border:1px solid var(--g);font-family:var(--mono);font-size:9px;color:var(--g);display:flex;align-items:center;justify-content:center;}
+.step h4{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px;}
+.step p{font-size:12px;color:var(--muted);line-height:1.5;margin:0;}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:12px;margin:14px 0;}
+th{font-family:var(--mono);font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:var(--dim);padding:7px 12px;text-align:left;border-bottom:1px solid var(--border);}
+td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--muted);vertical-align:top;}
+td:first-child{color:var(--text);font-family:var(--mono);font-size:11px;}
+tr:last-child td{border-bottom:none;}
+
+/* TWO COL */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0;}
+@media(max-width:680px){.two{grid-template-columns:1fr;}}
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px 16px;}
+.card h3{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--text);margin-bottom:6px;}
+.card p{font-size:11px;color:var(--muted);line-height:1.5;margin:0;}
+.cg2{border-top:2px solid var(--g);}
+.cb2{border-top:2px solid var(--b);}
+.cy2{border-top:2px solid var(--y);}
+.cr2{border-top:2px solid var(--r);}
+
+h4.ss{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--c);margin:22px 0 10px;}
+p.t{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:10px;}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo"><h1>// SPORTSAI</h1><p>complete build prompts v1.0</p></div>
+  <ul>
+    <div class="ns">Setup</div>
+    <li><a href="#ide">IDE setup — Trae</a></li>
+    <li><a href="#rules">Rules files</a></li>
+    <li><a href="#scaffold">Project scaffold prompt</a></li>
+
+    <div class="ns">Layer 1 — AI Engine</div>
+    <li><a href="#pose">Pose service</a></li>
+    <li><a href="#rules-engine">Rules engine</a></li>
+    <li><a href="#feedback">Feedback generator</a></li>
+    <li><a href="#tracker">2-person tracker</a></li>
+    <li><a href="#anime-svc">Anime service</a></li>
+
+    <div class="ns">Layer 2 — Backend API</div>
+    <li><a href="#schema">Supabase schema</a></li>
+    <li><a href="#upload">Video upload + moderation</a></li>
+    <li><a href="#xp">XP + gamification</a></li>
+    <li><a href="#marketplace">Coach marketplace</a></li>
+    <li><a href="#notifications">Push notifications</a></li>
+
+    <div class="ns">Layer 3 — Mobile App</div>
+    <li><a href="#onboarding-build">Onboarding screens</a></li>
+    <li><a href="#home-build">Home screen</a></li>
+    <li><a href="#record-build">Record + upload</a></li>
+    <li><a href="#annotation">Annotation player</a></li>
+    <li><a href="#chat-build">AI coach chat</a></li>
+    <li><a href="#arena-build">1v1 Arena</a></li>
+    <li><a href="#progress-build">Progress + skill tree</a></li>
+    <li><a href="#social-build">Social + leaderboard</a></li>
+    <li><a href="#avatar-build">Avatar system</a></li>
+    <li><a href="#anime-build">Anime cinematics</a></li>
+
+    <div class="ns">Layer 4 — Coach Web</div>
+    <li><a href="#coach-web">Coach dashboard</a></li>
+
+    <div class="ns">Layer 5 — Landing</div>
+    <li><a href="#landing-build">Waitlist landing page</a></li>
+
+    <div class="ns">Full-app prompts</div>
+    <li><a href="#mega">MEGA prompt (all-in-one)</a></li>
+    <li><a href="#order">Build order</a></li>
+  </ul>
+</nav>
+
+<main>
+
+<!-- HERO -->
+<section id="hero" class="wide">
+  <span class="kicker">// SportsAI — Master Build Prompts</span>
+  <h1>Every prompt.<br>Every <span class="g">layer.</span><br>Copy. Paste. <span class="b">Ship.</span></h1>
+  <p class="sub">The complete prompt library to build SportsAI using Trae IDE and Claude Code. Each prompt is self-contained, production-ready, and tells the AI exactly what file paths, types, and patterns to use.</p>
+  <div class="ide-row">
+    <span class="ide-pill ip-trae">🟢 Trae IDE — Builder mode + SOLO</span>
+    <span class="ide-pill ip-claude">🔵 Claude Code — Terminal agent</span>
+    <span class="ide-pill ip-cursor">🟣 Cursor — Inline chat backup</span>
+  </div>
+</section>
+
+<!-- IDE SETUP -->
+<section id="ide">
+  <span class="sl">// 00 — IDE Setup</span>
+  <h2>Setting up Trae IDE for this project</h2>
+  <p class="lead">Trae is built by ByteDance, runs on VS Code, supports Claude 3.5 + GPT-4, and has a SOLO mode that builds entire features autonomously. <a href="https://www.trae.ai/" style="color:var(--b);">Download at trae.ai</a>. Here is the exact setup before you run any prompts.</p>
+
+  <div class="note nb"><strong>How Trae works for this project:</strong> Use <strong>Builder mode</strong> for generating new screens and features from scratch. Use <strong>IDE mode</strong> for debugging, fixing specific functions, and code review. Use <strong>SOLO mode</strong> for large multi-file tasks like "build the entire XP system." Always attach the relevant files and the .rules file to give Trae maximum context.</div>
+
+  <div class="steps">
+    <div class="step" data-n="1">
+      <h4>Install Trae → trae.ai → select Claude Sonnet 4.5 as primary model</h4>
+      <p>In Settings → AI → Model → Select Claude Sonnet 4.5. This is the best model for React Native + TypeScript for this project. Keep GPT-4o as fallback for large context windows.</p>
+    </div>
+    <div class="step" data-n="2">
+      <h4>Create .trae/rules.md in your project root</h4>
+      <p>This is Trae's equivalent of .cursorrules — it gives the AI permanent project context. See the rules file prompt below. Without this, Trae generates generic React code instead of Expo Router + Supabase + your exact patterns.</p>
+    </div>
+    <div class="step" data-n="3">
+      <h4>Connect GitHub → Trae → GitHub Integration → authorize</h4>
+      <p>Trae auto-commits on file save when connected. Create branches in Trae's source control panel. Never push directly to main from Trae — always create a feature branch first.</p>
+    </div>
+    <div class="step" data-n="4">
+      <h4>Upload the UI design files as image context</h4>
+      <p>Trae supports multimodal input — drag the sportsai_mobile_ui.html file (open in browser, screenshot the screens you need) into the Trae chat. It reads the design and generates matching React Native code. This is Trae's biggest advantage over Cursor for this project.</p>
+    </div>
+    <div class="step" data-n="5">
+      <h4>Install Claude Code CLI alongside Trae</h4>
+      <p>npm install -g @anthropic-ai/claude-code. Use Claude Code in the terminal for long agentic tasks (building the XP system, schema migration, full rules engine). Trae and Claude Code are complementary — Trae for visual/frontend, Claude Code for complex multi-file logic.</p>
+    </div>
+  </div>
+</section>
+
+<!-- RULES FILE -->
+<section id="rules">
+  <span class="sl">// 01 — Rules Files</span>
+  <h2>Rules files — paste before any other prompt</h2>
+  <p class="lead">These rules files give every AI tool permanent context about the project. Create both files before running any prompt below.</p>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-ide pb-both">ALL TOOLS</span>
+      <span class="pb-title">.trae/rules.md — Trae IDE project rules</span>
+      <button class="pb-copy" onclick="copyPrompt(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cg"># SportsAI — Project Rules for Trae AI</span>
+
+<span class="cb">## What we're building</span>
+SportsAI is a React Native mobile app for AI-powered combat sports technique analysis.
+Athletes upload videos → AI extracts pose data → rules engine scores technique →
+Claude API generates coaching feedback. Also includes 1v1 Arena mode, anime fight
+cinematics, skill unlock tree, XP/belt gamification, and coach marketplace.
+
+<span class="cb">## Tech stack (never deviate from this)</span>
+- Mobile: React Native + Expo (Expo Router for navigation)
+- Language: TypeScript EVERYWHERE. Never use `any`. Always type everything.
+- State: Zustand for UI state, TanStack Query for server state
+- Backend: Node.js/Express on Railway
+- Database: Supabase (PostgreSQL + auth + storage)
+- Video: Cloudflare R2 (storage) + Cloudflare Stream (delivery)
+- AI inference: Python FastAPI on Modal (GPU serverless)
+- Payments: Stripe Connect
+- Push: Expo Push Notifications
+- 3D: Three.js + expo-gl + Kalidokit for avatar rendering
+- Canvas: @shopify/react-native-skia for skeleton overlays
+- Charts: victory-native
+
+<span class="cb">## Code conventions (always follow these)</span>
+- Use StyleSheet.create() — never inline styles in React Native
+- All async functions must handle errors with try/catch
+- All API calls go through src/lib/api.ts (typed axios wrapper)
+- All Supabase calls go through src/lib/supabase.ts
+- Components in src/components/, screens in app/(tabs)/ and app/
+- Always add loading and error states to every async operation
+- Use zod for all API input validation
+- Push notification tokens stored in Supabase users.expo_push_token
+- Never hardcode colors — use tokens from src/theme/colors.ts
+- XP events always go through the xpService.awardXP() function
+
+<span class="cb">## Design system (Barlow Condensed + DM Sans aesthetic)</span>
+- Primary: #ff2d4e (red — actions, errors, CTA)
+- Gold: #ffc22d (XP, rewards, belt)
+- Success: #00e676 (green — correct, improvements)
+- Background: #07070f (ink), #0d0d1c (surface), #121225 (card)
+- Text: #ececff (primary), #5c5c8a (muted)
+- Heading font: Barlow Condensed (bold, condensed)
+- Body font: DM Sans (clean, readable)
+- Mono font: JetBrains Mono (code, stats, XP values)
+
+<span class="cb">## File structure (always match this)</span>
+sportsai-app/
+  app/
+    (tabs)/home.tsx, arena.tsx, progress.tsx, social.tsx
+    analysis/[id].tsx
+    onboarding/sport.tsx, level.tsx, avatar.tsx, record.tsx, result.tsx
+    record.tsx
+  src/
+    components/AnnotationPlayer.tsx, PowerAura.tsx, AvatarViewer.tsx, SkeletonOverlay.tsx
+    components/XPBar.tsx, BeltCard.tsx, ChallengeCard.tsx, StreakWidget.tsx
+    lib/api.ts, supabase.ts, store.ts, notifications.ts
+    theme/colors.ts, typography.ts
+    types/index.ts (import from @sportsai/types shared package)
+    services/xpService.ts, analysisService.ts, uploadService.ts
+
+<span class="cb">## What NOT to do</span>
+- Never use React Native's built-in StyleSheet shadows — use borderRadius + background instead
+- Never use Animated from React Native — always use react-native-reanimated
+- Never use React Navigation directly — only Expo Router
+- Never hardcode API URLs — always use EXPO_PUBLIC_API_URL from env
+- Never call Supabase directly from screens — always through src/lib/supabase.ts
+- Never add new npm packages without checking if one already exists in the project
+</div>
+  </div>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-ide pb-claude">CLAUDE CODE</span>
+      <span class="pb-title">CLAUDE.md — Claude Code project context</span>
+      <button class="pb-copy" onclick="copyPrompt(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cg"># SportsAI — Claude Code Context</span>
+
+<span class="cb">## Project overview</span>
+Three separate repos working together:
+1. sportsai-app — React Native / Expo (Person 2 owns)
+2. sportsai-api — Node.js / Express (Person 1 owns)  
+3. sportsai-ai — Python FastAPI on Modal GPU (Person 1 owns)
+
+<span class="cb">## When I ask you to build something:</span>
+1. Always check what files already exist before creating new ones
+2. Always use the types from sportsai-api/src/types/ — never invent new interfaces
+3. Always run the tests after generating code: npm test or pytest
+4. Always generate the corresponding Supabase migration SQL if you touch the schema
+5. When building API routes: validate with zod, authenticate with Supabase JWT middleware
+6. When building React Native screens: match the design in sportsai_mobile_ui.html exactly
+
+<span class="cb">## Supabase project</span>
+URL: from SUPABASE_URL env var
+All migrations are in: supabase/migrations/
+Run migrations: supabase db push
+Regenerate types: supabase gen types typescript --local > src/types/database.ts
+
+<span class="cb">## Python AI service</span>
+Entry point: sportsai-ai/modal_app.py
+Deploy: modal deploy modal_app.py
+Test locally: modal run modal_app.py::test_analysis
+Rules engine: sportsai-ai/rules_engine/wrestling.py (extend for each sport)
+
+<span class="cb">## Critical constraints</span>
+- EVERY video upload must pass AWS Rekognition CSAM scan before storage
+- EVERY athlete under 18 requires parental consent flag in users table
+- XP is NEVER awarded directly — always through xpService.awardXP(athleteId, event, sourceId)
+- Analysis results are PRIVATE — Fighter A never sees Fighter B's errors (1v1 mode)
+- Skeleton coordinate JSON is NOT personal data under GDPR — raw video frames ARE
+</div>
+  </div>
+</section>
+
+<!-- SCAFFOLD PROMPT -->
+<section id="scaffold">
+  <span class="sl">// 02 — First prompt ever</span>
+  <h2>Project scaffold — run this first in Claude Code</h2>
+  <p class="lead">Run this single prompt in Claude Code terminal before anything else. It creates the complete folder structure, installs all packages, and sets up all config files.</p>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-ide pb-claude">CLAUDE CODE — Terminal</span>
+      <span class="pb-title">Complete project scaffold — run once</span>
+      <button class="pb-copy" onclick="copyPrompt(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cm">Scaffold the complete SportsAI project. Create three directories:</span>
+
+<span class="cg">1. sportsai-app (React Native / Expo)</span>
+Run: npx create-expo-app@latest sportsai-app --template expo-template-blank-typescript
+
+Then install ALL of these packages:
+<span class="cy">npx expo install expo-router react-native-safe-area-context react-native-screens
+npx expo install expo-camera expo-av expo-video expo-media-library expo-file-system expo-secure-store
+npx expo install react-native-gesture-handler react-native-reanimated
+npx expo install @shopify/react-native-skia
+npm install three expo-gl kalidokit @react-three/fiber
+npm install victory-native
+npm install @readyplayerme/react-native-webview-sdk react-native-webview
+npm install @supabase/supabase-js
+npm install zustand @tanstack/react-query
+npx expo install expo-notifications expo-device
+npx expo install react-native-view-shot expo-sharing
+npm install @expo/vector-icons react-native-mmkv</span>
+
+Create these files with correct content:
+- app.json (Expo config with scheme "sportsai", bundleId "com.sportsai.app")
+- tsconfig.json (strict mode, paths alias @/* → src/*)
+- .env.example (all env vars from the complete list)
+- src/theme/colors.ts (design system tokens)
+- src/lib/api.ts (typed axios wrapper with auth interceptor)
+- src/lib/supabase.ts (Supabase client singleton)
+- src/lib/store.ts (Zustand store with user + session + currentAnalysis)
+- src/types/index.ts (all shared TypeScript interfaces)
+- .trae/rules.md (paste the rules file content)
+- CLAUDE.md (paste the Claude Code context)
+
+<span class="cg">2. sportsai-api (Node.js / Express)</span>
+Run: mkdir sportsai-api && cd sportsai-api && npm init -y
+
+Install:
+<span class="cy">npm install express cors helmet morgan dotenv stripe
+npm install @supabase/supabase-js @aws-sdk/client-s3 @aws-sdk/client-rekognition
+npm install bullmq ioredis node-cron resend expo-server-sdk
+npm install zod jsonwebtoken @sentry/node
+npm install -D typescript ts-node-dev @types/express @types/node tsconfig-paths</span>
+
+Create: tsconfig.json, src/index.ts, src/middleware/auth.ts, src/middleware/validate.ts
+Create all route files: src/routes/{video,analysis,xp,leaderboard,stripe,coaches,challenges,arena}.ts
+Create: src/jobs/{analysisWorker,animeWorker,notificationWorker,weeklyReset}.ts
+Create: supabase/migrations/001_initial_schema.sql (full schema with ALL tables)
+
+<span class="cg">3. sportsai-ai (Python FastAPI on Modal)</span>
+Run: mkdir sportsai-ai && cd sportsai-ai && python -m venv venv
+
+Install:
+<span class="cy">pip install ultralytics fastapi uvicorn bytetracker opencv-python numpy
+pip install torch torchvision modal anthropic scikit-learn joblib roboflow</span>
+
+Create: modal_app.py, pose_service.py, two_person_tracker.py, feedback_generator.py
+Create: rules_engine/__init__.py, rules_engine/wrestling.py, rules_engine/mma.py
+Create: anime_service.py, requirements.txt
+
+After creating everything, verify the structure matches exactly and run:
+- cd sportsai-app && npx expo start (should open without errors)
+- cd sportsai-api && npm run dev (should start on port 3000)
+- cd sportsai-ai && modal run modal_app.py::health_check (should return OK)
+</div>
+  </div>
+</section>
+
+<!-- POSE SERVICE -->
+<section id="pose">
+  <span class="sl">// 03 — AI Layer</span>
+  <h2>Layer 1A — Pose extraction service</h2>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-ide pb-claude">CLAUDE CODE</span>
+      <span class="pb-title">sportsai-ai/pose_service.py — Complete YOLO11 pose extraction</span>
+      <button class="pb-copy" onclick="copyPrompt(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cm">Build the complete pose extraction service in sportsai-ai/pose_service.py
+
+Requirements:</span>
+- Load YOLO11x-pose model fine-tuned on AthletePose3D from ./checkpoints/yolo11x-pose-athletepose3d.pt
+- Function: extract_poses(video_url: str, mode: str = "single") -> dict
+  - mode "single": tracks one athlete
+  - mode "dual": tracks two athletes simultaneously using ByteTrack
+- Download video from Cloudflare R2 URL to temp file, process, delete temp file
+- For each frame: extract 33 keypoints (x, y normalized, confidence)
+- Calculate derived biomechanics per frame:
+  hip_angle, knee_angle (both legs), spine_angle, head_angle,
+  hip_height_norm (left hip y), shoulder_width,
+  hip_velocity_forward (delta from previous frame)
+- Filter: skip frames where mean confidence of key joints (5,6,11,12,13,14) < 0.65
+- Return: {
+    mode: str,
+    fps: float,
+    total_frames: int,
+    scored_frames: int,
+    fighter_a: List[FrameData],  # always present
+    fighter_b: Optional[List[FrameData]],  # only in dual mode
+    interaction_events: List[InteractionEvent]  # clinch, strike, takedown events
+  }
+- FrameData: {timestamp_ms, keypoints, confidence, biomechanics, tier: "clean"|"contact"|"lost"}
+- InteractionEvent: {type, timestamp_ms, attacker, success, confidence}
+
+For dual mode:
+- Use ByteTrack (bytetracker library) for persistent fighter ID assignment
+- Assign Fighter A = leftmost fighter on frame 1, Fighter B = rightmost
+- detect_interaction(): returns "separated" | "clinch" | "ground" based on hip distance
+- When "clinch": pause technique scoring, still record interaction events
+- When "ground": discard frames entirely
+
+Type hint every function. Raise ValueError with specific messages on bad input.
+Write 5 unit tests in test_pose_service.py using sample fixture data.
+</div>
+  </div>
+</section>
+
+<!-- RULES ENGINE -->
+<section id="rules-engine">
+  <span class="sl">// 04</span>
+  <h2>Layer 1B — Rules engine (your competitive moat)</h2>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-ide pb-claude">CLAUDE CODE</span>
+      <span class="pb-title">sportsai-ai/rules_engine/wrestling.py — Complete wrestling rules engine</span>
+      <button class="pb-copy" onclick="copyPrompt(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cm">Build the complete wrestling rules engine in sportsai-ai/rules_engine/wrestling.py</span>
+
+<span class="cg">WRESTLING_RULES dict structure for these 6 techniques:</span>
+<span class="cy">stance_movement, single_leg_shot, double_leg_shot, high_crotch, scramble_defense, firemans_carry</span>
+
+For each technique, define 3 phases (entry, execution, finish).
+For each phase, define rules with these fields:
+  metric: str (biomechanics key to evaluate)
+  elite_range: [min, max] (from AthletePose3D data — use these exact values)
+  error_if_above: Optional[float]
+  error_if_below: Optional[float]
+  severity: "high" | "medium" | "low"
+  cue: str (specific coaching instruction — not generic)
+  visual_timestamp: "entry" | "contact" | "finish"
+
+<span class="cg">Elite threshold values to use (from research + AthletePose3D):</span>
+<span class="cy">single_leg entry → hip_height_norm: error_if_above 0.70, elite_range [0.55, 0.70]
+single_leg entry → head_angle: error_if_below 150, elite_range [160, 180]
+single_leg execution → knee_velocity_forward: error_if_below 0.8, elite_range [0.8, 2.5]
+double_leg entry → hip_height_norm: error_if_above 0.68, elite_range [0.50, 0.68]
+double_leg execution → spine_angle: error_if_below 155, elite_range [155, 175]
+stance → shoulder_width: error_if_below 0.18, error_if_above 0.38, elite_range [0.18, 0.38]</span>
+(add biomechanically reasonable values for remaining rules)
+
+<span class="cg">Main function:</span>
+assess_technique(pose_sequence: List[FrameData], technique_name: str) -> TechniqueAssessment
+
+TechniqueAssessment: {
+  score: int (0-100, start at 100 deduct high=20, medium=10, low=5),
+  technique: str,
+  phase_scores: {entry: int, execution: int, finish: int},
+  errors: List[ErrorResult],
+  scoreable_frame_count: int,
+  confidence: float
+}
+
+ErrorResult: {
+  phase: str, rule: str, severity: str,
+  measured_value: float, elite_range: list,
+  cue: str, jump_to_timestamp: str
+}
+
+Also implement:
+- detect_technique_phases(pose_sequence) → splits frames into entry/execution/finish
+- average_phase_metrics(frames) → averages all biomechanics across a phase
+- AdaptiveRulesEngine class (Phase 2): loads GaussianMixture model from ./models/ if available,
+  falls back to threshold engine if model not found (graceful degradation)
+
+Write comprehensive tests including: perfect technique → score 90+, beginner errors → score < 60.
+</div>
+  </div>
+</section>
+
+<!-- FEEDBACK GENERATOR -->
+<section id="feedback">
+  <span class="sl">// 05</span>
+  <h2>Layer 1C — Claude feedback generator</h2>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-ide pb-claude">CLAUDE CODE</span>
+      <span class="pb-title">sportsai-ai/feedback_generator.py — AI coaching feedback</span>
+      <button class="pb-copy" onclick="copyPrompt(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cm">Build sportsai-ai/feedback_generator.py — generates natural language coaching feedback via Claude API</span>
+
+Functions needed:
+
+<span class="cg">1. generate_private_feedback(assessment: TechniqueAssessment, athlete_history: List[dict], sport: str) -> str</span>
+System prompt template (use exactly):
+  "You are an expert {sport} coach analyzing technique video. You receive structured
+   biomechanical data and must produce coaching feedback.
+   RULES:
+   - Be specific — reference the exact error and when it happened
+   - Lead with one thing done WELL before addressing errors
+   - Use {sport} terminology naturally (e.g. 'level change', 'penetration step')
+   - Suggest ONE primary drill to fix the most critical error
+   - Keep to 200-280 words. Never exceed 300.
+   - Tone: encouraging but direct. Like a coach who believes in the athlete.
+   - Never say 'it appears' or 'it seems' — be confident.
+   - Reference the athlete's history: {history_summary}"
+
+User message: structured JSON of assessment + errors + athlete history (last 3 sessions)
+Model: claude-sonnet-4-20250514, max_tokens: 600, temperature: 0.7
+
+<span class="cg">2. generate_comparison_report(assessment_a: TechniqueAssessment, assessment_b: TechniqueAssessment, events: List[InteractionEvent]) -> str</span>
+Shared 1v1 breakdown — tactical narrative, key turning points, decisive technique difference.
+250-350 words. No private error details from either fighter.
+
+<span class="cg">3. generate_anime_narration(assessment: TechniqueAssessment) -> dict</span>
+Returns: {
+  power_level: int (score * 94, scaled to DBZ range),
+  technique_card_name: str (dramatic DBZ-style name for their best technique),
+  battle_commentary: str (30-word DBZ-style commentary for the cinematic),
+  aura_color: str (hex, based on score: ≥85 → gold, ≥70 → blue, else red)
+}
+
+<span class="cg">4. generate_game_plan(opponent_dossier: dict, athlete_strengths: dict, sport: str) -> str</span>
+Pre-fight game plan using opponent's weaknesses vs athlete's strengths.
+150-200 words. Specific, actionable. Uses sport terminology.
+
+Handle rate limits with exponential backoff. Log all API calls with tokens used.
+</div>
+  </div>
+</section>
+
+<!-- SUPABASE SCHEMA -->
+<section id="schema">
+  <span class="sl">// 06 — Backend Layer</span>
+  <h2>Layer 2A — Complete Supabase schema</h2>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-ide pb-claude">CLAUDE CODE</span>
+      <span class="pb-title">supabase/migrations/001_complete_schema.sql — Every table</span>
+      <button class="pb-copy" onclick="copyPrompt(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cm">Create the complete Supabase schema migration in supabase/migrations/001_complete_schema.sql
+
+Create ALL these tables with exact column types:</span>
+
+<span class="cg">users</span> — id UUID PK, email TEXT UNIQUE, username TEXT UNIQUE, role TEXT CHECK(athlete|coach|admin),
+  sport TEXT, skill_level TEXT CHECK(beginner|intermediate|advanced|elite),
+  avatar_url TEXT, stripe_account_id TEXT, expo_push_token TEXT,
+  is_under_18 BOOLEAN DEFAULT false, parent_consent_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+
+<span class="cg">athlete_xp</span> — athlete_id UUID FK users, total_xp INTEGER DEFAULT 0, weekly_xp INTEGER DEFAULT 0,
+  current_belt TEXT DEFAULT 'white', belt_progress_pct INTEGER DEFAULT 0,
+  current_streak_weeks INTEGER DEFAULT 0, longest_streak_weeks INTEGER DEFAULT 0,
+  last_upload_date DATE, PK(athlete_id)
+
+<span class="cg">xp_transactions</span> — id UUID PK, athlete_id UUID FK, amount INTEGER, reason TEXT,
+  source_id UUID (video_id or review_id), metadata JSONB, created_at TIMESTAMPTZ
+
+<span class="cg">video_uploads</span> — id UUID PK, athlete_id UUID FK, cloudflare_stream_id TEXT,
+  r2_skeleton_path TEXT, sport TEXT, technique TEXT, duration_sec INTEGER,
+  moderation_status TEXT DEFAULT 'pending' CHECK(pending|clean|flagged),
+  analysis_status TEXT DEFAULT 'queued' CHECK(queued|processing|done|failed),
+  anime_clip_url TEXT, fighter_partner_id UUID FK users,
+  is_1v1 BOOLEAN DEFAULT false, created_at TIMESTAMPTZ
+
+<span class="cg">ai_analyses</span> — id UUID PK, video_id UUID FK, technique_detected TEXT,
+  score INTEGER CHECK(0-100), phase_scores JSONB, errors JSONB,
+  feedback_text TEXT, anime_narration JSONB, elite_percentiles JSONB,
+  pose_sequence_url TEXT, fighter_b_analysis_id UUID, processing_ms INTEGER,
+  created_at TIMESTAMPTZ
+
+<span class="cg">technique_unlocks</span> — athlete_id+sport+technique_name PK, unlocked_at TIMESTAMPTZ,
+  unlock_score INTEGER, is_prestige BOOLEAN DEFAULT false
+
+<span class="cg">weekly_challenges</span> — id UUID PK, week_start DATE, sport TEXT, challenge_type TEXT,
+  target_technique TEXT, target_value DECIMAL, xp_reward INTEGER,
+  description TEXT, is_auto_generated BOOLEAN DEFAULT true
+
+<span class="cg">challenge_completions</span> — athlete_id+challenge_id PK, completed_at TIMESTAMPTZ
+
+<span class="cg">leaderboard_snapshots</span> — id UUID PK, snapshot_date DATE, leaderboard_type TEXT,
+  sport TEXT, athlete_id UUID FK, rank INTEGER, score DECIMAL
+
+<span class="cg">coach_reviews</span> — id UUID PK, video_id UUID FK, coach_id UUID FK,
+  ai_analysis_id UUID FK, review_video_url TEXT, review_text TEXT,
+  coach_score INTEGER, edited_errors JSONB, status TEXT DEFAULT 'pending',
+  price_cents INTEGER, coach_payout_cents INTEGER, stripe_payment_intent TEXT,
+  created_at TIMESTAMPTZ
+
+<span class="cg">coach_ai_divergence</span> — id UUID PK, analysis_id UUID FK, coach_id UUID FK,
+  ai_score INTEGER, coach_score INTEGER,
+  score_delta INTEGER GENERATED ALWAYS AS (coach_score - ai_score) STORED,
+  coach_removed_errors TEXT[], coach_added_errors JSONB, technique TEXT, sport TEXT
+
+<span class="cg">rivalries</span> — id UUID PK, athlete_a_id+athlete_b_id+sport UNIQUE,
+  session_count INTEGER DEFAULT 0, a_wins INTEGER DEFAULT 0, b_wins INTEGER DEFAULT 0,
+  last_session TIMESTAMPTZ
+
+<span class="cg">opponent_dossiers</span> — id UUID PK, requesting_athlete_id UUID FK,
+  opponent_identifier TEXT (username or external ref), sport TEXT,
+  videos_analyzed INTEGER, pattern_data JSONB, game_plan_text TEXT,
+  stripe_payment_intent TEXT, created_at TIMESTAMPTZ
+
+After tables, write:
+- ENABLE ROW LEVEL SECURITY on all tables
+- RLS policies: athletes read/write own data only, coaches read videos assigned to them,
+  admins have full access, 1v1 analyses: each fighter sees only their own errors
+- All necessary indexes (athlete_id, sport, technique, created_at)
+- Seed data: 5 wrestling challenge templates for week_start = current_week
+</div>
+  </div>
+</section>
+
+<!-- VIDEO UPLOAD API -->
+<section id="upload">
+  <span class="sl">// 07</span>
+  <h2>Layer 2B — Video upload + moderation API</h2>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-ide pb-trae">TRAE — Builder Mode</span>
+      <span class="pb-title">sportsai-api/src/routes/video.ts — Complete upload pipeline</span>
+      <button class="pb-copy" onclick="copyPrompt(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cm">Build the complete video upload route in sportsai-api/src/routes/video.ts
+
+POST /api/video/upload-url
+- Auth required (Supabase JWT middleware)
+- Body: { sport: string, technique: string, duration_sec: number, is_1v1: boolean }
+- Validate with zod schema
+- Generate signed Cloudflare R2 upload URL (PUT, 15-minute expiry)
+- Create video_uploads record in Supabase (status: pending)
+- Return: { upload_url, video_id, stream_id }
+
+POST /api/video/:videoId/complete
+- Called after client finishes uploading to R2
+- Auth required, must own the video
+- Step 1: CSAM moderation via AWS Rekognition on first/middle/last frame
+  - Extract frames using ffmpeg child process from the R2 URL
+  - Call Rekognition DetectModerationLabels on each frame
+  - If ANY frame has EXPLICIT_NUDITY or GRAPHIC_VIOLENCE confidence > 60: mark flagged, return 400
+  - Delete temp frames after check
+- Step 2: Register video with Cloudflare Stream for transcoding
+- Step 3: Update video_uploads: moderation_status = 'clean', analysis_status = 'queued'
+- Step 4: Add job to BullMQ analysisQueue: { video_id, stream_url, sport, technique, is_1v1 }
+- Step 5: Award 10 XP via xpService.awardXP(athlete_id, 'upload', video_id)
+- Return: { success: true, estimated_analysis_seconds: 18 }
+
+GET /api/video/:videoId/status
+- Returns: { analysis_status, score, has_anime_clip, anime_clip_url }
+
+All routes use existing auth middleware from src/middleware/auth.ts
+Use zod for all input validation
+Handle all errors with the central error handler
+</span>
+    </div>
+  </div>
+</section>
+
+<!-- XP SYSTEM -->
+<section id="xp">
+  <span class="sl">// 08</span>
+  <h2>Layer 2C — XP + gamification system</h2>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-ide pb-claude">CLAUDE CODE</span>
+      <span class="pb-title">Complete XP, belt, challenge, and unlock system</span>
+      <button class="pb-copy" onclick="copyPrompt(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cm">Build the complete gamification system across these files:</span>
+
+<span class="cg">sportsai-api/src/services/xpService.ts</span>
+Main function: awardXP(athleteId: string, event: XPEvent, sourceId: string) -> XPResult
+
+XP values per event (use exactly):
+<span class="cy">upload: 50
+score_improved_10pct: 120  // compared to athlete's last session same technique
+score_improved_20pct: 200
+coach_review_completed: 200
+streak_week_maintained: 75
+challenge_completed: 150
+technique_unlocked: 300
+belt_promoted: 500
+first_1v1_win: 250
+perfect_technique: 400  // score >= 90</span>
+
+After awarding XP:
+1. Update athlete_xp: total_xp += amount, weekly_xp += amount
+2. Log to xp_transactions
+3. Check belt thresholds and promote if crossed
+4. Check technique unlock prerequisites and unlock if met
+5. If belt promoted: send push notification, return { promoted: true, new_belt: string }
+6. Return: { xp_awarded, total_xp, weekly_xp, belt_promoted, techniques_unlocked, new_score }
+
+Belt XP thresholds:
+<span class="cy">white: 0, yellow: 500, orange: 1200, green: 2500, blue: 5000,
+purple: 9000, brown: 15000, black: 25000</span>
+
+<span class="cg">sportsai-api/src/services/unlockService.ts</span>
+checkUnlocks(athleteId: string, sport: string, technique: string, score: int) -> string[]
+Wrestling unlock prerequisites:
+<span class="cy">single_leg: stance_movement avg >= 60 over 3 sessions
+double_leg: single_leg avg >= 65
+high_crotch: single_leg avg >= 70
+scramble_defense: double_leg avg >= 65
+firemans_carry: high_crotch avg >= 75 AND belt >= purple</span>
+
+<span class="cg">sportsai-api/src/jobs/weeklyReset.ts (node-cron)</span>
+Every Monday 00:00 UTC:
+1. Reset all athlete_xp.weekly_xp = 0
+2. Generate 3 new weekly_challenges per active sport
+3. Challenge generation: query athlete's 3-week average phase scores,
+   target their weakest phase with a score-threshold challenge
+4. Send "New challenges live" push notification to all athletes with pushTokens
+
+<span class="cg">sportsai-api/src/routes/challenges.ts</span>
+GET /api/challenges — returns active challenges + completion status for auth'd athlete
+POST /api/challenges/:id/complete — marks complete, awards XP if not already done
+
+Write comprehensive tests for all XP calculations and belt threshold checks.
+</div>
+  </div>
+</section>
+
+<!-- ONBOARDING SCREENS -->
+<section id="onboarding-build">
+  <span class="sl">// 09 — Mobile App Layer</span>
+  <h2>Layer 3A — Onboarding screens</h2>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-ide pb-trae">TRAE — Builder Mode + image input</span>
+      <span class="pb-title">app/onboarding/ — All 5 onboarding screens</span>
+      <button class="pb-copy" onclick="copyPrompt(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cm">Build all 5 onboarding screens matching the design in sportsai_onboarding.html exactly.
+(Attach screenshot of the onboarding design file when running this in Trae)</span>
+
+<span class="cg">File: app/onboarding/sport.tsx (Step 1)</span>
+- Full-screen with Expo Router Stack navigation (no back button on step 1)
+- 4 sport option cards in 2x2 grid: Wrestling, MMA, BJJ, Volleyball
+- Each card: emoji (28px), sport name (Barlow Condensed 16px bold), short desc (DM Sans 10px muted)
+- Selected state: red border + red tinted background (use colors from src/theme/colors.ts)
+- Only one selectable at a time
+- "Continue" button at bottom (full width, red, Barlow Condensed 18px)
+- Store selection in Zustand: useStore().setOnboardingSport(sport)
+- Navigate to app/onboarding/level.tsx on continue
+
+<span class="cg">File: app/onboarding/level.tsx (Step 2)</span>
+- 4 level options as full-width tappable rows: Just Starting, Training Regularly, Competing Seriously, Elite/Coaching
+- Each: emoji (24px), title (13px 600), subtitle (10px muted), radio circle (20px, right side)
+- Selected state: red border + radio filled red
+- Progress bar at top: 5 dots (active, active, empty, empty, empty) with animation
+
+<span class="cg">File: app/onboarding/avatar.tsx (Step 3)</span>
+- Avatar preview circle (80px, gradient) at top center
+- Two sections: "Sport outfit" (4 emoji options) + "Aura color" (4 color swatches)
+- Tapping an option updates the avatar preview with matching emoji + gradient
+- 3 goal options below: Win competitions, Improve technique, Train injury-free
+- Single select with radio circles
+- All selections stored in Zustand onboarding state
+- Call Ready Player Me WebView via @readyplayerme/react-native-webview-sdk
+  (show RPM creator in a modal, save GLB URL to Supabase user record on close)
+
+<span class="cg">File: app/onboarding/record.tsx (Step 4)</span>
+- Expo Camera component centered (16:9 aspect ratio, rounded corners)
+- AR guide overlay (animated green dashed rectangle using Skia canvas)
+  "OPTIMAL POSITION" label at bottom of camera view (green, mono font)
+- 3 tip icons below camera: Side angle / 3-4 meters / 15-30 seconds
+- Record button (56px circle, red, shadow glow) with flanking gallery + flip buttons
+- Hold-to-record behavior: minimum 5 seconds, maximum 60 seconds
+- Technique selector dropdown (only unlocked techniques — always Stance for new users)
+- Skip button at bottom (ghost style) with stat: "Users who film now have 6× higher retention"
+- On upload complete: navigate to app/onboarding/result.tsx with video_id param
+
+<span class="cg">File: app/onboarding/result.tsx (Step 5)</span>
+- Processing state: scanning animation (rotating emoji 🔬), 4-step progress list with dot indicators
+  Steps: Extracting pose → Detecting technique → Comparing to elite → Generating report
+  Each step animates to green check + time when complete
+- Battle Power reading animates up (counter from 0 to calculated value) while processing
+- Result state (after API returns): celebration screen
+  Confetti emoji bouncing animation (react-native-reanimated)
+  Score circle (100px, gradient stroke, count-up animation to final score)
+  Belt unlock reveal (gold border card, Barlow Condensed, scale-in animation)
+  3 CTA cards: Fix error #1 / Challenge a friend / See full analysis
+  Free trial banner at bottom (30 days, no credit card)
+- Deep link to app/(tabs)/home after 1s delay or on any CTA tap
+
+Use react-native-reanimated for ALL animations. No Animated from RN core.
+All API calls through src/lib/api.ts. All errors show alert + allow retry.
+</div>
+  </div>
+</section>
+
+<!-- ANNOTATION PLAYER -->
+<section id="annotation">
+  <span class="sl">// 10</span>
+  <h2>Layer 3D — Annotation player (most critical screen)</h2>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-ide pb-trae">TRAE — Builder Mode</span>
+      <span class="pb-title">src/components/AnnotationPlayer.tsx — The core product screen</span>
+      <button class="pb-copy" onclick="copyPrompt(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cm">Build the AnnotationPlayer component — the most important screen in the app.
+This is what makes athletes trust the AI. Every interaction detail matters.</span>
+
+Props interface:
+<span class="cy">interface AnnotationPlayerProps {
+  videoUrl: string          // Cloudflare Stream HLS URL
+  poseOverlay: PoseFrame[]  // 30fps skeleton JSON from R2
+  errorMarkers: ErrorMarker[] // [{id, timestamp_ms, rule, severity, cue, joint}]
+  eliteComparison?: PoseFrame[] // elite skeleton for same technique (optional)
+  onShare: () => void
+}</span>
+
+<span class="cg">Component structure (top to bottom):</span>
+
+1. VIDEO LAYER: expo-video Video component, full width, 16:9 ratio
+   - HLS source from Cloudflare Stream URL
+   - Controllable: pause/play, seek, playback rate
+   - Custom controls hidden — controlled programmatically only
+
+2. SKIA CANVAS LAYER: @shopify/react-native-skia Canvas, absolute overlay over video
+   - Renders skeleton lines + joints from poseOverlay at current video timestamp
+   - Error joints highlighted in #ff2d4e, normal joints in rgba(245,244,239,0.5)
+   - If showElite: renders elite skeleton in rgba(77,140,255,0.5) simultaneously
+   - Joints are circles (r=4), bones are lines (stroke 1.5)
+   - Only renders frames within ±50ms of current video position
+
+3. SCRUBBER: custom timeline bar
+   - Red error marker dots positioned proportionally at each error timestamp
+   - Current position indicator (red dot, draggable)
+   - Tapping error dot calls jumpToError()
+
+4. ERROR STRIP: horizontal scrollable row of error pills
+   - Active error: red bg, white text
+   - Inactive: dark bg, muted text
+   - Shows: timestamp + error name + severity indicator
+
+5. COACHING TEXT: scrollable text area below player
+   - Shows current active error's coaching cue
+   - "AI Coach" label in green mono font above
+   - Previous/Next buttons to navigate errors
+
+<span class="cg">Key interactions (all required):</span>
+
+jumpToError(errorIndex: number):
+  - Seek video to: max(0, errorMarkers[errorIndex].timestamp_ms - 2000)
+  - Set playback rate to 1.0
+  - After 2000ms: set playback rate to 0.25 for 2s (slow-mo at error)
+  - After slow-mo: resume 1.0
+  - Update currentErrorIndex state
+  - Haptic feedback: Haptics.impactAsync(ImpactFeedbackStyle.Medium)
+
+Swipe gesture (react-native-gesture-handler Pan):
+  - translationX < -50: jumpToError(currentErrorIndex + 1)
+  - translationX > 50: jumpToError(currentErrorIndex - 1)
+  - Animate with spring (react-native-reanimated)
+
+Elite toggle button:
+  - Toggle showElite state
+  - Animate canvas transition with 300ms opacity fade
+
+Share button:
+  - react-native-view-shot: capture the video + overlay at current frame
+  - Add SportsAI watermark text in bottom-right corner
+  - expo-sharing: share as image
+  - Call onShare prop
+
+Pinch gesture (PinchGestureHandler):
+  - Scale canvas zoom 1x–3x around pinch center point
+  - Clamp to max 3x
+
+Use StyleSheet.create for all styles. Use useAnimatedStyle for all animated values.
+Export as default. No inline styles.
+</div>
+  </div>
+</section>
+
+<!-- AI COACH CHAT -->
+<section id="chat-build">
+  <span class="sl">// 11</span>
+  <h2>Layer 3E — AI Coach chat screen</h2>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-ide pb-trae">TRAE — Builder Mode</span>
+      <span class="pb-title">app/(tabs)/coach.tsx + useCoachChat hook</span>
+      <button class="pb-copy" onclick="copyPrompt(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cm">Build the AI Coach chat screen — the "ChatGPT for sports" feature.</span>
+
+<span class="cg">File: src/hooks/useCoachChat.ts</span>
+- Manages conversation state: messages: Message[], isLoading: boolean, remainingQuestions: number
+- Message type: { id, role: 'user'|'assistant', content, timestamp }
+- sendMessage(content: string): posts to POST /api/coach/chat
+  - Optimistically adds user message to state immediately
+  - Shows typing indicator (animated dots) while waiting
+  - Appends AI response when returned
+  - Decrements remainingQuestions (free tier: 3/day, pro: unlimited)
+  - On 429 response: show upgrade prompt modal instead of error
+- loadHistory(): fetches last 10 messages from /api/coach/messages
+- Persists to MMKV storage (react-native-mmkv) for offline viewing
+
+<span class="cg">File: app/(tabs)/coach.tsx</span>
+UI structure:
+- Header: AI Coach avatar (36px gradient circle with robot emoji), name, green "Online" dot
+  Subtitle: "Knows your last 30 sessions" in mono font
+- FlatList of messages (inverted — newest at bottom)
+  User bubbles: right-aligned, red background, white text, 12px rounded-12px 12px 2px
+  AI bubbles: left-aligned, dark bg, "AI COACH · your data" tag in green mono font
+- Suggested questions (horizontal scroll below input if conversation is empty):
+  "Why does my shot keep getting stuffed?"
+  "What should I work on this week?"
+  "How do I beat bigger wrestlers?"
+  "Analyze my latest session"
+- Text input: full-width bar with rounded corners, send button (red circle with arrow)
+  On focus: keyboard avoidance with KeyboardAvoidingView
+- If remainingQuestions === 0 (free tier): show banner above input
+  "3 daily questions used. Upgrade Competitor for unlimited coaching."
+  with "Upgrade" button linking to paywall
+
+<span class="cg">POST /api/coach/chat (in sportsai-api/src/routes/coach.ts)</span>
+- Auth required
+- Body: { message: string, conversation_id: string }
+- Check free tier rate limit (3/day per user) — store in Redis with 24h TTL
+- Build context: fetch athlete's last 30 session scores + errors from Supabase
+- Build system prompt with athlete context (sport, level, belt, history summary)
+- Call Claude API claude-sonnet-4-20250514 with full conversation history
+- Store message + response in coach_conversations table
+- Return: { response: string, remaining_questions: number }
+</div>
+  </div>
+</section>
+
+<!-- ARENA SCREEN -->
+<section id="arena-build">
+  <span class="sl">// 12</span>
+  <h2>Layer 3F — 1v1 Arena complete build</h2>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-ide pb-trae">TRAE — Builder Mode</span>
+      <span class="pb-title">app/(tabs)/arena.tsx — Complete 1v1 Arena with rivalry system</span>
+      <button class="pb-copy" onclick="copyPrompt(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cm">Build the complete 1v1 Arena screen with all sub-screens.</span>
+
+<span class="cg">app/(tabs)/arena.tsx — Main arena screen</span>
+4 sections rendered as ScrollView:
+
+Section 1 — Active rivalry card (if exists):
+- Dark card with red/blue gradient border
+- Fighter A (you) and Fighter B side by side with avatars
+- Rivalry stats: X vs Y record, "You're improving 22% faster"
+- "Start session" red CTA button
+- "View head-to-head" ghost button
+
+Section 2 — Send challenge:
+- Search input to find other SportsAI users by username
+- User result shows: avatar, belt, sport, recent score
+- "Challenge" button → creates challenge in Supabase, sends push notification
+
+Section 3 — Pending challenges:
+- List of incoming challenge requests with accept/decline buttons
+- Accept → navigate to pre-fight screen
+
+Section 4 — Scout opponent (Elite tier gate):
+- Card showing the scouting dossier feature
+- If not Elite: show lock icon with "Available in Elite plan"
+- Upload 3-5 opponent videos → AI builds dossier
+
+<span class="cg">app/arena/prefight.tsx</span>
+- Fighter A vs Fighter B cards side by side (full stats)
+- Underdog bonus banner if you're the lower-scored fighter (+50% XP if you win)
+- "Ready" button: both fighters must tap ready
+  Use Supabase realtime subscription to detect when partner taps ready
+  When both ready: navigate to arena/session.tsx
+
+<span class="cg">app/arena/session.tsx</span>
+- Camera view (same as record screen) with 2-person mode active
+- Live confidence indicator: GREEN dot (both tracked) / AMBER (clinch) / RED (lost)
+- Timer showing session duration
+- Technique selection before starting
+- "End session" button → upload video → navigate to arena/result.tsx
+
+<span class="cg">app/arena/result.tsx</span>
+- 60-second processing screen (same style as onboarding result)
+- Result reveal: both fighter cards appear simultaneously
+- YOUR score (red) vs THEIR score (blue) with winner banner
+- "Your private report" button → navigate to analysis/[id].tsx
+- "Share comparison" toggle (both must consent via Supabase realtime)
+  If both consent: show shared tactical breakdown
+- XP awarded with win/loss modifier
+- Rivalry card updated
+
+All realtime features use Supabase realtime channels.
+Push notifications for challenge received, partner ready, analysis complete.
+</div>
+  </div>
+</section>
+
+<!-- ANIME SYSTEM BUILD -->
+<section id="anime-build">
+  <span class="sl">// 13</span>
+  <h2>Layer 3J — Anime fight cinematic system</h2>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-ide pb-trae">TRAE — Builder Mode</span>
+      <span class="pb-title">src/components/PowerAura.tsx + anime pipeline</span>
+      <button class="pb-copy" onclick="copyPrompt(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cm">Build the complete anime fight cinematic system in 3 parts:</span>
+
+<span class="cg">Part 1: src/components/PowerAura.tsx (Three.js particle aura system)</span>
+Props: { techniqueScore: number, errorActive: boolean, position: [x,y,z] }
+
+Aura color logic (data-driven, not cosmetic):
+<span class="cy">score >= 85 → '#FFD700' (gold — mastery state)
+score >= 70 → '#4488FF' (blue — technical precision)
+score >= 50 → '#FFFFFF' (white — neutral)
+errorActive → '#FF2D4E' (red — error state, flickering)</span>
+
+Implementation:
+- Create particle system using Three.js Points geometry (sphereGeometry args [0.8, 32, 32])
+- pointsMaterial: size 0.03, transparent, opacity = score/100 * 0.7
+- useFrame: rotate particles Y axis at 0.01 * auraIntensity speed
+- Error state: animate opacity with Math.sin(elapsedTime * 8) for flicker effect
+- Export as React component for use inside @react-three/fiber Canvas
+
+<span class="cg">Part 2: Technique card system (Skia — no Three.js, pure 2D overlay)</span>
+src/components/TechniqueCard.tsx
+Props: { techniqueName: string, score: number, phase: 'entry'|'execution'|'finish', visible: boolean }
+
+Render as Skia Canvas absolute overlay:
+- Semi-transparent black background bar (full width, 60px height)
+- Technique name in Barlow Condensed CAPS, 24px, color based on score
+- Score as "XX% POWER" in mono font
+- Entry animation: slide in from right (200ms), hold 1.5s, fade out (300ms)
+- Trigger: when analysis timestamps reach a technique boundary
+
+<span class="cg">Part 3: Anime pipeline (backend job)</span>
+sportsai-api/src/jobs/animeWorker.ts
+
+Job triggered after analysis completes:
+1. Extract best 30-second highlight window (highest technique scores)
+2. Download clip from Cloudflare R2
+3. POST to DomoAI API (anime style transfer):
+   endpoint: https://api.domoai.app/v1/video2video
+   body: { video_url, style: "dragon_ball_z", strength: 0.75, preserve_motion: true }
+4. Poll for job completion every 5 seconds (max 120 seconds)
+5. When complete: download anime clip, upload to Cloudflare R2 (anime/ prefix)
+6. Update video_uploads.anime_clip_url
+7. Fetch anime_narration from feedback_generator.generate_anime_narration()
+8. Send push notification: "Your anime fight scene is ready 🔥"
+
+If DomoAI API fails: gracefully degrade — use original clip, log error
+Cost tracking: log every DomoAI API call with duration and cost estimate to analytics table
+</div>
+  </div>
+</section>
+
+<!-- COACH WEB DASHBOARD -->
+<section id="coach-web">
+  <span class="sl">// 14 — Coach Web Layer</span>
+  <h2>Layer 4 — Coach web dashboard (Next.js)</h2>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-ide pb-trae">TRAE — Builder Mode</span>
+      <span class="pb-title">sportsai-web/ — Complete Next.js coach dashboard</span>
+      <button class="pb-copy" onclick="copyPrompt(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cm">Build the complete coach web dashboard in sportsai-web/ using Next.js 14 App Router + TypeScript.
+Coaches use this on desktop/laptop — mobile-first is NOT required. Build for 1280px+ width.</span>
+
+<span class="cg">Pages needed:</span>
+
+<span class="cy">app/dashboard/page.tsx</span> — Overview
+- Pending reviews count (large number, red badge)
+- This week's earnings (Stripe Connect balance)
+- Average rating (stars)
+- Reviews completed today
+
+<span class="cy">app/reviews/page.tsx</span> — Review queue
+- List of pending coach_reviews sorted by created_at
+- Each row: athlete name/sport/technique, video thumbnail, AI pre-analysis summary, time ago
+- "Review" button → navigate to /reviews/[id]
+- Status tabs: Pending / In Progress / Completed
+
+<span class="cy">app/reviews/[id]/page.tsx</span> — Review detail (most important page)
+- LEFT PANEL: Cloudflare Stream video player (full analysis video)
+  - Custom Skia-style skeleton overlay (web canvas version)
+  - AI-detected error timestamps listed below player
+  - Click error → video seeks to that timestamp
+- CENTER PANEL: AI analysis read-only display
+  - Score ring, phase breakdown, error list with cues
+  - Coach can toggle each error: Agree / Disagree / Modify cue
+  - Score override input
+- RIGHT PANEL: Coach response recorder
+  - Screen + camera recording (using MediaRecorder API)
+  - Or: type written feedback
+  - Character counter (target 200-400 words)
+  - "Deliver to athlete" button (updates status, triggers push notification)
+
+<span class="cy">app/earnings/page.tsx</span>
+- Stripe Connect dashboard embedded (use Stripe's /v1/financial_connections endpoint)
+- Payout history table
+- Earnings by week chart
+
+<span class="cy">app/onboarding/page.tsx (coach signup)</span>
+- Stripe Connect Express account creation flow
+- Credentials verification (what sport, years coaching, certifications)
+- Stripe KYC completion via Stripe hosted link
+
+Auth: Supabase Auth with magic link (coaches use email, no social auth)
+Use Tailwind CSS for styling. Dark theme matching mobile app colors.
+All Supabase calls server-side via Route Handlers.
+</div>
+  </div>
+</section>
+
+<!-- LANDING PAGE BUILD -->
+<section id="landing-build">
+  <span class="sl">// 15 — Landing Page</span>
+  <h2>Layer 5 — Waitlist landing page</h2>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-ide pb-trae">TRAE — Builder Mode</span>
+      <span class="pb-title">Deploy sportsai_landing.html to Vercel in 10 minutes</span>
+      <button class="pb-copy" onclick="copyPrompt(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cm">The landing page HTML file (sportsai_landing.html) is already built.
+Here is how to wire it to a real backend and deploy it:</span>
+
+<span class="cg">Step 1: Add Loops.so email capture to the form</span>
+Replace the handleSubmit function in sportsai_landing.html:
+<span class="cy">async function handleSubmit(e) {
+  e.preventDefault();
+  const email = document.getElementById('emailInput')?.value;
+  const res = await fetch('https://app.loops.so/api/newsletter-form/YOUR_FORM_ID', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ email, sport: 'wrestling', source: 'landing_page' })
+  });
+  if (res.ok) { showToast(); incrementCounter(); }
+}</span>
+Get YOUR_FORM_ID from loops.so → Forms → Create form → Embed code
+
+<span class="cg">Step 2: Wire the counter to Supabase</span>
+Add at bottom of script: fetch real waitlist count from Supabase public endpoint:
+<span class="cy">const { count } = await supabase.from('waitlist_signups').select('*', { count: 'exact' });
+document.getElementById('counter').textContent = count;</span>
+
+<span class="cg">Step 3: Deploy to Vercel (zero config)</span>
+1. Create new GitHub repo: sportsai-landing
+2. Add sportsai_landing.html as index.html
+3. vercel.com → Import repo → Deploy → Done
+4. Set custom domain in Vercel settings
+5. Landing page is live
+
+<span class="cg">Step 4: Analytics (Plausible — self-hosted, GDPR compliant)</span>
+Add to &lt;head&gt;:
+<span class="cy">&lt;script defer data-domain="yourdomain.com" src="https://plausible.io/js/script.js"&gt;&lt;/script&gt;</span>
+No cookies required. No GDPR banner needed.
+
+<span class="cg">Track custom events for conversion optimization:</span>
+<span class="cy">plausible('Waitlist Signup', { props: { sport: 'wrestling' } })</span>
+<span class="cy">plausible('CTA Click', { props: { location: 'hero' } })</span>
+</div>
+  </div>
+</section>
+
+<!-- MEGA PROMPT -->
+<section id="mega">
+  <span class="sl">// 16 — The nuclear option</span>
+  <h2>MEGA PROMPT — Give Trae SOLO the entire app at once</h2>
+  <p class="lead">Use Trae's SOLO mode for this. SOLO is autonomous — it plans, creates, and wires everything. Run this after the scaffold prompt has completed and the project structure exists.</p>
+
+  <div class="note ny"><strong>When to use this:</strong> After the project is scaffolded and rules files are in place. SOLO mode will take 15–30 minutes to run. Review every file it generates before pushing. This is for speed — not for blind trust.</div>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-ide pb-trae">TRAE — SOLO Mode</span>
+      <span class="pb-title">Complete SportsAI app — build everything</span>
+      <button class="pb-copy" onclick="copyPrompt(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cg">Build the complete SportsAI React Native app. Read CLAUDE.md and .trae/rules.md first.</span>
+
+<span class="cm">This is a combat sports AI coaching app. Build all screens and functionality:</span>
+
+<span class="cb">ONBOARDING (5 screens in app/onboarding/):</span>
+sport.tsx → level.tsx → avatar.tsx → record.tsx → result.tsx
+Each screen has a progress indicator (5 dots), back navigation, and "Skip for now" where appropriate.
+Use the design from: all screens have --ink background, red as primary CTA color,
+Barlow Condensed for headings, DM Sans for body text.
+
+<span class="cb">MAIN TABS (app/(tabs)/):</span>
+home.tsx: Avatar card, XP bar, streak widget, today's challenge, today's AI drill, social feed
+record.tsx: Camera with AR placement guide (green box overlay), technique selector, record button
+arena.tsx: Rival card, challenge search, pending challenges, scout opponent CTA
+progress.tsx: Score graph (victory-native), skill unlock tree map, belt progress, badge wall
+social.tsx: Friends/Regional/Global leaderboard tabs, rivalry notifications
+
+<span class="cb">DETAIL SCREENS:</span>
+app/analysis/[id].tsx: Score reveal → phase bars → AnnotationPlayer component → XP celebration
+app/coach.tsx: Full chat interface with message history and suggested questions
+app/arena/prefight.tsx, session.tsx, result.tsx: Complete 1v1 flow
+
+<span class="cb">SHARED COMPONENTS (src/components/):</span>
+AnnotationPlayer.tsx: expo-video + Skia canvas + gesture handler (full spec above)
+PowerAura.tsx: Three.js particle system driven by technique score
+AvatarViewer.tsx: expo-gl + Three.js + GLB loading + Kalidokit bone animation
+SkeletonOverlay.tsx: Skia canvas skeleton renderer (joints + bones)
+XPBar.tsx: Animated progress bar with count-up animation
+BeltCard.tsx: Belt display with glow effect and level info
+ChallengeCard.tsx: Challenge row with progress bar
+StreakWidget.tsx: Streak flame with count and urgency state
+
+<span class="cb">SERVICES (src/services/):</span>
+uploadService.ts: Video upload to R2 with progress callback
+analysisService.ts: Poll analysis status, return when complete
+xpService.ts (client-side): Display XP events, trigger celebration animations
+
+<span class="cb">STATE (src/lib/store.ts — Zustand):</span>
+user: UserProfile | null
+session: SupabaseSession | null
+onboarding: OnboardingState (sport, level, goal, avatarUrl)
+currentAnalysis: Analysis | null
+notifications: PushToken | null
+
+All screens must:
+- Handle loading states (ActivityIndicator or skeleton screens)
+- Handle error states (retry button, error message)
+- Use src/lib/api.ts for all API calls (never raw fetch)
+- Use src/lib/supabase.ts for all Supabase calls
+- Follow exact color tokens from src/theme/colors.ts
+- Use StyleSheet.create — never inline styles
+- Use react-native-reanimated — never Animated from RN core
+
+<span class="cb">API INTEGRATION NOTES:</span>
+Base URL: process.env.EXPO_PUBLIC_API_URL
+Auth header: Bearer {supabase_access_token} from useSession()
+On 401: clear session, redirect to /onboarding/sport
+On 429 (AI chat limit): show upgrade modal, not error toast
+
+After building all files: run npx expo start and verify no TypeScript errors.
+Generate a SCREENS.md file listing every screen, its route, and its key components.
+</div>
+  </div>
+</section>
+
+<!-- BUILD ORDER -->
+<section id="order">
+  <span class="sl">// 17 — Execution</span>
+  <h2>Exact build order — run prompts in this sequence</h2>
+  <p class="lead">Run in this exact order. Each prompt depends on the previous one being complete. Do not skip ahead.</p>
+
+  <table>
+    <thead><tr><th>#</th><th>Prompt</th><th>Tool</th><th>Est. time</th><th>Verify with</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td>Rules files (.trae/rules.md + CLAUDE.md)</td><td>Manual copy-paste</td><td>5 min</td><td>Files exist in project root</td></tr>
+      <tr><td>1</td><td>Complete project scaffold</td><td>Claude Code</td><td>20 min</td><td>npx expo start works</td></tr>
+      <tr><td>2</td><td>Supabase schema migration</td><td>Claude Code</td><td>15 min</td><td>supabase db push succeeds</td></tr>
+      <tr><td>3</td><td>Pose service (Python)</td><td>Claude Code</td><td>20 min</td><td>pytest test_pose_service.py passes</td></tr>
+      <tr><td>4</td><td>Rules engine — wrestling</td><td>Claude Code</td><td>25 min</td><td>perfect technique scores 90+</td></tr>
+      <tr><td>5</td><td>Feedback generator (Claude API)</td><td>Claude Code</td><td>15 min</td><td>generates 200-word feedback</td></tr>
+      <tr><td>6</td><td>Video upload + moderation API</td><td>Trae Builder</td><td>20 min</td><td>test upload + Rekognition scan</td></tr>
+      <tr><td>7</td><td>XP + gamification system</td><td>Claude Code</td><td>25 min</td><td>all XP event tests pass</td></tr>
+      <tr><td>8</td><td>Onboarding screens (5 screens)</td><td>Trae + image</td><td>30 min</td><td>full flow works on device</td></tr>
+      <tr><td>9</td><td>Home screen</td><td>Trae Builder</td><td>20 min</td><td>all data loads, no errors</td></tr>
+      <tr><td>10</td><td>Annotation player (critical)</td><td>Trae Builder</td><td>35 min</td><td>tap error → jumps to -2s, slow-mo works</td></tr>
+      <tr><td>11</td><td>AI Coach chat</td><td>Trae Builder</td><td>20 min</td><td>sends message, gets response</td></tr>
+      <tr><td>12</td><td>1v1 Arena full flow</td><td>Trae Builder</td><td>30 min</td><td>both fighters get private reports</td></tr>
+      <tr><td>13</td><td>Progress + skill tree</td><td>Trae Builder</td><td>20 min</td><td>graph shows, tree navigable</td></tr>
+      <tr><td>14</td><td>Social + leaderboard</td><td>Trae Builder</td><td>20 min</td><td>3 leaderboard types show real data</td></tr>
+      <tr><td>15</td><td>Power aura + anime pipeline</td><td>Trae Builder</td><td>25 min</td><td>aura changes color with score</td></tr>
+      <tr><td>16</td><td>Coach web dashboard</td><td>Trae Builder</td><td>30 min</td><td>coach can review + deliver</td></tr>
+      <tr><td>17</td><td>Landing page deployment</td><td>Manual</td><td>10 min</td><td>live URL works, form submits</td></tr>
+      <tr><td>18</td><td>Integration testing (all together)</td><td>Manual</td><td>2 hrs</td><td>full user journey works end-to-end</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note ng"><strong>Fastest path to demo-ready:</strong> Steps 0–5 (AI engine) + Steps 8–10 (onboarding + annotation player). That is all you need for an investor demo. The full feature set is steps 0–17. The delta between "investor demo" and "launch-ready" is steps 11–17 — approximately 3 additional weeks of work.</div>
+</section>
+
+</main>
+
+<script>
+// Scrollspy
+const links=document.querySelectorAll('nav a');
+const secs=document.querySelectorAll('section[id]');
+window.addEventListener('scroll',()=>{
+  let cur='';
+  secs.forEach(s=>{if(window.scrollY>=s.offsetTop-120)cur=s.id;});
+  links.forEach(l=>{l.classList.remove('on');if(l.getAttribute('href')==='#'+cur)l.classList.add('on');});
+});
+links.forEach(l=>l.addEventListener('click',e=>{
+  e.preventDefault();
+  document.querySelector(l.getAttribute('href'))?.scrollIntoView({behavior:'smooth',block:'start'});
+}));
+
+// Copy buttons
+function copyPrompt(btn) {
+  const body = btn.closest('.prompt-block').querySelector('.pb-body');
+  const text = body.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+</script>
+</body>
+</html>

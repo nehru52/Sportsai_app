@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SportsAI — Welcome</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .launcher-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    
+    .launcher-logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 72px;
+      font-weight: 900;
+      letter-spacing: -2px;
+      margin-bottom: 16px;
+    }
+    
+    .launcher-logo em {
+      color: var(--red);
+      font-style: normal;
+    }
+    
+    .launcher-tagline {
+      font-size: 20px;
+      color: var(--muted);
+      margin-bottom: 60px;
+      max-width: 600px;
+      line-height: 1.6;
+    }
+    
+    .features-preview {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 60px;
+      max-width: 700px;
+      width: 100%;
+    }
+    
+    @media (max-width: 768px) {
+      .features-preview {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    .feature-preview {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    }
+    
+    .feature-preview:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      border-color: var(--border2);
+    }
+    
+    .feature-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+    }
+    
+    .feature-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+    
+    .launch-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 400px;
+      width: 100%;
+    }
+    
+    .btn-launch {
+      padding: 20px 40px;
+      background: var(--red);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 20px rgba(255,45,78,0.3);
+      text-decoration: none;
+      display: block;
+      text-align: center;
+    }
+    
+    .btn-launch:hover {
+      background: #ff4560;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(255,45,78,0.4);
+    }
+    
+    .btn-launch:active {
+      transform: scale(0.98);
+    }
+    
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border2);
+      color: var(--muted);
+      font-size: 18px;
+    }
+    
+    .btn-secondary:hover {
+      background: var(--card);
+      color: var(--text);
+      border-color: var(--border2);
+    }
+    
+    .info-text {
+      margin-top: 40px;
+      font-size: 14px;
+      color: var(--muted);
+      max-width: 500px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+<div class="launcher-container">
+  <div class="launcher-logo">Sports<em>AI</em></div>
+  <p class="launcher-tagline">
+    Olympic-grade biomechanics analysis powered by AI. Train smarter, perform better.
+  </p>
+  
+  <div class="features-preview">
+    <div class="feature-preview">
+      <div class="feature-icon">🏠</div>
+      <div class="feature-name">Dashboard</div>
+    </div>
+    <div class="feature-preview">
+      <div class="feature-icon">🎬</div>
+      <div class="feature-name">Video Analysis</div>
+    </div>
+    <div class="feature-preview">
+      <div class="feature-icon">💬</div>
+      <div class="feature-name">AI Coach</div>
+    </div>
+    <div class="feature-preview">
+      <div class="feature-icon">📊</div>
+      <div class="feature-name">Progress</div>
+    </div>
+  </div>
+  
+  <div class="launch-buttons">
+    <a href="index.html" class="btn-launch">
+      🚀 Launch SportsAI
+    </a>
+  </div>
+  
+  <p class="info-text">
+    Upload your technique videos and get instant AI-powered coaching with biomechanics analysis.
+  </p>
+</div>
+
+<script>
+  // Add subtle animation to feature cards
+  document.addEventListener('DOMContentLoaded', () => {
+    const features = document.querySelectorAll('.feature-preview');
+    features.forEach((feature, index) => {
+      feature.style.animation = `fadeInUp 0.5s ease-out ${index * 0.1}s both`;
+    });
+  });
+  
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  `;
+  document.head.appendChild(style);
+</script>
+
+</body>
+</html>

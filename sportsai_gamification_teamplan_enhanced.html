@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SportsAI — Olympic Competition Readiness & Team Gamification</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="frontend/enhanced.css">
+<style>
+/* Enhanced gamification styles with competition readiness */
+.competition-readiness-dashboard {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  margin: 24px 0;
+}
+
+.readiness-overview {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 32px;
+  align-items: center;
+}
+
+.readiness-score {
+  text-align: center;
+}
+
+.readiness-ring {
+  width: 180px;
+  height: 180px;
+  margin: 0 auto 16px;
+  position: relative;
+}
+
+.readiness-ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.readiness-ring .bg-circle {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 8;
+}
+
+.readiness-ring .progress-circle {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.5s ease;
+}
+
+.readiness-ring .elite { stroke: var(--elite-tier); }
+.readiness-ring .advanced { stroke: var(--advanced-tier); }
+.readiness-ring .intermediate { stroke: var(--intermediate-tier); }
+.readiness-ring .developing { stroke: var(--developing-tier); }
+
+.readiness-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.readiness-value {
+  font-size: 36px;
+  font-weight: 800;
+  font-family: var(--head);
+  line-height: 1;
+}
+
+.readiness-label {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+.three-layer-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.layer-progress {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.layer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.layer-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.layer-percentage {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.progress-bar {
+  background: var(--bg4);
+  border-radius: 4px;
+  height: 6px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.tactical-fill { background: var(--tactical-color); }
+.biomechanical-fill { background: var(--biomechanical-color); }
+.llm-fill { background: var(--llm-color); }
+
+.fivb-benchmarks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.benchmark-item {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.benchmark-item:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+}
+
+.benchmark-icon {
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+.benchmark-value {
+  font-size: 28px;
+  font-weight: 800;
+  font-family: var(--head);
+  margin-bottom: 4px;
+}
+
+.benchmark-unit {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.benchmark-label {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.team-competition-tracker {
+  background: linear-gradient(135deg, var(--bg2), var(--bg3));
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  margin: 24px 0;
+}
+
+.team-members {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.team-member {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.2s ease;
+}
+
+.team-member:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+}
+
+.member-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.member-info {
+  flex: 1;
+}
+
+.member-name {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.member-role {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.member-readiness {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.readiness-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.readiness-text {
+  font-size: 11px;
+  font-family: var(--mono);
+}
+
+.elite { background: var(--elite-tier); }
+.advanced { background: var(--advanced-tier); }
+.intermediate { background: var(--intermediate-tier); }
+.developing { background: var(--developing-tier); }
+
+.weekly-challenges {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  margin: 24px 0;
+}
+
+.challenge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.challenge-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.challenge-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--tactical-color), var(--biomechanical-color), var(--llm-color));
+}
+
+.challenge-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.challenge-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.challenge-difficulty {
+  font-size: 10px;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.difficulty-easy { background: rgba(107, 203, 119, 0.1); color: var(--ready-color); border: 1px solid rgba(107, 203, 119, 0.3); }
+.difficulty-medium { background: rgba(255, 193, 7, 0.1); color: var(--caution-color); border: 1px solid rgba(255, 193, 7, 0.3); }
+.difficulty-hard { background: rgba(220, 53, 69, 0.1); color: var(--danger-color); border: 1px solid rgba(220, 53, 69, 0.3); }
+
+.challenge-description {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.challenge-reward {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--gold);
+}
+
+.training-program-integration {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  margin: 24px 0;
+}
+
+.program-timeline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 24px 0;
+  position: relative;
+}
+
+.program-timeline::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--border);
+  z-index: 1;
+}
+
+.timeline-week {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  position: relative;
+  z-index: 2;
+  transition: all 0.2s ease;
+}
+
+.timeline-week:hover {
+  transform: scale(1.1);
+  border-color: var(--accent);
+}
+
+.timeline-week.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.timeline-week.completed {
+  background: var(--ready-color);
+  color: white;
+  border-color: var(--ready-color);
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">SportsAI<em>•</em><span>Olympic Competition System</span></div>
+  <ul>
+    <li><a href="#hero" class="p1-nav">Competition Dashboard</a></li>
+    <li><a href="#readiness">Readiness Assessment</a></li>
+    <li><a href="#team-tracker">Team Tracker</a></li>
+    <li><a href="#challenges">Weekly Challenges</a></li>
+    <li><a href="#training">Training Integration</a></li>
+    <li><a href="#fivb-benchmarks">FIVB Benchmarks</a></li>
+  </ul>
+  <div class="nav-sec">Three-Layer System</div>
+  <ul>
+    <li><a href="#tactical-gamification">Tactical Layer</a></li>
+    <li><a href="#biomechanical-gamification">Biomechanical Layer</a></li>
+    <li><a href="#llm-gamification">LLM Integration</a></li>
+  </ul>
+</nav>
+
+<main>
+  <section id="hero">
+    <div class="hero-pill">Olympic Competition Ready</div>
+    <h1>Competition Readiness & <span class="hi">Team</span> <span class="hi2">Gamification</span></h1>
+    <p class="hero-sub">Transform your volleyball team into an Olympic-level competitive force with three-layer analysis, FIVB benchmarks, and gamified training progression.</p>
+    <div class="person-strip">
+      <div class="person-pill pp1">
+        <span class="dot d1"></span>
+        <span>Tactical Mastery</span>
+      </div>
+      <div class="person-pill pp2">
+        <span class="dot d2"></span>
+        <span>Biomechanical Excellence</span>
+      </div>
+      <div class="person-pill pp3">
+        <span class="dot d3"></span>
+        <span>AI-Driven Insights</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="readiness">
+    <span class="sec-tag">Competition Assessment</span>
+    <h2>Four-Tier Competition Readiness</h2>
+    <p class="lead">Olympic-grade assessment system based on FIVB Level II biomechanical benchmarks and tactical performance metrics for elite volleyball competition.</p>
+    
+    <div class="competition-readiness-dashboard">
+      <div class="readiness-overview">
+        <div class="readiness-score">
+          <div class="readiness-ring">
+            <svg>
+              <circle class="bg-circle" cx="90" cy="90" r="80"></circle>
+              <circle class="progress-circle elite" cx="90" cy="90" r="80" 
+                      stroke-dasharray="377 502" stroke-dashoffset="125"></circle>
+            </svg>
+            <div class="readiness-text">
+              <div class="readiness-value" style="color: var(--elite-tier);">92%</div>
+              <div class="readiness-label">Elite Ready</div>
+            </div>
+          </div>
+          <h4>Team Competition Readiness</h4>
+          <p>Olympic-level performance standards achieved across all three analysis layers.</p>
+        </div>
+        
+        <div class="three-layer-bars">
+          <div class="layer-progress">
+            <div class="layer-header">
+              <span class="layer-name" style="color: var(--tactical-color);">⚡ Tactical Layer</span>
+              <span class="layer-percentage">94%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill tactical-fill" style="width: 94%"></div>
+            </div>
+            <p class="text-sm">VideoMAE/ActionFormer integration with Data Volley analysis</p>
+          </div>
+          
+          <div class="layer-progress">
+            <div class="layer-header">
+              <span class="layer-name" style="color: var(--biomechanical-color);">🎯 Biomechanical Layer</span>
+              <span class="layer-percentage">89%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill biomechanical-fill" style="width: 89%"></div>
+            </div>
+            <p class="text-sm">ByteTrack+TrOCR with ViTPose and FIVB benchmarks</p>
+          </div>
+          
+          <div class="layer-progress">
+            <div class="layer-header">
+              <span class="layer-name" style="color: var(--llm-color);">🧠 LLM Integration</span>
+              <span class="layer-percentage">96%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill llm-fill" style="width: 96%"></div>
+            </div>
+            <p class="text-sm">Training data generation and personalized recommendations</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="team-tracker">
+    <span class="sec-tag g">Team Performance</span>
+    <h2>Team Competition Tracker</h2>
+    <p class="lead">Monitor individual player readiness across your team with real-time three-layer analysis and FIVB benchmark comparisons.</p>
+    
+    <div class="team-competition-tracker">
+      <h4>Current Team Readiness Status</h4>
+      <div class="team-members">
+        <div class="team-member">
+          <div class="member-avatar" style="background: rgba(255, 107, 107, 0.1); color: var(--tactical-color);">S1</div>
+          <div class="member-info">
+            <div class="member-name">Sarah Johnson</div>
+            <div class="member-role">Outside Hitter</div>
+            <div class="member-readiness">
+              <div class="readiness-dot elite"></div>
+              <span class="readiness-text" style="color: var(--elite-tier);">Elite Ready (97%)</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="team-member">
+          <div class="member-avatar" style="background: rgba(92, 232, 212, 0.1); color: var(--biomechanical-color);">L2</div>
+          <div class="member-info">
+            <div class="member-name">Lisa Chen</div>
+            <div class="member-role">Setter</div>
+            <div class="member-readiness">
+              <div class="readiness-dot advanced"></div>
+              <span class="readiness-text" style="color: var(--advanced-tier);">Advanced (89%)</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="team-member">
+          <div class="member-avatar" style="background: rgba(124, 92, 252, 0.1); color: var(--llm-color);">M3</div>
+          <div class="member-info">
+            <div class="member-name">Maria Rodriguez</div>
+            <div class="member-role">Middle Blocker</div>
+            <div class="member-readiness">
+              <div class="readiness-dot elite"></div>
+              <span class="readiness-text" style="color: var(--elite-tier);">Elite Ready (94%)</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="team-member">
+          <div class="member-avatar" style="background: rgba(255, 193, 7, 0.1); color: var(--caution-color);">E4</div>
+          <div class="member-info">
+            <div class="member-name">Emma Wilson</div>
+            <div class="member-role">Libero</div>
+            <div class="member-readiness">
+              <div class="readiness-dot intermediate"></div>
+              <span class="readiness-text" style="color: var(--intermediate-tier);">Intermediate (78%)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="challenges">
+    <span class="sec-tag o">Weekly Challenges</span>
+    <h2>Olympic-Level Training Challenges</h2>
+    <p class="lead">Gamified weekly challenges based on three-layer analysis with FIVB benchmark targets and team competition progression.</p>
+    
+    <div class="weekly-challenges">
+      <div class="challenge-grid">
+        <div class="challenge-card">
+          <div class="challenge-header">
+            <div>
+              <div class="challenge-title">Tactical Pattern Recognition</div>
+              <div class="challenge-difficulty difficulty-medium">Medium</div>
+            </div>
+          </div>
+          <div class="challenge-description">
+            Analyze 50 tactical patterns using VideoMAE/ActionFormer integration. Achieve 90% accuracy in rotation analysis.
+          </div>
+          <div class="challenge-reward">
+            <span>🏆</span>
+            <span>+500 XP, Elite Badge</span>
+          </div>
+        </div>
+        
+        <div class="challenge-card">
+          <div class="challenge-header">
+            <div>
+              <div class="challenge-title">Biomechanical Excellence</div>
+              <div class="challenge-difficulty difficulty-hard">Hard</div>
+            </div>
+          </div>
+          <div class="challenge-description">
+            Achieve FIVB Level II benchmarks: 108+ km/h attack speed, 342+ cm jump reach, 0.18s reaction time.
+          </div>
+          <div class="challenge-reward">
+            <span>🎯</span>
+            <span>+1000 XP, Olympic Ready</span>
+          </div>
+        </div>
+        
+        <div class="challenge-card">
+          <div class="challenge-header">
+            <div>
+              <div class="challenge-title">Team Coordination Mastery</div>
+              <div class="challenge-difficulty difficulty-easy">Easy</div>
+            </div>
+          </div>
+          <div class="challenge-description">
+            Complete 3-team synchronized drills with 95% tactical execution accuracy using multi-player tracking.
+          </div>
+          <div class="challenge-reward">
+            <span>⚡</span>
+            <span>+300 XP, Team Player</span>
+          </div>
+        </div>
+        
+        <div class="challenge-card">
+          <div class="challenge-header">
+            <div>
+              <div class="challenge-title">Elite Training Program</div>
+              <div class="challenge-difficulty difficulty-hard">Hard</div>
+            </div>
+          </div>
+          <div class="challenge-description">
+            Complete 8-week personalized training program with LLM-generated insights and FIVB benchmark tracking.
+          </div>
+          <div class="challenge-reward">
+            <span>🧠</span>
+            <span>+1500 XP, AI Optimized</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="training">
+    <span class="sec-tag">Training Integration</span>
+    <h2>8-Week Elite Training Program</h2>
+    <p class="lead">Personalized training progression based on three-layer analysis with FIVB benchmarks and Olympic-level competition preparation.</p>
+    
+    <div class="training-program-integration">
+      <h4>Progressive Training Timeline</h4>
+      <div class="program-timeline">
+        <div class="timeline-week completed">1</div>
+        <div class="timeline-week completed">2</div>
+        <div class="timeline-week completed">3</div>
+        <div class="timeline-week active">4</div>
+        <div class="timeline-week">5</div>
+        <div class="timeline-week">6</div>
+        <div class="timeline-week">7</div>
+        <div class="timeline-week">8</div>
+      </div>
+      
+      <div class="two-col">
+        <div class="card p1">
+          <h4>Weeks 1-2: Foundation</h4>
+          <p><strong>Tactical:</strong> Basic pattern recognition with VideoMAE</p>
+          <p><strong>Biomechanical:</strong> Fundamental movement analysis with ViTPose</p>
+          <p><strong>LLM:</strong> Baseline assessment and goal setting</p>
+        </div>
+        
+        <div class="card p2">
+          <h4>Weeks 3-4: Development</h4>
+          <p><strong>Tactical:</strong> Advanced rotation analysis with ActionFormer</p>
+          <p><strong>Biomechanical:</strong> Multi-player tracking with ByteTrack</p>
+          <p><strong>LLM:</strong> Personalized insights generation</p>
+        </div>
+        
+        <div class="card p3">
+          <h4>Weeks 5-6: Optimization</h4>
+          <p><strong>Tactical:</strong> Data Volley integration and strategic analysis</p>
+          <p><strong>Biomechanical:</strong> FIVB benchmark comparison and refinement</p>
+          <p><strong>LLM:</strong> Advanced recommendation engine</p>
+        </div>
+        
+        <div class="card gold">
+          <h4>Weeks 7-8: Competition Ready</h4>
+          <p><strong>Tactical:</strong> Olympic-level pattern mastery</p>
+          <p><strong>Biomechanical:</strong> Elite performance standards achievement</p>
+          <p><strong>LLM:</strong> Competition readiness certification</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="fivb-benchmarks">
+    <span class="sec-tag g">Elite Standards</span>
+    <h2>FIVB Level II Competition Benchmarks</h2>
+    <p class="lead">Olympic-level performance standards from 2014 FIVB World Championship integrated into gamification progression system.</p>
+    
+    <div class="fivb-benchmarks-grid">
+      <div class="benchmark-item">
+        <div class="benchmark-icon">⚡</div>
+        <div class="benchmark-value" style="color: var(--biomechanical-color);">108.3</div>
+        <div class="benchmark-unit">km/h</div>
+        <div class="benchmark-label">Attack Speed</div>
+      </div>
+      
+      <div class="benchmark-item">
+        <div class="benchmark-icon">🚀</div>
+        <div class="benchmark-value" style="color: var(--biomechanical-color);">342</div>
+        <div class="benchmark-unit">cm</div>
+        <div class="benchmark-label">Jump Reach</div>
+      </div>
+      
+      <div class="benchmark-item">
+        <div class="benchmark-icon">⚡</div>
+        <div class="benchmark-value" style="color: var(--biomechanical-color);">0.18</div>
+        <div class="benchmark-unit">seconds</div>
+        <div class="benchmark-label">Reaction Time</div>
+      </div>
+      
+      <div class="benchmark-item">
+        <div class="benchmark-icon">📏</div>
+        <div class="benchmark-value" style="color: var(--biomechanical-color);">3.27</div>
+        <div class="benchmark-unit">meters</div>
+        <div class="benchmark-label">Spike Height</div>
+      </div>
+      
+      <div class="benchmark-item">
+        <div class="benchmark-icon">🛡️</div>
+        <div class="benchmark-value" style="color: var(--biomechanical-color);">3.15</div>
+        <div class="benchmark-unit">meters</div>
+        <div class="benchmark-label">Block Height</div>
+      </div>
+      
+      <div class="benchmark-item">
+        <div class="benchmark-icon">🏃</div>
+        <div class="benchmark-value" style="color: var(--biomechanical-color);">5.2</div>
+        <div class="benchmark-unit">m/s</div>
+        <div class="benchmark-label">Movement Speed</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="frontend/enhanced.js"></script>
+<script>
+// Initialize gamification functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const sportsAI = new SportsAIEnhanced();
+  
+  // Animate readiness rings
+  function animateReadinessRings() {
+    const rings = document.querySelectorAll('.progress-circle');
+    rings.forEach(ring => {
+      const circumference = 2 * Math.PI * 80;
+      const progress = parseFloat(ring.style.strokeDasharray.split(' ')[0]) / 502;
+      ring.style.strokeDasharray = `0 ${circumference}`;
+      
+      setTimeout(() => {
+        ring.style.strokeDasharray = `${circumference * progress} ${circumference}`;
+      }, 500);
+    });
+  }
+  
+  // Animate progress bars
+  function animateProgressBars() {
+    const bars = document.querySelectorAll('.progress-fill');
+    bars.forEach(bar => {
+      const width = bar.style.width;
+      bar.style.width = '0%';
+      
+      setTimeout(() => {
+        bar.style.width = width;
+      }, 300);
+    });
+  }
+  
+  // Initialize animations
+  setTimeout(() => {
+    animateReadinessRings();
+    animateProgressBars();
+  }, 1000);
+  
+  // Add challenge completion simulation
+  document.querySelectorAll('.challenge-card').forEach(card => {
+    card.addEventListener('click', function() {
+      this.style.transform = 'scale(0.98)';
+      setTimeout(() => {
+        this.style.transform = 'scale(1.02)';
+        this.style.borderColor = 'var(--ready-color)';
+      }, 150);
+    });
+  });
+  
+  // Team member interaction
+  document.querySelectorAll('.team-member').forEach(member => {
+    member.addEventListener('click', function() {
+      // Simulate detailed player analysis
+      const memberName = this.querySelector('.member-name').textContent;
+      console.log(`Analyzing ${memberName} with three-layer system...`);
+      
+      // Add visual feedback
+      this.style.background = 'rgba(124, 92, 252, 0.1)';
+      setTimeout(() => {
+        this.style.background = '';
+      }, 1000);
+    });
+  });
+  
+  // Timeline week interaction
+  document.querySelectorAll('.timeline-week').forEach(week => {
+    week.addEventListener('click', function() {
+      if (!this.classList.contains('completed')) {
+        this.classList.add('active');
+        setTimeout(() => {
+          this.classList.remove('active');
+          this.classList.add('completed');
+        }, 2000);
+      }
+    });
+  });
+});
+</script>
+
+</body>
+</html>

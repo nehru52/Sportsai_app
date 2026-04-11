@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SportsAI — Live 1v1 Olympic-Grade Combat System</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #050508;
+  --bg2: #0a0a0f;
+  --bg3: #0f0f18;
+  --bg4: #151520;
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.12);
+  --text: #f2f2ff;
+  --muted: #7a7a99;
+  --dim: #3a3a55;
+  --red: #ff4d6d;
+  --blue: #4d94ff;
+  --gold: #ffd700;
+  --green: #00e676;
+  --orange: #ff9100;
+  --purple: #b44dff;
+  --cyan: #00e5ff;
+  --head: 'Bebas Neue', sans-serif;
+  --sans: 'Inter', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.7;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;width:230px;height:100vh;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;padding:24px 0;z-index:100;}
+.logo{padding:0 20px 20px;border-bottom:1px solid var(--border);}
+.logo h1{font-family:var(--head);font-size:22px;letter-spacing:2px;color:var(--red);}
+.logo p{font-size:10px;font-family:var(--mono);color:var(--muted);margin-top:2px;}
+.nav-sec{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);padding:14px 20px 4px;font-family:var(--mono);}
+nav a{display:block;padding:7px 20px;color:var(--muted);text-decoration:none;font-size:11px;font-family:var(--mono);border-left:2px solid transparent;transition:all .15s;}
+nav a:hover,nav a.on{color:var(--text);border-left-color:var(--red);background:rgba(255,77,109,0.06);}
+
+main{margin-left:230px;}
+section{padding:70px 56px;border-bottom:1px solid var(--border);max-width:960px;}
+section.full{max-width:none;}
+
+/* HERO */
+#hero{
+  padding:100px 56px 80px;max-width:none;
+  background:radial-gradient(ellipse at 60% 50%, rgba(255,77,109,0.08) 0%, transparent 60%),
+              radial-gradient(ellipse at 10% 80%, rgba(77,148,255,0.06) 0%, transparent 50%);
+  position:relative;overflow:hidden;
+}
+#hero::after{
+  content:'';position:absolute;top:0;right:0;width:50%;height:100%;
+  background:url("data:image/svg+xml,%3Csvg width='600' height='600' viewBox='0 0 600 600' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='rgba(255,77,109,0.04)' stroke-width='1'%3E%3Ccircle cx='300' cy='300' r='100'/%3E%3Ccircle cx='300' cy='300' r='200'/%3E%3Ccircle cx='300' cy='300' r='280'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;
+  pointer-events:none;
+}
+.hero-kicker{font-family:var(--mono);font-size:11px;color:var(--red);letter-spacing:3px;text-transform:uppercase;margin-bottom:20px;display:block;}
+h1{font-family:var(--head);font-size:72px;letter-spacing:3px;line-height:0.95;margin-bottom:24px;max-width:800px;}
+h1 .r{color:var(--red);}
+h1 .b{color:var(--blue);}
+h1 .g{color:var(--gold);}
+.hero-desc{font-size:16px;color:var(--muted);max-width:600px;line-height:1.7;margin-bottom:40px;}
+.fighter-vs{display:flex;align-items:center;gap:20px;margin-top:32px;}
+.fighter-box{background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.3);border-radius:12px;padding:16px 24px;text-align:center;}
+.fighter-box.b{background:rgba(77,148,255,0.1);border-color:rgba(77,148,255,0.3);}
+.fighter-box .name{font-family:var(--head);font-size:28px;letter-spacing:2px;}
+.fighter-box .stat{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px;}
+.vs-text{font-family:var(--head);font-size:48px;color:var(--gold);}
+
+/* SECTION HEADERS */
+.sec-label{font-family:var(--mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--red);display:block;margin-bottom:10px;}
+h2{font-family:var(--head);font-size:48px;letter-spacing:2px;line-height:1;margin-bottom:12px;}
+.lead{font-size:15px;color:var(--muted);border-left:3px solid var(--red);padding-left:16px;margin-bottom:36px;line-height:1.7;max-width:700px;}
+
+/* OLYMPIC COMPARISON TABLE */
+.olympic-table{width:100%;border-collapse:collapse;margin:24px 0;}
+.olympic-table th{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--dim);padding:10px 16px;text-align:left;border-bottom:1px solid var(--border);}
+.olympic-table td{padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px;color:var(--muted);vertical-align:top;}
+.olympic-table td:first-child{color:var(--text);font-weight:500;}
+.olympic-table .pro{color:var(--gold);}
+.olympic-table .us{color:var(--green);}
+.olympic-table .gap{color:var(--orange);}
+
+/* SYSTEM LAYERS */
+.layer{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:14px;display:grid;grid-template-columns:60px 1fr;gap:20px;align-items:start;}
+.layer-num{font-family:var(--head);font-size:52px;line-height:1;opacity:0.15;}
+.ln-r{color:var(--red);}
+.ln-b{color:var(--blue);}
+.ln-g{color:var(--gold);}
+.ln-p{color:var(--purple);}
+.ln-c{color:var(--cyan);}
+.layer-content h3{font-size:16px;font-weight:600;color:var(--text);margin-bottom:6px;}
+.layer-content .tech{font-family:var(--mono);font-size:10px;color:var(--red);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;display:block;}
+.layer-content p{font-size:13px;color:var(--muted);line-height:1.6;}
+.layer-content p strong{color:var(--text);font-weight:500;}
+.tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.tag{font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border2);color:var(--muted);}
+.tag.r{border-color:rgba(255,77,109,0.4);color:var(--red);background:rgba(255,77,109,0.06);}
+.tag.b{border-color:rgba(77,148,255,0.4);color:var(--blue);background:rgba(77,148,255,0.06);}
+.tag.g{border-color:rgba(0,230,118,0.4);color:var(--green);background:rgba(0,230,118,0.06);}
+.tag.gold{border-color:rgba(255,215,0,0.4);color:var(--gold);background:rgba(255,215,0,0.06);}
+
+/* FIGHT PHASES */
+.phase-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0;}
+@media(max-width:700px){.phase-grid{grid-template-columns:1fr;}}
+.phase-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:18px;position:relative;overflow:hidden;}
+.phase-card::before{content:attr(data-icon);position:absolute;right:-10px;top:-10px;font-size:64px;opacity:0.06;}
+.phase-card .phase-name{font-family:var(--head);font-size:20px;letter-spacing:1px;color:var(--text);margin-bottom:6px;}
+.phase-card .phase-sub{font-family:var(--mono);font-size:10px;color:var(--red);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;}
+.phase-card p{font-size:12px;color:var(--muted);line-height:1.6;}
+
+/* FEEDBACK TYPES */
+.feedback-row{display:grid;grid-template-columns:120px 1fr;gap:16px;padding:14px 0;border-bottom:1px solid var(--border);align-items:start;}
+.feedback-row:last-child{border-bottom:none;}
+.fb-timing{font-family:var(--head);font-size:22px;letter-spacing:1px;}
+.fb-r{color:var(--red);}
+.fb-b{color:var(--blue);}
+.fb-g{color:var(--green);}
+.fb-body h4{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.fb-body p{font-size:12px;color:var(--muted);margin:0;line-height:1.5;}
+.fb-example{font-family:var(--mono);font-size:11px;background:var(--bg4);border:1px solid var(--border2);border-left:2px solid var(--red);border-radius:6px;padding:8px 12px;margin-top:8px;color:var(--cyan);line-height:1.5;}
+
+/* CALLOUTS */
+.callout{border-radius:10px;padding:14px 18px;margin:20px 0;font-size:13px;line-height:1.6;}
+.c-red{background:rgba(255,77,109,0.08);border:1px solid rgba(255,77,109,0.25);color:rgba(255,180,190,0.9);}
+.c-blue{background:rgba(77,148,255,0.08);border:1px solid rgba(77,148,255,0.25);color:rgba(150,190,255,0.9);}
+.c-gold{background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.25);color:rgba(255,230,100,0.9);}
+.c-green{background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.25);color:rgba(100,255,180,0.9);}
+.callout strong{font-weight:600;}
+
+/* CODE */
+pre{background:#060610;border:1px solid var(--border2);border-radius:10px;padding:20px 24px;margin:16px 0;overflow-x:auto;font-family:var(--mono);font-size:12px;line-height:1.8;color:#b0b0d0;}
+.c1{color:var(--muted);}
+.c2{color:var(--red);}
+.c3{color:var(--green);}
+.c4{color:var(--cyan);}
+.c5{color:var(--gold);}
+.code-file{font-family:var(--mono);font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px;padding:8px 24px;background:#060610;border:1px solid var(--border2);border-bottom:none;border-radius:10px 10px 0 0;display:block;margin-top:16px;}
+.code-file+pre{border-radius:0 0 10px 10px;margin-top:0;}
+
+/* PIPELINE STEPS */
+.pipe{position:relative;padding-left:32px;margin:24px 0;}
+.pipe::before{content:'';position:absolute;left:10px;top:8px;bottom:8px;width:1px;background:linear-gradient(to bottom,var(--red),var(--blue),transparent);}
+.ps{position:relative;margin-bottom:24px;}
+.ps::before{content:attr(data-n);position:absolute;left:-38px;top:2px;width:22px;height:22px;border-radius:50%;background:var(--red);color:#fff;font-family:var(--mono);font-size:9px;font-weight:500;display:flex;align-items:center;justify-content:center;}
+.ps h4{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.ps p{font-size:12px;color:var(--muted);line-height:1.5;margin:0;}
+
+/* TWO COL */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;}
+@media(max-width:680px){.two-col{grid-template-columns:1fr;}}
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:18px 20px;}
+.card h3{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px;}
+.card p{font-size:12px;color:var(--muted);line-height:1.5;margin:0;}
+.card.r{border-left:3px solid var(--red);}
+.card.b{border-left:3px solid var(--blue);}
+.card.g{border-left:3px solid var(--green);}
+.card.gold{border-left:3px solid var(--gold);}
+
+/* METRIC GRID */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0;}
+@media(max-width:700px){.metrics{grid-template-columns:repeat(2,1fr);}}
+.met{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.met .ml{font-family:var(--mono);font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;}
+.met .mv{font-family:var(--head);font-size:28px;letter-spacing:1px;color:var(--text);}
+.met .ms{font-size:11px;color:var(--muted);margin-top:2px;}
+
+/* OLYMPIC GRADE SPECS */
+.spec-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:20px 0;}
+@media(max-width:700px){.spec-grid{grid-template-columns:1fr;}}
+.spec{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:18px;}
+.spec .spec-icon{font-size:24px;margin-bottom:10px;display:block;}
+.spec h3{font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;}
+.spec p{font-size:12px;color:var(--muted);line-height:1.5;margin:0;}
+.spec .spec-val{font-family:var(--head);font-size:32px;color:var(--gold);letter-spacing:1px;margin-bottom:4px;}
+
+h4.sub{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--cyan);margin:28px 0 14px;}
+p.t{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:12px;}
+ul,ol{padding-left:20px;margin-bottom:12px;}
+li{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:4px;}
+li strong{color:var(--text);font-weight:500;}
+hr{border:none;border-top:1px solid var(--border);margin:28px 0;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <h1>⚔ ARENA</h1>
+    <p>SportsAI Live 1v1 System</p>
+  </div>
+  <ul>
+    <div class="nav-sec">Vision</div>
+    <li><a href="#hero">Overview</a></li>
+    <li><a href="#olympics">Olympic grade defined</a></li>
+    <li><a href="#what-exists">What exists vs. what you build</a></li>
+
+    <div class="nav-sec">Technical System</div>
+    <li><a href="#layers">5 system layers</a></li>
+    <li><a href="#two-person">2-person tracking</a></li>
+    <li><a href="#realtime">Real-time feedback engine</a></li>
+    <li><a href="#corner">Corner AI system</a></li>
+    <li><a href="#feedback-types">3 feedback types</a></li>
+
+    <div class="nav-sec">Fight Modes</div>
+    <li><a href="#modes">4 fight modes</a></li>
+    <li><a href="#scouting">Pre-fight scouting</a></li>
+    <li><a href="#postgame">Post-fight breakdown</a></li>
+
+    <div class="nav-sec">Olympic Grade</div>
+    <li><a href="#standards">Olympic tech standards</a></li>
+    <li><a href="#validation">Validation protocol</a></li>
+    <li><a href="#hardware">Hardware setup</a></li>
+    <li><a href="#phases">Build phases</a></li>
+  </ul>
+</nav>
+
+<main>
+
+<!-- HERO -->
+<section id="hero" class="full">
+  <span class="hero-kicker">SportsAI Arena — Live 1v1 Combat Intelligence</span>
+  <h1>TWO<br>FIGHTERS.<br><span class="r">ONE</span> <span class="b">AI.</span><br><span class="g">ZERO EXCUSES.</span></h1>
+  <p class="hero-desc">The complete technical system for real-time two-person combat analysis — from the first frame of a sparring session to a full Olympic-grade post-fight breakdown with tactical game plans, error analysis, and the exact moves to beat your specific opponent.</p>
+  <div class="fighter-vs">
+    <div class="fighter-box">
+      <div class="name" style="color:var(--red)">FIGHTER A</div>
+      <div class="stat">Score: 74/100 · Belt: Blue · 3-week streak</div>
+    </div>
+    <div class="vs-text">VS</div>
+    <div class="fighter-box b">
+      <div class="name" style="color:var(--blue)">FIGHTER B</div>
+      <div class="stat">Score: 68/100 · Belt: Purple · 5-week streak</div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT OLYMPIC GRADE MEANS -->
+<section id="olympics">
+  <span class="sec-label">The standard</span>
+  <h2>WHAT OLYMPIC GRADE ACTUALLY MEANS</h2>
+  <p class="lead">At Paris 2024, AI-powered systems analyzed every athlete's biomechanics in real-time. Here is exactly what they used — and exactly how your app matches or exceeds each capability.</p>
+
+  <table class="olympic-table">
+    <thead><tr><th>Capability</th><th class="pro">Olympic / Pro System (Paris 2024)</th><th class="us">SportsAI Arena</th><th class="gap">Gap / Advantage</th></tr></thead>
+    <tbody>
+      <tr><td>Biomechanical analysis</td><td class="pro">AI cameras calculate precise movements in real-time during training and competition</td><td class="us">YOLO11-Pose fine-tuned on AthletePose3D, 30fps, joint angle extraction per frame</td><td class="gap">Equivalent quality, 1 camera vs 8+</td></tr>
+      <tr><td>Two-person tracking</td><td class="pro">Multi-camera physics-based tracking (CVPR 2025 system)</td><td class="us">ByteTrack + YOLO11 multi-person, physics constraint for combat sports</td><td class="gap">Same algorithm, fewer cameras — more practical</td></tr>
+      <tr><td>Real-time feedback</td><td class="pro">Coaching team receives live insights on tablets at courtside</td><td class="us">WebSocket stream, 500ms feedback cycle, corner tablet app</td><td class="gap">Functionally identical delivery mechanism</td></tr>
+      <tr><td>Pattern detection</td><td class="pro">Intel + IOC platform identifies talent and technique weaknesses from any camera device</td><td class="us">Opponent dossier: combo patterns, guard timings, pressure responses from 3-5 videos</td><td class="gap">More detailed for 1v1 — Olympic system is broad, yours is deep</td></tr>
+      <tr><td>3D rendering</td><td class="pro">Alibaba near real-time 3D athlete renders for broadcast</td><td class="us">Ready Player Me avatar + Three.js, bone-driven from pose data</td><td class="gap">Similar output, better personalization (it's YOUR avatar)</td></tr>
+      <tr><td>Stroboscopic analysis</td><td class="pro">Used at Paris 2024 for diving, athletics, gymnastics — frame-by-frame breakdown</td><td class="us">Annotation player: 0.25x slow-mo at error frames, timestamp jumping, skeleton overlay</td><td class="gap">Equivalent for coaching review purposes</td></tr>
+      <tr><td>Cost</td><td class="pro">$500K–$2M per Olympic program per year</td><td class="us">$9.99–49.99/month per athlete</td><td class="gap">1000x cheaper. This is the entire market opportunity.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout c-gold">
+    <strong>The gap that defines your business:</strong> At Paris 2024, AI-powered cameras analyzed every athlete's precise movements in real-time, providing coaching teams with insights that could be the difference between winning and losing. That technology is available exclusively to athletes whose countries can fund it. You are building the version that every athlete on earth can access for the price of a gym membership.
+  </div>
+</section>
+
+<!-- WHAT EXISTS VS WHAT YOU BUILD -->
+<section id="what-exists">
+  <span class="sec-label">Market reality</span>
+  <h2>WHAT EXISTS. WHAT DOESN'T.</h2>
+  <p class="lead">Be precise about where the gap is. Every competitor does something. Nobody does what you're building.</p>
+
+  <div class="two-col">
+    <div class="card r">
+      <h3>What exists today (all incomplete)</h3>
+      <ul style="margin-top:10px;">
+        <li><strong>Catapult Pro Video</strong> — team tactical video, no AI pose analysis, no 1v1</li>
+        <li><strong>Hudl</strong> — video storage for teams, no AI, no individual feedback</li>
+        <li><strong>VueMotion</strong> — single-athlete biomechanics, no combat sports, no real-time</li>
+        <li><strong>HomeCourt</strong> — AI basketball training, single-sport, no opponents</li>
+        <li><strong>POSE app</strong> — real-time form feedback for gym exercises, not combat sports</li>
+        <li><strong>PoseTracker API</strong> — fitness exercise tracking, no sport-specific intelligence</li>
+      </ul>
+    </div>
+    <div class="card g">
+      <h3>What you build that nobody has</h3>
+      <ul style="margin-top:10px;">
+        <li><strong>Live 1v1 analysis:</strong> both fighters tracked simultaneously, private feedback each</li>
+        <li><strong>Corner AI tablet:</strong> real-time pattern alerts during the fight for the coach</li>
+        <li><strong>Opponent dossier:</strong> AI-generated game plan based on opponent's specific patterns</li>
+        <li><strong>Personalized game plan:</strong> exploits opponent weakness using YOUR strengths</li>
+        <li><strong>Rivalry progression:</strong> head-to-head history, who's improving faster, over time</li>
+        <li><strong>Technique unlock from fight data:</strong> unlocks based on what you do in sparring</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 5 SYSTEM LAYERS -->
+<section id="layers">
+  <span class="sec-label">Architecture</span>
+  <h2>THE 5 SYSTEM LAYERS</h2>
+  <p class="lead">Every layer builds on the previous. Layers 1–2 are existing tools. Layers 3–5 are your original work — and your moat.</p>
+
+  <div class="layer">
+    <div class="layer-num ln-r">1</div>
+    <div class="layer-content">
+      <span class="tech">Vision layer — existing, free</span>
+      <h3>Two-person simultaneous pose extraction</h3>
+      <p>YOLO11x-Pose in multi-person mode. ByteTrack assigns Fighter A (red skeleton) and Fighter B (blue skeleton) persistent IDs from frame 1. Physics constraint: two human bodies cannot occupy the same skeleton space — prevents limb misattribution during clinch. <strong>Output: two independent 33-keypoint sequences at 30fps with per-joint confidence scores.</strong> Frames with confidence below 0.65 are flagged and excluded from scoring — never feed garbage frames to the analysis engine.</p>
+      <div class="tag-row"><span class="tag r">YOLO11x-Pose</span><span class="tag b">ByteTrack</span><span class="tag">AthletePose3D fine-tune</span><span class="tag">Physics constraint</span></div>
+    </div>
+  </div>
+
+  <div class="layer">
+    <div class="layer-num ln-b">2</div>
+    <div class="layer-content">
+      <span class="tech">Interaction layer — partially existing</span>
+      <h3>Fight event detection — what happened between them</h3>
+      <p>Detects the moments that matter: strike attempt (Fighter A hand keypoint crosses Fighter B's body boundary), takedown entry (hip drop below knee + proximity), clinch (both fighters within contact range for 3+ frames), knockdown (fighter's hip below 0.3 normalized height), escape. <strong>These events become the annotated timeline of the fight</strong> — every piece of feedback is anchored to a specific event, not just a timestamp. Coaches and athletes jump directly to the clinch at 1:34 or the failed single-leg at 2:07.</p>
+      <div class="tag-row"><span class="tag r">Proximity detection</span><span class="tag b">Keypoint boundary crossing</span><span class="tag">Event timeline DB</span></div>
+    </div>
+  </div>
+
+  <div class="layer">
+    <div class="layer-num ln-g">3</div>
+    <div class="layer-content">
+      <span class="tech">Analysis layer — YOUR MOAT</span>
+      <h3>Per-fighter rules engine + relative analysis</h3>
+      <p>Your existing rules engine runs twice — once per fighter's pose sequence. Each fighter gets their own technique score, error list, phase breakdown. Then a <strong>relative analysis layer</strong> compares the two: who controlled range (average distance throughout fight), reaction times (milliseconds from opponent movement to response), guard height differential, strike success rate, and which fighter's technique degraded more over time (fatigue index). This comparison is where the tactical intelligence lives.</p>
+      <div class="tag-row"><span class="tag gold">Rules engine ×2</span><span class="tag">Relative analysis</span><span class="tag r">Fatigue index</span><span class="tag b">Range control</span></div>
+    </div>
+  </div>
+
+  <div class="layer">
+    <div class="layer-num ln-p">4</div>
+    <div class="layer-content">
+      <span class="tech">Intelligence layer — YOUR MOAT</span>
+      <h3>Pattern detection + opponent dossier engine</h3>
+      <p>Across multiple sessions between the same two fighters: detects which combinations Fighter B uses when Fighter A closes distance, at what point in the fight Fighter B's guard drops, whether Fighter B telegraphs their takedown with a shoulder dip. <strong>From 3–5 sessions, the system builds a behavioral fingerprint of every fighter on the platform.</strong> This fingerprint is private to the opponent who uploads it. When you request a dossier on your upcoming competitor, the AI cross-references their fingerprint against your own strength profile to generate a personalized game plan.</p>
+      <div class="tag-row"><span class="tag r">Pattern clustering</span><span class="tag">Behavioral fingerprint</span><span class="tag gold">Game plan generation</span></div>
+    </div>
+  </div>
+
+  <div class="layer">
+    <div class="layer-num ln-c">5</div>
+    <div class="layer-content">
+      <span class="tech">Output layer — Claude API</span>
+      <h3>Three separate natural-language reports per session</h3>
+      <p>Claude API generates three outputs after every session: <strong>(A) Fighter A private report</strong> — their technique errors, improvement since last session, 2 specific drills to fix their biggest weakness. <strong>(B) Fighter B private report</strong> — same. <strong>(C) Shared tactical breakdown</strong> — visible only if both consent — how the fight played out, key turning points, what the decisive technique difference was. The shared breakdown is the one athletes post on social media. The private reports are the ones that change how they train tomorrow.</p>
+      <div class="tag-row"><span class="tag">Claude API ×3</span><span class="tag r">Fighter A private</span><span class="tag b">Fighter B private</span><span class="tag gold">Shared breakdown</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- TWO PERSON TRACKING -->
+<section id="two-person">
+  <span class="sec-label">Core technical challenge</span>
+  <h2>TWO-PERSON TRACKING IN COMBAT</h2>
+  <p class="lead">This is the hardest technical problem in sports AI. Here is the honest approach — including what fails and how to handle it gracefully.</p>
+
+  <div class="callout c-red">
+    <strong>The fundamental problem:</strong> When two wrestlers clinch or an MMA fighter is in guard position, standard pose models assign one fighter's arm to the other fighter's body. The CVPR 2025 research uses 8+ cameras and physics simulation to solve this. You have 1 phone camera. Here is how you build around that constraint instead of pretending it doesn't exist.
+  </div>
+
+  <h4 class="sub">The 3-tier confidence system</h4>
+  <div class="phase-grid">
+    <div class="phase-card" data-icon="✅">
+      <div class="phase-name" style="color:var(--green)">CLEAN</div>
+      <div class="phase-sub">Both fighters separated, conf &gt;0.75</div>
+      <p>Full technique scoring active. Both fighters' joint angles recorded with high accuracy. Rules engine runs at full fidelity. These frames count toward technique scores and dossier patterns.</p>
+    </div>
+    <div class="phase-card" data-icon="⚠️">
+      <div class="phase-name" style="color:var(--orange)">CONTACT</div>
+      <div class="phase-sub">Clinch or grappling range, conf 0.5–0.75</div>
+      <p>Technique scoring paused. Interaction events still recorded (clinch entry, break timing, control position). Partial data used for grappling pattern detection only. Display: "Contact phase" indicator in the UI.</p>
+    </div>
+    <div class="phase-card" data-icon="🚫">
+      <div class="phase-name" style="color:var(--red)">LOST</div>
+      <div class="phase-sub">Ground work or occlusion, conf &lt;0.5</div>
+      <p>Frames discarded entirely. Temporal interpolation fills the visual gap smoothly. Never show athletes data from lost frames. Ground work analysis is a Phase 3 feature requiring multi-camera setup.</p>
+    </div>
+  </div>
+
+  <span class="code-file">two_person_tracker.py</span>
+  <pre><span class="c1"># Two-person combat tracking with confidence-based tier system</span>
+<span class="c1"># This is the most important 100 lines in the entire codebase</span>
+
+<span class="c2">from</span> ultralytics <span class="c2">import</span> YOLO
+<span class="c2">import</span> numpy <span class="c2">as</span> np
+
+model = YOLO(<span class="c3">'yolo11x-pose.pt'</span>)  <span class="c1"># fine-tuned checkpoint</span>
+
+<span class="c2">def</span> <span class="c4">process_combat_frame</span>(frame, prev_assignments):
+    results = model.track(frame, persist=<span class="c5">True</span>, tracker=<span class="c3">"bytetrack.yaml"</span>)
+    
+    fighters = {}
+    <span class="c2">for</span> i, box <span class="c2">in</span> enumerate(results[<span class="c5">0</span>].boxes):
+        track_id = <span class="c2">int</span>(box.id)
+        kpts = results[<span class="c5">0</span>].keypoints.xyn[i].numpy()
+        conf = results[<span class="c5">0</span>].keypoints.conf[i].numpy()
+        
+        <span class="c1"># Assign consistent Fighter A/B IDs across frames</span>
+        fighter_id = resolve_fighter_identity(track_id, prev_assignments)
+        
+        <span class="c1"># Calculate mean confidence across load-bearing joints only</span>
+        <span class="c1"># (hips, knees, shoulders — not fingers)</span>
+        key_joints = [<span class="c5">5</span>,<span class="c5">6</span>,<span class="c5">11</span>,<span class="c5">12</span>,<span class="c5">13</span>,<span class="c5">14</span>,<span class="c5">15</span>,<span class="c5">16</span>]
+        mean_conf = conf[key_joints].mean()
+        
+        fighters[fighter_id] = {
+            <span class="c3">"keypoints"</span>: kpts,
+            <span class="c3">"confidence"</span>: mean_conf,
+            <span class="c3">"tier"</span>: get_confidence_tier(mean_conf),
+            <span class="c3">"biomechanics"</span>: extract_biomechanics(kpts) <span class="c2">if</span> mean_conf > <span class="c5">0.65</span> <span class="c2">else</span> <span class="c5">None</span>
+        }
+    
+    <span class="c1"># Detect interaction state</span>
+    interaction = detect_interaction(fighters)
+    
+    <span class="c2">return</span> {
+        <span class="c3">"fighters"</span>: fighters,
+        <span class="c3">"interaction"</span>: interaction,   <span class="c1"># 'separated', 'clinch', 'ground'</span>
+        <span class="c3">"scoreable"</span>: interaction == <span class="c3">"separated"</span> <span class="c2">and</span>
+                      <span class="c2">all</span>(f[<span class="c3">"confidence"</span>] > <span class="c5">0.65</span> <span class="c2">for</span> f <span class="c2">in</span> fighters.values())
+    }
+
+<span class="c2">def</span> <span class="c4">detect_interaction</span>(fighters):
+    <span class="c2">if</span> <span class="c2">len</span>(fighters) < <span class="c5">2</span>: <span class="c2">return</span> <span class="c3">"single"</span>
+    
+    a_hip = fighters[<span class="c3">"A"</span>][<span class="c3">"keypoints"</span>][<span class="c5">11</span>]  <span class="c1"># left hip</span>
+    b_hip = fighters[<span class="c3">"B"</span>][<span class="c3">"keypoints"</span>][<span class="c5">11</span>]
+    distance = np.linalg.norm(a_hip - b_hip)
+    
+    a_hip_height = fighters[<span class="c3">"A"</span>][<span class="c3">"keypoints"</span>][<span class="c5">11</span>][<span class="c5">1</span>]
+    b_hip_height = fighters[<span class="c3">"B"</span>][<span class="c3">"keypoints"</span>][<span class="c5">11</span>][<span class="c5">1</span>]
+    
+    <span class="c2">if</span> distance < <span class="c5">0.25</span>: <span class="c2">return</span> <span class="c3">"clinch"</span>
+    <span class="c2">if</span> a_hip_height > <span class="c5">0.75</span> <span class="c2">or</span> b_hip_height > <span class="c5">0.75</span>: <span class="c2">return</span> <span class="c3">"ground"</span>
+    <span class="c2">return</span> <span class="c3">"separated"</span></pre>
+</section>
+
+<!-- REAL-TIME FEEDBACK ENGINE -->
+<section id="realtime">
+  <span class="sec-label">Live analysis</span>
+  <h2>REAL-TIME FEEDBACK ENGINE</h2>
+  <p class="lead">The fight is happening now. The AI is watching both fighters simultaneously. It knows patterns the fighters themselves don't see yet.</p>
+
+  <div class="metrics">
+    <div class="met"><div class="ml">Feedback latency</div><div class="mv">&lt;200ms</div><div class="ms">From frame to fighter's earpiece</div></div>
+    <div class="met"><div class="ml">Feedback cycle</div><div class="mv">500ms</div><div class="ms">Maximum interrupt frequency</div></div>
+    <div class="met"><div class="ml">Pattern window</div><div class="mv">90 sec</div><div class="ms">Rolling window for pattern detection</div></div>
+    <div class="met"><div class="ml">Min samples for pattern</div><div class="mv">3×</div><div class="ms">Before alerting coach</div></div>
+  </div>
+
+  <h4 class="sub">The feedback interrupt rules — critical design decision</h4>
+  <div class="callout c-blue">
+    <strong>You cannot give feedback every 500ms or you destroy the fight.</strong> The system must decide: is this observation important enough to interrupt the athlete or coach right now? There are only 3 levels of interrupt, and only Level 1 fires during the live fight. Levels 2 and 3 are between rounds and post-fight.
+  </div>
+
+  <div class="feedback-row">
+    <div class="fb-timing fb-r">LIVE</div>
+    <div class="fb-body">
+      <h4>Level 1 — Immediate safety / high-value pattern (fires during fight, vibration alert)</h4>
+      <p>Only fires when: (a) injury risk indicator detected (knee valgus, spine hyperextension), or (b) opponent has shown the same exploitable pattern 3+ times in the last 90 seconds. Maximum 1 Level 1 alert per minute. Goes to coach's tablet as a vibration + one-line text.</p>
+      <div class="fb-example">⚡ PATTERN: Opp drops right guard 0.3s after body shot — seen 3× in last 80s. Counter window open.</div>
+    </div>
+  </div>
+
+  <div class="feedback-row">
+    <div class="fb-timing fb-b">ROUND</div>
+    <div class="fb-body">
+      <h4>Level 2 — Between rounds (60-second corner report)</h4>
+      <p>Delivered to coach's tablet when the round ends. Contains: this round's technique score vs previous round, top 2 errors detected, opponent's most common pattern this round, and 1 tactical adjustment. Presented as bullet points — coach reads it in 15 seconds while treating the fighter.</p>
+      <div class="fb-example">Round 2 summary: Your level change ↓ (entry avg 0.74, was 0.68). Opp shot 71% to your left — circle right. Guard dropped after own combos ×4. Fix: extend your 1-2 by one beat before resetting.</div>
+    </div>
+  </div>
+
+  <div class="feedback-row">
+    <div class="fb-timing fb-g">POST</div>
+    <div class="fb-body">
+      <h4>Level 3 — Full post-fight breakdown (complete analysis)</h4>
+      <p>Available within 60 seconds of the final bell. Contains: complete timeline with all events annotated, technique scores per round with trend, error frequency by phase, opponent pattern map, head-to-head comparison, and the full personalized improvement plan. Each fighter receives their private version. The shared breakdown unlocks if both consent.</p>
+      <div class="fb-example">Fight breakdown: 12 technique events scored. Your entry improved R1→R3 (+8pts). Critical gap: finish phase (avg 42/100). Opp exploited this in 4 of 7 successful counters. Primary drill: penetration step finishing drill ×50/day.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CORNER AI SYSTEM -->
+<section id="corner">
+  <span class="sec-label">Corner intelligence</span>
+  <h2>THE CORNER AI TABLET</h2>
+  <p class="lead">The coach's interface during a live fight. Designed to be read in 2 seconds, not studied. Every decision in a corner has to be instant.</p>
+
+  <h4 class="sub">Corner tablet screen design — exactly 4 elements</h4>
+  <div class="spec-grid">
+    <div class="spec">
+      <span class="spec-icon">🔴</span>
+      <h3>Live score bars</h3>
+      <p>Two horizontal bars — one per fighter — updating in real time. Color-coded: green above 70, amber 50–70, red below 50. Coach sees at a glance who is dominating technically.</p>
+    </div>
+    <div class="spec">
+      <span class="spec-icon">⚡</span>
+      <h3>Pattern alert feed</h3>
+      <p>Single scrolling line of the most recent patterns detected. Maximum 3 lines visible at once. The most recent pattern is always at top. Disappears after 2 minutes if not repeated.</p>
+    </div>
+    <div class="spec">
+      <span class="spec-icon">📊</span>
+      <h3>Round comparison</h3>
+      <p>Mini chart showing this round vs last round per fighter. One number: "Your fighter: +6 pts this round." Tells the coach if the tactical adjustment from last corner is working.</p>
+    </div>
+    <div class="spec">
+      <span class="spec-icon">🎯</span>
+      <h3>The one thing</h3>
+      <p>A single sentence at the bottom: the single most important thing the coach should tell their fighter this round. Generated by Claude in under 200 tokens. This is the product's highest-value output per word.</p>
+    </div>
+  </div>
+
+  <div class="callout c-red">
+    <strong>"The one thing" prompt design matters enormously.</strong> The system prompt: "You are a combat sports corner coach. You have 30 seconds to give one instruction. Based on the data, what is the single most important adjustment your fighter must make? Maximum 15 words. Be specific and actionable. Never generic." That constraint produces: "Circle right after your jab — his left cross is slower than his right" not "keep your guard up."
+  </div>
+</section>
+
+<!-- FEEDBACK TYPES -->
+<section id="feedback-types">
+  <span class="sec-label">Output design</span>
+  <h2>THREE REPORTS, THREE PURPOSES</h2>
+  <p class="lead">Every 1v1 session produces exactly three outputs. Each serves a different purpose. Each has a different audience. Neither fighter sees the other's private report.</p>
+
+  <div class="two-col">
+    <div class="card r">
+      <h3>🔒 Fighter A Private Report</h3>
+      <p style="margin-top:8px;font-size:12px;color:var(--muted);">Visible only to Fighter A. Contains: technique score vs personal history, phase-by-phase breakdown, specific errors with video timestamps (-2s before each error), elite benchmark comparison, and a 2-drill training prescription targeting the weakest phase. Fighter B never sees this report.</p>
+    </div>
+    <div class="card b">
+      <h3>🔒 Fighter B Private Report</h3>
+      <p style="margin-top:8px;font-size:12px;color:var(--muted);">Same structure as Fighter A's. Completely independent. Fighter B's errors are framed in terms of their own progression history — not compared to Fighter A. Training prescriptions based on their specific weak phases. Fighter A never sees this report.</p>
+    </div>
+  </div>
+  <div class="card gold" style="margin-top:14px;">
+    <h3>🤝 Shared Tactical Breakdown (requires mutual consent — both tap "Share")</h3>
+    <p style="margin-top:8px;font-size:12px;color:var(--muted);">The shareable version. Contains: fight timeline with key events annotated, who controlled range and when it shifted, the decisive technique difference, and the head-to-head rivalry stats update. This is what athletes post on TikTok and Instagram. The shareable breakdown has Fighter A's avatar (red) and Fighter B's avatar (blue) animated through the fight's key moments with skeleton overlays. It is a 30-second shareable video clip. This is your organic growth engine.</p>
+  </div>
+</section>
+
+<!-- FOUR FIGHT MODES -->
+<section id="modes">
+  <span class="sec-label">Product modes</span>
+  <h2>FOUR FIGHT MODES</h2>
+  <p class="lead">Each mode serves a different training context. Each unlocks at a different tier. Build them in order.</p>
+
+  <div class="pipe">
+    <div class="ps" data-n="1">
+      <h4>Drill Mode — Upload recorded sparring (Phase 1, weeks 10–12)</h4>
+      <p>Both fighters film a sparring session. Upload to app. Tag both fighters. System processes asynchronously, delivers two private reports + optional shared breakdown. No live infrastructure needed. Build time: 2–3 weeks on top of existing pipeline. The core — proves the concept, generates the first viral moments, costs nothing extra in infrastructure.</p>
+    </div>
+    <div class="ps" data-n="2">
+      <h4>Rivalry Mode — 3+ sessions between the same two fighters (Phase 2, month 5)</h4>
+      <p>After 3 sessions against the same opponent, the rivalry card activates: head-to-head score history, who is improving faster, which techniques each fighter dominates, and a prediction of who is trending stronger. "Over 5 sessions: You've improved 22%, opponent improved 8%. You are trending toward dominance in the entry phase." This is the addiction mechanic.</p>
+    </div>
+    <div class="ps" data-n="3">
+      <h4>Scout Mode — Opponent dossier before competition (Phase 2, month 7)</h4>
+      <p>Upload 3–5 public or consented videos of your upcoming opponent. System builds their behavioral fingerprint: dominant combinations, guard timing, pressure response, takedown telegraph, fatigue pattern. Claude generates a personalized game plan that maps their specific weaknesses against your specific strengths. Priced at $19.99 per dossier. The athlete who uses this once before a tournament will use it before every tournament.</p>
+    </div>
+    <div class="ps" data-n="4">
+      <h4>Corner Mode — Live real-time analysis during competition (Phase 3, Elite tier)</h4>
+      <p>Coach runs the tablet app at ringside. Two cameras (one each side of the mat/ring) connect via the gym's WiFi. WebSocket stream feeds the analysis server. Corner tablet receives pattern alerts, live score updates, and "the one thing" instruction before each round. This is the Olympic-grade feature. Priced at $49.99/month or $299/team contract. Requires a 2-camera setup guide and a minimum 50Mbps WiFi connection.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PRE-FIGHT SCOUTING -->
+<section id="scouting">
+  <span class="sec-label">Scout mode deep dive</span>
+  <h2>PRE-FIGHT OPPONENT SCOUTING</h2>
+  <p class="lead">The dossier that changes how an athlete prepares for every competition. Six intelligence categories, all extracted automatically from uploaded video.</p>
+
+  <table class="olympic-table">
+    <thead><tr><th>Intelligence</th><th>What AI detects</th><th>Exact output to athlete</th></tr></thead>
+    <tbody>
+      <tr><td>Combo patterns</td><td>Sequence frequency analysis on striking combinations across all videos</td><td>"Opens with jab-cross-hook 71% of the time. Step offline left after his cross."</td></tr>
+      <tr><td>Guard openings</td><td>Moments when guard keypoints drop below threshold — timing, trigger, duration</td><td>"Right hand drops 310ms after the body shot — 84% reliability across 23 instances."</td></tr>
+      <tr><td>Pressure response</td><td>What they do when you close distance below 1.5m — clinch, retreat, counter</td><td>"Below 1.5m he always initiates a clinch — use that to reset his rhythm."</td></tr>
+      <tr><td>Takedown tell</td><td>Body position changes 0.2–0.5s before a takedown attempt</td><td>"Right shoulder dip + weight shift forward = double-leg coming. 100% correlation."</td></tr>
+      <tr><td>Fatigue signature</td><td>How technique quality degrades — guard height, footwork, combination length over time</td><td>"By equivalent of round 3, guard 15% lower, combinations shorter by 1 beat."</td></tr>
+      <tr><td>Timing signature</td><td>Attack cadence — interval between combinations, gap within combinations</td><td>"Attacks every 2.1 seconds in mid-range. Combination gap is 0.8s — counterable."</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout c-gold">
+    <strong>The personalization that makes it worth $19.99:</strong> The dossier doesn't just describe the opponent — it maps their weaknesses against YOUR strengths from your training history. "Given your left hook scores 78/100 and his right-side guard drops 310ms after the body shot — your left hook after his body shot is your highest-probability scoring sequence. Drill this combination 100× before the fight."
+  </div>
+</section>
+
+<!-- POST FIGHT BREAKDOWN -->
+<section id="postgame">
+  <span class="sec-label">Post-fight analysis</span>
+  <h2>THE 60-SECOND POST-FIGHT BREAKDOWN</h2>
+  <p class="lead">Available within 60 seconds of the final frame. The most complete individual athletic performance analysis any amateur athlete has ever received.</p>
+
+  <span class="code-file">post_fight_report_generator.py</span>
+  <pre><span class="c1"># Everything the Claude API receives to generate the post-fight report</span>
+<span class="c1"># This structured data turns into the most valuable coaching output in the product</span>
+
+post_fight_data = {
+    <span class="c3">"session_id"</span>: session_id,
+    <span class="c3">"duration_seconds"</span>: <span class="c5">480</span>,
+    <span class="c3">"sport"</span>: <span class="c3">"mma"</span>,
+    
+    <span class="c1"># Fighter A's data (never shared with Fighter B)</span>
+    <span class="c3">"fighter_a"</span>: {
+        <span class="c3">"technique_score"</span>: <span class="c5">71</span>,
+        <span class="c3">"score_vs_last_session"</span>: <span class="c5">+4</span>,
+        <span class="c3">"phase_scores"</span>: {<span class="c3">"entry"</span>: <span class="c5">78</span>, <span class="c3">"execution"</span>: <span class="c5">65</span>, <span class="c3">"finish"</span>: <span class="c5">52</span>},
+        <span class="c3">"errors"</span>: [
+            {<span class="c3">"rule"</span>: <span class="c3">"finish_phase_hip_extension"</span>, <span class="c3">"count"</span>: <span class="c5">7</span>, <span class="c3">"severity"</span>: <span class="c3">"high"</span>,
+             <span class="c3">"timestamps"</span>: [<span class="c5">34</span>,<span class="c5">89</span>,<span class="c5">145</span>,<span class="c5">201</span>,<span class="c5">298</span>,<span class="c5">341</span>,<span class="c5">412</span>]},
+        ],
+        <span class="c3">"vs_elite_percentile"</span>: {<span class="c3">"entry"</span>: <span class="c5">62</span>, <span class="c3">"execution"</span>: <span class="c5">44</span>, <span class="c3">"finish"</span>: <span class="c5">28</span>},
+        <span class="c3">"session_history"</span>: [<span class="c5">58</span>,<span class="c5">63</span>,<span class="c5">67</span>,<span class="c5">71</span>],  <span class="c1"># last 4 sessions</span>
+    },
+    
+    <span class="c1"># Fight events (shared/neutral)</span>
+    <span class="c3">"events"</span>: [
+        {<span class="c3">"type"</span>: <span class="c3">"strike_landed"</span>, <span class="c3">"attacker"</span>: <span class="c3">"A"</span>, <span class="c3">"timestamp"</span>: <span class="c5">23</span>, <span class="c3">"technique"</span>: <span class="c3">"jab"</span>},
+        {<span class="c3">"type"</span>: <span class="c3">"takedown_attempt"</span>, <span class="c3">"attacker"</span>: <span class="c3">"B"</span>, <span class="c3">"timestamp"</span>: <span class="c5">67</span>, <span class="c3">"success"</span>: <span class="c5">False</span>},
+        <span class="c1"># ... all detected events</span>
+    ],
+    
+    <span class="c1"># Relative analysis</span>
+    <span class="c3">"comparison"</span>: {
+        <span class="c3">"range_control_winner"</span>: <span class="c3">"A"</span>,        <span class="c1"># who controlled distance more</span>
+        <span class="c3">"reaction_time_ms"</span>: {<span class="c3">"A"</span>: <span class="c5">340</span>, <span class="c3">"B"</span>: <span class="c5">410</span>},
+        <span class="c3">"fatigue_index"</span>: {<span class="c3">"A"</span>: <span class="c5">0.12</span>, <span class="c3">"B"</span>: <span class="c5">0.31</span>},  <span class="c1"># B degraded more</span>
+        <span class="c3">"decisive_factor"</span>: <span class="c3">"A's reaction time advantage widened in final 2 mins"</span>
+    }
+}
+
+<span class="c1"># Claude generates three reports from this structured data</span>
+<span class="c1"># Fighter A report: personal, private, improvement-focused</span>
+<span class="c1"># Fighter B report: same, completely independent framing</span>
+<span class="c1"># Shared breakdown: tactical narrative, no private error details</span></pre>
+</section>
+
+<!-- OLYMPIC STANDARDS -->
+<section id="standards">
+  <span class="sec-label">Olympic grade specifications</span>
+  <h2>OLYMPIC-GRADE TECHNICAL STANDARDS</h2>
+  <p class="lead">What Olympic programs use, what you match, and what you realistically cannot match with a phone — plus why it doesn't matter for your market.</p>
+
+  <div class="spec-grid">
+    <div class="spec">
+      <span class="spec-icon">📷</span>
+      <h3>Camera setup</h3>
+      <div class="spec-val">2–4</div>
+      <p>Olympic: 8–16 cameras, 4K, 240fps. Yours: 2 phones (consumer Phase 2+), 1080p, 60fps. The technique quality delta between 2-camera and 8-camera is real — but 2 cameras eliminates 80% of the occlusion problem. Your product guide must include a camera placement diagram for Phase 3 Corner Mode.</p>
+    </div>
+    <div class="spec">
+      <span class="spec-icon">⚡</span>
+      <h3>Analysis latency</h3>
+      <div class="spec-val">&lt;500ms</div>
+      <p>Olympic systems: sub-100ms with dedicated server rooms at venue. Yours: &lt;500ms via WebSocket over gym WiFi. For corner coaching, this is completely acceptable — the coach absorbs the data over 5–10 seconds between rounds anyway.</p>
+    </div>
+    <div class="spec">
+      <span class="spec-icon">🎯</span>
+      <h3>Accuracy target</h3>
+      <div class="spec-val">±8°</div>
+      <p>Olympic motion capture: ±2mm (sub-millimetric). Your YOLO11 fine-tuned: ±8° joint angle error. Research shows ±8° is clinically meaningful for technique coaching. Not laboratory biomechanics — but the difference between "coach can trust it" and "coach ignores it."</p>
+    </div>
+    <div class="spec">
+      <span class="spec-icon">🏅</span>
+      <h3>Validation standard</h3>
+      <div class="spec-val">75%</div>
+      <p>Your target: 75% AI/coach agreement rate before calling it Olympic-grade. Below 65%: coaches override constantly, product feels broken. 65–75%: usable, improving. Above 75%: coaches trust the AI, it accelerates their work rather than adding friction. This is your ship/don't-ship criterion.</p>
+    </div>
+    <div class="spec">
+      <span class="spec-icon">📊</span>
+      <h3>Metrics per session</h3>
+      <div class="spec-val">47+</div>
+      <p>Olympic sports science programs track 40–60 biomechanical parameters per session. Your system extracts: 33 keypoints × 3 values (x,y,conf) per frame + 14 derived joint angles + 6 velocity vectors + interaction event count = 47+ metrics per session, every session.</p>
+    </div>
+    <div class="spec">
+      <span class="spec-icon">🔒</span>
+      <h3>Privacy standard</h3>
+      <div class="spec-val">GDPR+</div>
+      <p>Olympic biometric data is protected by athlete consent agreements and national body policies. Yours: GDPR compliant (EU), COPPA for under-18, explicit dual-consent for any 1v1 session, skeleton-only storage (no raw video of non-consenting individuals), and right-to-deletion for all biometric data.</p>
+    </div>
+  </div>
+</section>
+
+<!-- VALIDATION PROTOCOL -->
+<section id="validation">
+  <span class="sec-label">Proving it works</span>
+  <h2>VALIDATION PROTOCOL</h2>
+  <p class="lead">How you prove the system is Olympic-grade before you call it that. Three validation stages, each with a pass/fail threshold.</p>
+
+  <div class="pipe">
+    <div class="ps" data-n="V1">
+      <h4>Stage 1 — Pose accuracy validation (before launch)</h4>
+      <p>Film 50 sparring sessions with known ground truth (have a biomechanist manually measure joint angles on a subset of frames). Compare YOLO11 outputs to ground truth. Target: mean absolute error below 8° for hip, knee, and shoulder angles. If above 12°: re-fine-tune on more data before shipping. This is the objective measurement that makes "Olympic grade" a defensible claim, not marketing language.</p>
+    </div>
+    <div class="ps" data-n="V2">
+      <h4>Stage 2 — Coach agreement rate (first 3 months post-launch)</h4>
+      <p>Every time a human coach reviews a 1v1 session and sees the AI's error report, they agree/disagree/edit. Track the agreement rate. Target: 75%+ by month 3. Below 65% at month 2: convene an emergency coach knowledge session to recalibrate thresholds. The divergence data tells you exactly which rules are wrong.</p>
+    </div>
+    <div class="ps" data-n="V3">
+      <h4>Stage 3 — Outcome correlation (6 months post-launch)</h4>
+      <p>The ultimate validation: do athletes who follow the AI's training prescriptions actually improve their competition results? Survey your most active users at 6 months. Correlate: sessions analyzed vs. tournament win rate vs. technique score progression. If AI-coached athletes win more often than non-AI-coached athletes in the same skill bracket — that is your Olympic-grade proof point. That is your press release. That is your Series A data slide.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HARDWARE SETUP -->
+<section id="hardware">
+  <span class="sec-label">Physical setup</span>
+  <h2>HARDWARE SETUP GUIDE</h2>
+  <p class="lead">What the athlete and coach actually need to set up in a gym to run Olympic-grade 1v1 analysis. Designed for zero technical expertise.</p>
+
+  <div class="two-col">
+    <div class="card r">
+      <h3>Phase 1 — Drill Mode (one phone, one angle)</h3>
+      <p style="margin-top:8px;font-size:12px;color:var(--muted);">Equipment: one phone, one tripod or stable surface. Camera placement: 45° side angle, 3–4 meters from the athletes, hip-height. Records the full session. Upload after. This is enough for technique scoring in striking sports. Grappling loses accuracy during clinch — acknowledged limitation.</p>
+    </div>
+    <div class="card b">
+      <h3>Phase 3 — Corner Mode (two phones, WiFi)</h3>
+      <p style="margin-top:8px;font-size:12px;color:var(--muted);">Equipment: two iPhones (12 or later), two tripods, gym WiFi minimum 50Mbps. Phone A: front angle (3m from mat). Phone B: rear angle (3m from mat, opposite side). Both run SportsAI camera app simultaneously. System syncs the streams, processes in real-time, and pushes corner alerts. Setup time: 8 minutes with the in-app placement guide.</p>
+    </div>
+  </div>
+
+  <div class="callout c-green">
+    <strong>The placement guide is a product feature, not documentation.</strong> Build an AR placement guide directly in the app — point the phone at the mat and the app shows you exactly where to position the tripod with an overlay indicator. "Move left 0.5m — you're in the green zone." This removes the single biggest friction point for first-time Corner Mode setup.
+  </div>
+</section>
+
+<!-- BUILD PHASES -->
+<section id="phases">
+  <span class="sec-label">Execution plan</span>
+  <h2>BUILD PHASES FOR 1v1 SYSTEM</h2>
+  <p class="lead">Added on top of the existing 10-week single-fighter pipeline. Each phase adds one fight mode.</p>
+
+  <div class="phase-grid">
+    <div class="phase-card" data-icon="📱">
+      <div class="phase-name">PHASE 1</div>
+      <div class="phase-sub">Weeks 10–13 · Drill Mode</div>
+      <p>Add ByteTrack to pose service. Run rules engine twice. Split output into private reports. Add consent toggle for shared breakdown. Add rivalry card after 3 sessions. Cost: zero additional infrastructure — just 2–3 weeks of development.</p>
+    </div>
+    <div class="phase-card" data-icon="🕵️">
+      <div class="phase-name">PHASE 2</div>
+      <div class="phase-sub">Month 5–7 · Scout Mode</div>
+      <p>Pattern detection pipeline. Behavioral fingerprint database. Dossier generation via Claude. $19.99 per dossier transaction. Consent and privacy flow for opponent video. New revenue stream with zero subscription dependency.</p>
+    </div>
+    <div class="phase-card" data-icon="🏆">
+      <div class="phase-name">PHASE 3</div>
+      <div class="phase-sub">Month 10–18 · Corner Mode</div>
+      <p>WebSocket real-time server. Two-camera sync. Corner tablet app (iPad-native). Live pattern interrupts. AR placement guide. $49.99/month Elite or $299/month team contract. Olympic program partnership target.</p>
+    </div>
+  </div>
+
+  <div class="callout c-gold">
+    <strong>The Series A pitch this creates:</strong> "SportsAI began as an individual training tool. It is now the competitive intelligence layer for combat sports. Athletes use it to train (daily habit), scout opponents (pre-competition dependency), and corner their fighters (live competition integration). We have behavioral data on 50,000 fighters across 40 countries. We are building the Bloomberg Terminal of combat sports. No competitor has all three layers." That is a $20M Series A conversation.
+  </div>
+</section>
+
+</main>
+
+<script>
+const links = document.querySelectorAll('nav a');
+const secs = document.querySelectorAll('section[id]');
+window.addEventListener('scroll', () => {
+  let cur = '';
+  secs.forEach(s => { if (window.scrollY >= s.offsetTop - 130) cur = s.id; });
+  links.forEach(l => { l.classList.remove('on'); if (l.getAttribute('href') === '#'+cur) l.classList.add('on'); });
+});
+links.forEach(l => l.addEventListener('click', e => {
+  e.preventDefault();
+  document.querySelector(l.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}));
+</script>
+</body>
+</html>

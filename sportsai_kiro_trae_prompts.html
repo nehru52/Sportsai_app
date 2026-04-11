@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SportsAI — Kiro + Trae Complete Build System</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#030308;--bg2:#07070f;--bg3:#0b0b16;--bg4:#0f0f1e;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);
+  --text:#e8e8ff;--muted:#6060a0;--dim:#1e1e40;
+  --g:#00ff88;--b:#3d8bff;--r:#ff3d6e;--y:#ffc800;--p:#c084fc;--c:#00d4ff;--o:#ff8800;
+  --mono:'JetBrains Mono',monospace;--sans:'DM Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.7;}
+
+nav{position:fixed;top:0;left:0;width:230px;height:100vh;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;padding:20px 0;z-index:100;}
+.logo{padding:0 18px 18px;border-bottom:1px solid var(--border);}
+.logo h1{font-family:var(--mono);font-size:12px;color:var(--g);letter-spacing:1px;}
+.logo p{font-size:9px;color:var(--muted);margin-top:3px;}
+.ns{font-size:8px;letter-spacing:2.5px;text-transform:uppercase;color:var(--dim);padding:12px 18px 2px;}
+nav a{display:block;padding:5px 18px;color:var(--muted);text-decoration:none;font-size:10px;font-family:var(--mono);border-left:2px solid transparent;transition:all .1s;}
+nav a:hover,nav a.on{color:var(--g);border-left-color:var(--g);background:rgba(0,255,136,.04);}
+main{margin-left:230px;}
+section{padding:56px 48px;border-bottom:1px solid var(--border);max-width:980px;}
+section.wide{max-width:none;}
+
+#hero{padding:72px 48px 56px;max-width:none;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(0,255,136,.015) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(0,255,136,.015) 40px);}
+.kicker{font-family:var(--mono);font-size:10px;color:var(--g);letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;display:block;}
+h1{font-size:46px;font-weight:700;letter-spacing:-2px;line-height:1.05;max-width:760px;margin-bottom:14px;}
+h1 .g{color:var(--g);}h1 .b{color:var(--b);}h1 .y{color:var(--y);}
+.sub{font-size:15px;color:var(--muted);max-width:580px;line-height:1.7;margin-bottom:28px;}
+.strategy-box{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:700px;}
+@media(max-width:640px){.strategy-box{grid-template-columns:1fr;}}
+.sb{padding:16px 18px;border-radius:8px;border:1px solid;}
+.sb-kiro{border-color:rgba(61,139,255,.3);background:rgba(61,139,255,.06);}
+.sb-trae{border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.06);}
+.sb h3{font-family:var(--mono);font-size:12px;font-weight:600;margin-bottom:4px;}
+.sb-kiro h3{color:var(--b);}
+.sb-trae h3{color:var(--g);}
+.sb p{font-size:11px;color:var(--muted);line-height:1.5;}
+
+.sl{font-family:var(--mono);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--g);display:block;margin-bottom:8px;}
+h2{font-size:28px;font-weight:700;letter-spacing:-1px;line-height:1.05;margin-bottom:10px;}
+.lead{font-size:13px;color:var(--muted);border-left:2px solid var(--g);padding-left:14px;margin-bottom:28px;line-height:1.65;max-width:680px;}
+
+/* PROMPT BLOCKS */
+.prompt-block{margin:16px 0;}
+.pb-header{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border2);border-bottom:none;border-radius:8px 8px 0 0;padding:10px 16px;flex-wrap:wrap;gap:8px;}
+.pb-tool{font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;font-weight:600;white-space:nowrap;}
+.pt-kiro{background:rgba(61,139,255,.12);border:1px solid rgba(61,139,255,.25);color:var(--b);}
+.pt-trae{background:rgba(0,255,136,.12);border:1px solid rgba(0,255,136,.25);color:var(--g);}
+.pt-both{background:rgba(192,132,252,.12);border:1px solid rgba(192,132,252,.25);color:var(--p);}
+.pt-manual{background:rgba(255,200,0,.12);border:1px solid rgba(255,200,0,.25);color:var(--y);}
+.pb-title{font-family:var(--mono);font-size:11px;color:var(--text);flex:1;}
+.pb-file{font-family:var(--mono);font-size:9px;color:var(--muted);margin-left:auto;}
+.pb-copy{cursor:pointer;background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.2);border-radius:4px;padding:2px 10px;font-family:var(--mono);font-size:9px;color:var(--g);transition:all .15s;white-space:nowrap;}
+.pb-copy:hover{background:rgba(0,255,136,.2);}
+.pb-copy.done{color:var(--y);}
+.pb-body{background:#020208;border:1px solid var(--border2);border-radius:0 0 8px 8px;padding:20px 22px;font-family:var(--mono);font-size:12px;line-height:1.85;color:#9090c8;white-space:pre-wrap;overflow-x:auto;max-height:600px;overflow-y:auto;}
+.pb-body .cg{color:var(--g);}
+.pb-body .cb{color:var(--b);}
+.pb-body .cy{color:var(--y);}
+.pb-body .cp{color:var(--p);}
+.pb-body .cc{color:var(--c);}
+.pb-body .cr{color:var(--r);}
+.pb-body .co{color:var(--o);}
+.pb-body .cm{color:var(--muted);}
+.pb-body .cw{color:var(--text);}
+
+/* NOTES */
+.note{border-radius:6px;padding:12px 14px;margin:14px 0;font-size:12px;line-height:1.6;}
+.ng{background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.16);color:rgba(0,255,136,.85);}
+.nb{background:rgba(61,139,255,.06);border:1px solid rgba(61,139,255,.16);color:rgba(130,175,255,.9);}
+.ny{background:rgba(255,200,0,.06);border:1px solid rgba(255,200,0,.16);color:rgba(255,220,80,.9);}
+.nr{background:rgba(255,61,110,.06);border:1px solid rgba(255,61,110,.16);color:rgba(255,130,150,.9);}
+.no{background:rgba(255,136,0,.06);border:1px solid rgba(255,136,0,.16);color:rgba(255,190,100,.9);}
+.note strong{font-weight:600;}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:12px;margin:14px 0;}
+th{font-family:var(--mono);font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:var(--dim);padding:7px 12px;text-align:left;border-bottom:1px solid var(--border);}
+td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--muted);vertical-align:top;}
+td:first-child{color:var(--text);}
+tr:last-child td{border-bottom:none;}
+
+/* STEPS */
+.steps{position:relative;padding-left:28px;margin:16px 0;}
+.steps::before{content:'';position:absolute;left:9px;top:8px;bottom:8px;width:1px;background:linear-gradient(to bottom,var(--g),var(--b),transparent);}
+.step{position:relative;margin-bottom:20px;}
+.step::before{content:attr(data-n);position:absolute;left:-34px;top:1px;width:20px;height:20px;border-radius:50%;background:var(--bg3);border:1px solid var(--g);font-family:var(--mono);font-size:9px;color:var(--g);display:flex;align-items:center;justify-content:center;}
+.step h4{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px;}
+.step p{font-size:12px;color:var(--muted);line-height:1.5;margin:0;}
+
+/* PHASE CARDS */
+.phase-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0;}
+@media(max-width:700px){.phase-grid{grid-template-columns:1fr;}}
+.phase-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px 16px;}
+.phase-card h3{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--text);margin-bottom:6px;}
+.phase-card p{font-size:11px;color:var(--muted);line-height:1.5;margin:0;}
+.phase-card .ph-num{font-family:var(--mono);font-size:9px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;}
+
+h4.ss{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--c);margin:22px 0 10px;}
+p.t{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:10px;}
+
+/* HOOK CARD */
+.hook-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px;}
+.hc-trigger{font-family:var(--mono);font-size:9px;color:var(--o);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.hc-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.hc-desc{font-size:11px;color:var(--muted);line-height:1.5;}
+
+/* MOCK STATE */
+.mock-label{font-family:var(--mono);font-size:9px;color:var(--y);text-transform:uppercase;letter-spacing:1.5px;background:rgba(255,200,0,.08);border:1px solid rgba(255,200,0,.2);border-radius:4px;padding:2px 8px;display:inline-block;margin-bottom:6px;}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo"><h1>// SPORTSAI BUILD</h1><p>kiro + trae · consumer app first</p></div>
+  <ul>
+    <div class="ns">Strategy</div>
+    <li><a href="#strategy">The approach</a></li>
+    <li><a href="#phases">3 build phases</a></li>
+
+    <div class="ns">Kiro Setup</div>
+    <li><a href="#steering">Steering files (3)</a></li>
+    <li><a href="#hooks">Agent hooks (5)</a></li>
+
+    <div class="ns">Phase 1 — Core app</div>
+    <li><a href="#scaffold-spec">Scaffold spec</a></li>
+    <li><a href="#mock-engine">Mock AI engine</a></li>
+    <li><a href="#onboarding-spec">Onboarding spec</a></li>
+    <li><a href="#home-spec">Home screen spec</a></li>
+    <li><a href="#record-spec">Record + upload spec</a></li>
+    <li><a href="#analysis-spec">Analysis screen spec</a></li>
+    <li><a href="#gamification-spec">Full gamification spec</a></li>
+
+    <div class="ns">Phase 2 — Addiction layer</div>
+    <li><a href="#arena-spec">1v1 Arena spec</a></li>
+    <li><a href="#chat-spec">AI coach chat spec</a></li>
+    <li><a href="#social-spec">Social + leaderboard spec</a></li>
+    <li><a href="#anime-spec">Anime cinematics spec</a></li>
+    <li><a href="#avatar-spec">Avatar system spec</a></li>
+
+    <div class="ns">Phase 3 — Engine plug-in</div>
+    <li><a href="#engine-spec">Real engine integration</a></li>
+    <li><a href="#coach-spec">Coach marketplace spec</a></li>
+
+    <div class="ns">Trae prompts</div>
+    <li><a href="#trae-screens">Screen-by-screen Trae</a></li>
+    <li><a href="#trae-components">Component Trae prompts</a></li>
+
+    <div class="ns">Reference</div>
+    <li><a href="#order">Exact build order</a></li>
+  </ul>
+</nav>
+
+<main>
+
+<!-- HERO -->
+<section id="hero" class="wide">
+  <span class="kicker">// Consumer App First · AI Engine Later · Zero Spend</span>
+  <h1>Build the <span class="g">addictive app</span><br>now. Plug in the<br><span class="y">engine</span> when it's ready.</h1>
+  <p class="sub">Your co-founder owns the AI engine. You build the consumer product — every screen, every addictive loop, every feature — with mock analysis data first. When the real engine ships, swapping it in is one file change.</p>
+  <div class="strategy-box">
+    <div class="sb sb-kiro">
+      <h3>Kiro — spec-driven features</h3>
+      <p>All backend routes, database schema, gamification logic, API integration, complex multi-file features. Kiro's spec → design → tasks workflow means nothing is built on assumptions.</p>
+    </div>
+    <div class="sb sb-trae">
+      <h3>Trae — visual screens</h3>
+      <p>Every React Native screen built from the design mockups. Drag screenshots into Trae Builder, get matching code. All UI/UX, animations, and interactions. Zero backend knowledge required.</p>
+    </div>
+  </div>
+</section>
+
+<!-- STRATEGY -->
+<section id="strategy">
+  <span class="sl">// 00 — Core strategy</span>
+  <h2>Why consumer app first is the right call</h2>
+  <p class="lead">The AI engine is being built separately. You build everything the user touches. When the engine ships, it connects to an API you've already built and tested. The consumer app is the harder problem anyway.</p>
+
+  <div class="note ng"><strong>The key insight:</strong> The real AI analysis — pose extraction, rules engine, Claude feedback — all returns a standard JSON object: <code>{ score, phase_scores, errors, feedback_text }</code>. You build your entire app against this interface using mock data. When the real engine ships, you change one environment variable. Every screen, animation, gamification event, and notification works immediately.</div>
+
+  <div class="note nb"><strong>What Kiro does that changes everything for you:</strong> <a href="https://kiro.dev/docs/specs/" style="color:var(--b);">Kiro's spec-driven development</a> turns your natural language into EARS-notation requirements, then architecture, then implementation tasks with acceptance criteria. You type "build the XP system" — Kiro writes requirements.md, design.md, and tasks.md before touching code. You review and type "LGTM" to proceed. No more AI making assumptions you discover in code review.</div>
+
+  <h4 class="ss">// The mock → real swap architecture</h4>
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-tool pt-manual">CREATE THIS FILE FIRST</span>
+      <span class="pb-title">src/services/analysisService.ts — mock/real toggle</span>
+      <span class="pb-file">day 1 · most important file</span>
+    </div>
+    <div class="pb-body"><span class="cm">// src/services/analysisService.ts
+// THE MOST IMPORTANT ARCHITECTURAL DECISION IN THE APP
+// This is the ONLY file that changes when the real AI engine ships
+// Everything else in the app calls this service — nothing calls the engine directly</span>
+
+<span class="cb">import</span> { Analysis, TechniqueScore, ErrorMarker } <span class="cb">from</span> <span class="cy">'../types'</span>
+
+<span class="cm">// Toggle this when real engine is ready</span>
+<span class="cm">// In production: reads from EXPO_PUBLIC_USE_REAL_ENGINE=true</span>
+<span class="cg">const USE_REAL_ENGINE</span> = process.env.EXPO_PUBLIC_USE_REAL_ENGINE === <span class="cy">'true'</span>
+
+<span class="cm">// ─────────────────────────────────────────────────────────────
+// MOCK ENGINE — used until co-founder's engine is ready
+// Returns realistic data that makes all app features work
+// ─────────────────────────────────────────────────────────────</span>
+
+<span class="cb">const</span> <span class="cg">mockAnalysis</span> = async (videoId: string, sport: string, technique: string): Promise&lt;Analysis&gt; => {
+  <span class="cm">// Simulate realistic processing time</span>
+  await new Promise(r => setTimeout(r, 12000 + Math.random() * 6000))
+
+  <span class="cm">// Generate realistic but varied scores based on technique</span>
+  <span class="cb">const</span> baseScore = 55 + Math.floor(Math.random() * 30)
+
+  <span class="cb">return</span> {
+    id: `mock_${videoId}`,
+    video_id: videoId,
+    technique_detected: technique,
+    score: baseScore,
+    phase_scores: {
+      entry: baseScore - 10 + Math.floor(Math.random() * 20),
+      execution: baseScore + Math.floor(Math.random() * 15),
+      finish: baseScore - 15 + Math.floor(Math.random() * 25),
+    },
+    errors: [
+      {
+        id: 'e1', phase: 'entry', rule: 'hip_height',
+        severity: 'high', measured_value: 0.74, elite_range: [0.55, 0.70],
+        cue: 'Drop your level — hips should be at knee height on the step-in.',
+        jump_to_timestamp: 'entry', timestamp_ms: 3200
+      },
+      {
+        id: 'e2', phase: 'entry', rule: 'head_position',
+        severity: 'medium', measured_value: 142, elite_range: [160, 180],
+        cue: 'Head up — keep your eyes on the opponent\'s chest, not the mat.',
+        jump_to_timestamp: 'entry', timestamp_ms: 3800
+      },
+      {
+        id: 'e3', phase: 'finish', rule: 'drive_through',
+        severity: 'high', measured_value: 0.6, elite_range: [0.8, 2.5],
+        cue: 'Drive through the finish — your penetration step loses power before contact.',
+        jump_to_timestamp: 'finish', timestamp_ms: 8400
+      }
+    ],
+    feedback_text: <span class="cy">`Good session. Your execution phase shows real improvement — your shot timing is consistent and your level change has more urgency than last week. The critical issue is still your entry: your hip height at step-in averages 0.74 normalized — elite level is 0.63. That 17% gap means your opponent feels you coming before contact. Fix this first: 50 penetration steps daily with your hips pre-lowered before the step lands, not after. Film tomorrow and I'll track your progress.`</span>,
+    elite_percentiles: { entry: 42, execution: 61, finish: 38 },
+    anime_narration: {
+      power_level: baseScore * 94,
+      technique_card_name: 'SHADOW STEP',
+      battle_commentary: 'The fighter moves with deceptive speed — but power leaks at the critical moment.',
+      aura_color: baseScore >= 70 ? '#4488FF' : '#FF2D4E'
+    },
+    processing_ms: 14200,
+    created_at: new Date().toISOString()
+  }
+}
+
+<span class="cm">// ─────────────────────────────────────────────────────────────
+// REAL ENGINE — activated when co-founder's service is live
+// Calls the Python FastAPI service on Modal
+// ─────────────────────────────────────────────────────────────</span>
+
+<span class="cb">const</span> <span class="cg">realAnalysis</span> = async (videoId: string, sport: string, technique: string): Promise&lt;Analysis&gt; => {
+  <span class="cb">const</span> response = await fetch(`${process.env.EXPO_PUBLIC_AI_ENGINE_URL}/analyze`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ video_id: videoId, sport, technique })
+  })
+  <span class="cb">if</span> (!response.ok) throw new Error(`Engine error: ${response.status}`)
+  <span class="cb">return</span> response.json()
+}
+
+<span class="cm">// THE SWITCH — this is all that changes on engine launch day</span>
+<span class="cg">export const analyzeVideo</span> = USE_REAL_ENGINE ? realAnalysis : mockAnalysis
+
+<span class="cm">// Skeleton overlay data — mock until engine ships</span>
+<span class="cg">export const getPoseOverlay</span> = async (videoId: string) => {
+  <span class="cb">if</span> (USE_REAL_ENGINE) {
+    <span class="cb">const</span> r = await fetch(`${process.env.EXPO_PUBLIC_AI_ENGINE_URL}/pose/${videoId}`)
+    <span class="cb">return</span> r.json()
+  }
+  <span class="cm">// Return mock skeleton frames — enough to show the overlay UI working</span>
+  <span class="cb">return</span> generateMockPoseFrames(180) <span class="cm">// 6 seconds at 30fps</span>
+}
+</div>
+  </div>
+</section>
+
+<!-- BUILD PHASES -->
+<section id="phases">
+  <span class="sl">// 01 — Build phases</span>
+  <h2>3 phases — exactly what ships when</h2>
+
+  <div class="phase-grid">
+    <div class="phase-card">
+      <div class="ph-num">Phase 1 · Weeks 1–6</div>
+      <h3>Core consumer app</h3>
+      <p>Onboarding, home screen, record + upload, analysis screen with mock data, full gamification (XP, belts, streaks, challenges, skill tree). Everything works. Analysis uses mock scores that look and feel real.</p>
+    </div>
+    <div class="phase-card">
+      <div class="ph-num">Phase 2 · Weeks 7–10</div>
+      <h3>Addiction layer</h3>
+      <p>1v1 Arena, AI coach chat (using Claude API directly — this IS real from day 1), social leaderboards, anime cinematics with DomoAI, avatar system, rivalry cards, push notifications, all retention mechanics.</p>
+    </div>
+    <div class="phase-card">
+      <div class="ph-num">Phase 3 · On engine ready</div>
+      <h3>Real engine plug-in</h3>
+      <p>Set EXPO_PUBLIC_USE_REAL_ENGINE=true. Real pose analysis replaces mock. Skeleton overlay works with real data. Coach marketplace opens. Everything else already built — zero app rebuilding needed.</p>
+    </div>
+  </div>
+
+  <div class="note ny"><strong>The AI coach chat is real from Day 1.</strong> It uses Claude API directly — not the pose engine. The coach reads the user's history (stored in Supabase from their sessions) and gives real coaching advice. This is your most powerful feature and costs nothing to build. It works with mock session data just as well as real data.</div>
+</section>
+
+<!-- STEERING FILES -->
+<section id="steering">
+  <span class="sl">// 02 — Kiro setup</span>
+  <h2>Steering files — create these before any spec</h2>
+  <p class="lead">These three files give Kiro permanent context. <a href="https://kiro.dev/docs/getting-started/first-project/" style="color:var(--b);">Every prompt you run after this automatically follows your conventions</a> — no explaining the stack in every prompt.</p>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-tool pt-manual">CREATE FILE</span>
+      <span class="pb-title">.kiro/steering/product.md — what SportsAI is</span>
+      <button class="pb-copy" onclick="cp(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cg"># SportsAI — Product</span>
+
+<span class="cw">## What we're building</span>
+SportsAI is a consumer mobile app for combat sports athletes (wrestling, MMA, BJJ, volleyball).
+Athletes upload short technique videos and receive AI-powered coaching feedback, gamification
+rewards, and competitive features. Think "Duolingo meets Dragon Ball Z meets Olympic coaching."
+
+<span class="cw">## Target users</span>
+- Primary: Amateur wrestlers and MMA fighters aged 14–28, training at gyms or school clubs
+- Secondary: Youth sports parents paying for their child's training
+- Tertiary: Amateur coaches looking to scale their feedback capability
+- Geography: UK, Italy, Dubai, India — multi-language planned for Phase 2
+
+<span class="cw">## Core value proposition</span>
+Upload a 30-second technique video → get Olympic-grade coaching feedback in 20 seconds →
+compete with friends → unlock techniques → become the best fighter in your gym.
+The AI coach knows your entire training history and gives surgical, personalized feedback.
+
+<span class="cw">## The mock → real engine architecture</span>
+The AI analysis engine (pose estimation, rules engine) is being built by a co-founder separately.
+The app currently uses a MOCK engine (src/services/analysisService.ts) that returns realistic
+analysis data. When the real engine ships, we set EXPO_PUBLIC_USE_REAL_ENGINE=true.
+NEVER build screens that depend on real pose data — always code against the Analysis interface.
+
+<span class="cw">## Monetization</span>
+- Free: 5 analyses/month, 3 AI coach questions/day, basic features
+- Competitor (£9.99/mo): unlimited analyses, unlimited AI coach, full gamification
+- Elite (£29.99/mo): opponent scouting, human coach reviews, anime cinematics
+- Gym/Team (£99/mo): coach dashboard, bulk tools
+
+<span class="cw">## Addictive mechanics (MUST implement every one)</span>
+1. Weekly training streaks (not daily — athletes train 2-3x/week)
+2. Technique score improvement graph (athletes see their progress visually)
+3. Belt rank progression (White → Black through 8 levels)
+4. Technique unlock tree (can't unlock Flying Knee without mastering basics)
+5. Friends leaderboard (weekly XP ranking — most motivating feature)
+6. Rivalry cards (head-to-head stats after 3 sparring sessions)
+7. Weekly challenges (AI-personalized to your weakest phase)
+8. Anime fight cinematics (shareable 30-second anime highlight reel)
+9. AI coach chat (ChatGPT for sports — knows your full history)
+10. 1v1 Arena analysis (both fighters get private reports)
+</div>
+  </div>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-tool pt-manual">CREATE FILE</span>
+      <span class="pb-title">.kiro/steering/tech.md — exact tech stack</span>
+      <button class="pb-copy" onclick="cp(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cg"># SportsAI — Tech Stack</span>
+
+<span class="cw">## Mobile App (sportsai-app/)</span>
+- Framework: React Native with Expo SDK 52+ (managed workflow)
+- Navigation: Expo Router v3 (file-based, like Next.js App Router)
+- Language: TypeScript strict mode — never use `any`, always type everything
+- State: Zustand for UI/local state, TanStack Query for server state
+- Animations: react-native-reanimated v3 ONLY — never use Animated from RN core
+- Gestures: react-native-gesture-handler
+- Canvas/2D: @shopify/react-native-skia (skeleton overlays, power effects)
+- 3D: Three.js + expo-gl + @react-three/fiber + kalidokit (avatar system)
+- Charts: victory-native (Skia-based, performant)
+- Video: expo-video (playback), expo-camera (recording)
+- Storage: expo-secure-store (sensitive), react-native-mmkv (fast local)
+- Push: expo-notifications + expo-device
+- Avatar: @readyplayerme/react-native-webview-sdk + react-native-webview
+- HTTP: axios with typed wrapper in src/lib/api.ts
+- Database client: @supabase/supabase-js via src/lib/supabase.ts
+
+<span class="cw">## Backend API (sportsai-api/)</span>
+- Runtime: Node.js 20+ with TypeScript
+- Framework: Express.js
+- Hosting: Railway (auto-deploy from GitHub)
+- Database: Supabase (PostgreSQL + Auth + Storage + Realtime)
+- Video delivery: Cloudflare R2 (storage) + Cloudflare Stream (transcoding/CDN)
+- Payments: Stripe Connect (marketplace splits for coach payouts)
+- Jobs: BullMQ + Redis (video analysis queue)
+- Email: Resend
+- Push: expo-server-sdk
+- Validation: Zod on ALL inputs — no exceptions
+- Auth: Supabase JWT middleware on all protected routes
+- CSAM moderation: AWS Rekognition on every video upload (mandatory)
+
+<span class="cw">## AI Engine (external — co-founder building)</span>
+- Language: Python + FastAPI on Modal (serverless GPU)
+- Models: YOLO11-Pose fine-tuned on AthletePose3D
+- Interface: REST API returning Analysis JSON (see src/types/index.ts)
+- Current status: MOCK via src/services/analysisService.ts
+- Swap: set EXPO_PUBLIC_USE_REAL_ENGINE=true in env when ready
+
+<span class="cw">## External Services</span>
+- Claude API: claude-sonnet-4-20250514 for AI coach chat and feedback text
+- DomoAI API: anime style transfer for fight cinematics (Phase 2)
+- Ready Player Me: 3D avatar creation and GLB hosting
+- AWS Rekognition: CSAM content moderation (mandatory before storage)
+
+<span class="cw">## Never use these (banned in this project)</span>
+- `any` TypeScript type
+- Inline styles in React Native (always StyleSheet.create)
+- Animated from 'react-native' (always react-native-reanimated)
+- React Navigation directly (always Expo Router)
+- Direct Supabase calls in screens (always through src/lib/supabase.ts)
+- Direct fetch() in screens (always through src/lib/api.ts)
+- Firebase (we use Supabase)
+- Redux (we use Zustand + TanStack Query)
+</div>
+  </div>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-tool pt-manual">CREATE FILE</span>
+      <span class="pb-title">.kiro/steering/structure.md — conventions + patterns</span>
+      <button class="pb-copy" onclick="cp(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cg"># SportsAI — Structure & Conventions</span>
+
+<span class="cw">## Folder structure</span>
+sportsai-app/
+  app/                         # Expo Router pages
+    (tabs)/                    # Bottom tab screens
+      home.tsx                 # Home dashboard
+      record.tsx               # Record + upload
+      arena.tsx                # 1v1 Arena
+      progress.tsx             # Progress + skill tree
+      social.tsx               # Leaderboard + social
+    onboarding/                # 5-step onboarding flow
+      sport.tsx, level.tsx, avatar.tsx, record.tsx, result.tsx
+    analysis/[id].tsx          # Analysis detail screen
+    coach.tsx                  # AI coach chat
+    arena/prefight.tsx, session.tsx, result.tsx
+    _layout.tsx                # Root layout
+  src/
+    components/                # Shared UI components
+      AnnotationPlayer.tsx     # VIDEO + skeleton overlay + gestures
+      PowerAura.tsx            # Three.js aura particle system
+      AvatarViewer.tsx         # 3D avatar with bone animation
+      SkeletonOverlay.tsx      # Skia skeleton renderer
+      XPBar.tsx                # Animated XP progress bar
+      BeltCard.tsx             # Belt display with rank + progress
+      ChallengeCard.tsx        # Weekly challenge row
+      StreakWidget.tsx         # Streak flame + count
+      TechniqueCard.tsx        # Overlay card for anime mode
+    lib/
+      api.ts                   # Typed axios wrapper (ALL HTTP calls)
+      supabase.ts              # Supabase client singleton
+      store.ts                 # Zustand global store
+      notifications.ts         # Push notification handlers
+    services/
+      analysisService.ts       # MOCK/REAL toggle — the key file
+      uploadService.ts         # Video upload with R2 progress
+      xpService.ts             # Client-side XP event display
+    theme/
+      colors.ts                # ALL color tokens (never hardcode hex)
+      typography.ts            # Font families + sizes
+    types/
+      index.ts                 # ALL TypeScript interfaces
+
+<span class="cw">## Color tokens (always use these — never hardcode)</span>
+import { colors } from '../theme/colors'
+colors.primary      → #ff2d4e  (red — CTA, errors, actions)
+colors.gold         → #ffc22d  (XP, rewards, belt)
+colors.success      → #00e676  (green — correct, improvements)
+colors.ink          → #07070f  (darkest bg)
+colors.surface      → #0d0d1c  (card bg)
+colors.card         → #121225  (elevated card)
+colors.textPrimary  → #ececff
+colors.textMuted    → #5c5c8a
+colors.blue         → #4d8cff  (info, elite comparison)
+colors.purple       → #c084fc  (avatar aura, prestige)
+
+<span class="cw">## Component patterns</span>
+- Every screen: loading state (skeleton or spinner) + error state (retry button)
+- Every form input: controlled with useState, validated before submission
+- Every API call: try/catch with user-facing error toast
+- Every animation: useAnimatedStyle + withSpring or withTiming
+- Every list: FlatList or FlashList (never ScrollView with .map)
+- Every image: expo-image with blurhash placeholder
+
+<span class="cw">## XP system rules</span>
+XP is NEVER awarded directly. Always: xpService.awardXP(athleteId, event, sourceId)
+Events: upload(50), improved_10pct(120), improved_20pct(200), coach_review(200),
+streak_week(75), challenge_complete(150), unlock(300), belt_promote(500),
+first_1v1_win(250), perfect_score_90plus(400)
+
+<span class="cw">## Gamification rules</span>
+- Streaks: WEEKLY not daily (athletes train 2-3x/week, not daily)
+- Leaderboards: friends first, then regional, then global
+- Challenges: always show partial progress even at 0% complete
+- Unlock tree: locked techniques visible but greyed (motivation, not restriction)
+- Belt promotions: full-screen celebration animation, share prompt
+</div>
+  </div>
+</section>
+
+<!-- HOOKS -->
+<section id="hooks">
+  <span class="sl">// 03 — Agent hooks</span>
+  <h2>Kiro agent hooks — set up once, run forever</h2>
+  <p class="lead">These hooks run automatically in the background as you build. You set each one up once by pasting the prompt into Kiro's hooks panel. They save hours of manual work across the entire project.</p>
+
+  <div class="hook-card">
+    <div class="hc-trigger">Trigger: any *.tsx file saved in app/ or src/components/</div>
+    <div class="hc-title">Hook 1 — Auto-generate test file</div>
+    <div class="hc-desc">When I save any React Native screen or component, automatically create or update its corresponding test file in __tests__/ using React Native Testing Library. Tests should cover: renders without crashing, loading state shows, error state shows, primary CTA is present and tappable. Follow the existing test patterns in the project.</div>
+  </div>
+
+  <div class="hook-card">
+    <div class="hc-trigger">Trigger: src/types/index.ts saved</div>
+    <div class="hc-title">Hook 2 — Sync API types to backend</div>
+    <div class="hc-desc">When I update the TypeScript types in src/types/index.ts, check if any changed interface breaks the corresponding Supabase schema or API route response shapes. If there's a mismatch, create a GitHub issue comment listing what needs updating in sportsai-api. Never auto-change the API — just flag the discrepancy.</div>
+  </div>
+
+  <div class="hook-card">
+    <div class="hc-trigger">Trigger: any file in src/services/ saved</div>
+    <div class="hc-title">Hook 3 — Security scan</div>
+    <div class="hc-desc">When any service file is saved, scan for: hardcoded API keys or secrets, direct fetch() calls (should use src/lib/api.ts), missing error handling on async calls, any `any` TypeScript type. Output a warning comment at the top of the file if any issue is found. Add problematic files to .gitignore if they contain secrets.</div>
+  </div>
+
+  <div class="hook-card">
+    <div class="hc-trigger">Trigger: any new screen created in app/</div>
+    <div class="hc-title">Hook 4 — Design system check</div>
+    <div class="hc-desc">When a new screen file is created, check that it: imports colors from src/theme/colors (not hardcoded hex), uses StyleSheet.create (no inline styles), imports fonts from src/theme/typography, uses react-native-reanimated for animations (not Animated from RN), uses Expo Router navigation (not React Navigation). Add a TODO comment for any violation found.</div>
+  </div>
+
+  <div class="hook-card">
+    <div class="hc-trigger">Trigger: manual trigger (run before any commit)</div>
+    <div class="hc-title">Hook 5 — Pre-commit quality check</div>
+    <div class="hc-desc">Run TypeScript type checking (tsc --noEmit), check for any TODO comments added by other hooks (surface them for review), verify no env vars are hardcoded, check that every new screen has a corresponding entry in SCREENS.md. Output a summary of any issues found. Do not block the commit — just report.</div>
+  </div>
+
+  <div class="note nb">To set up each hook: In Kiro → left panel → Hooks section → New Hook → paste the description above as the instructions → set the trigger event. <a href="https://kiro.dev/docs/getting-started/first-project/" style="color:var(--b);">Kiro generates an optimized system prompt</a> from your description automatically.</div>
+</section>
+
+<!-- SCAFFOLD SPEC -->
+<section id="scaffold-spec">
+  <span class="sl">// 04 — Phase 1 specs</span>
+  <h2>Spec 1 — Project scaffold</h2>
+  <p class="lead">Run this as a Kiro spec first. Kiro generates requirements → design → tasks before touching code. Type "LGTM" at each stage to proceed.</p>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-tool pt-kiro">KIRO — New Spec</span>
+      <span class="pb-title">Complete SportsAI project scaffold and design system</span>
+      <button class="pb-copy" onclick="cp(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cg">Create the complete SportsAI React Native project scaffold.</span>
+
+<span class="cw">What to build:</span>
+1. Create Expo project with TypeScript: npx create-expo-app@latest sportsai-app --template expo-template-blank-typescript
+
+2. Install ALL required packages (read tech.md for the complete list)
+
+3. Create the complete folder structure from structure.md
+
+4. Create src/theme/colors.ts with ALL color tokens:
+   primary: '#ff2d4e', gold: '#ffc22d', success: '#00e676',
+   ink: '#07070f', surface: '#0d0d1c', card: '#121225', raised: '#17172e',
+   textPrimary: '#ececff', textMuted: '#5c5c8a', textDim: '#252545',
+   blue: '#4d8cff', purple: '#c084fc', cyan: '#00d4ff'
+
+5. Create src/theme/typography.ts with font config:
+   heading: 'Barlow_Condensed' (bold, condensed), body: 'DM_Sans', mono: 'JetBrains_Mono'
+
+6. Create src/types/index.ts with ALL interfaces:
+   User, Analysis, TechniqueScore, ErrorMarker, PoseFrame, Belt, XPEvent,
+   Challenge, TechniqueUnlock, Rivalry, CoachReview, ArenaSession
+
+7. Create src/lib/api.ts — typed axios wrapper:
+   - Base URL from EXPO_PUBLIC_API_URL
+   - Auth interceptor: adds Supabase Bearer token to every request
+   - Response interceptor: on 401 → clear session → redirect to onboarding
+   - Typed get(), post(), put(), delete() functions
+
+8. Create src/lib/supabase.ts — Supabase client singleton
+
+9. Create src/lib/store.ts — Zustand store with slices:
+   auth: { user, session, signIn, signOut }
+   onboarding: { sport, level, goal, avatarUrl, setStep }
+   analysis: { currentAnalysis, isProcessing, setAnalysis }
+   ui: { activeTab, notifications: [] }
+
+10. Create src/services/analysisService.ts — the mock/real toggle (see product.md)
+    Implement generateMockPoseFrames() returning 180 realistic skeleton frames
+
+11. Create .env.example with all variables:
+    EXPO_PUBLIC_API_URL, EXPO_PUBLIC_SUPABASE_URL, EXPO_PUBLIC_SUPABASE_ANON_KEY,
+    EXPO_PUBLIC_USE_REAL_ENGINE=false, EXPO_PUBLIC_AI_ENGINE_URL
+
+12. Create app/_layout.tsx with:
+    - QueryClientProvider (TanStack Query)
+    - GestureHandlerRootView
+    - Font loading (Barlow Condensed, DM Sans, JetBrains Mono via expo-font)
+    - Auth gate: check session → onboarding OR main tabs
+
+Acceptance criteria:
+- npx expo start runs without TypeScript errors
+- All imports resolve correctly
+- colors.ts has every token from the list above
+- store.ts has all slices typed correctly
+- analysisService.ts returns mock data matching the Analysis interface exactly
+</div>
+  </div>
+</section>
+
+<!-- MOCK ENGINE -->
+<section id="mock-engine">
+  <span class="sl">// 05</span>
+  <h2>Spec 2 — Mock AI engine + Supabase schema</h2>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-tool pt-kiro">KIRO — New Spec</span>
+      <span class="pb-title">Supabase schema + backend API + mock analysis pipeline</span>
+      <button class="pb-copy" onclick="cp(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cg">Build the complete backend foundation for SportsAI.</span>
+
+<span class="cw">Part A: Supabase schema (supabase/migrations/001_schema.sql)</span>
+Create all tables with exact columns, constraints, and RLS policies:
+
+users: id UUID PK, email, username UNIQUE, role CHECK(athlete|coach|admin),
+  sport, skill_level CHECK(beginner|intermediate|advanced|elite),
+  avatar_url, stripe_account_id, expo_push_token, is_under_18 BOOLEAN, created_at
+
+athlete_xp: athlete_id FK, total_xp=0, weekly_xp=0, current_belt='white',
+  belt_progress_pct=0, current_streak_weeks=0, longest_streak_weeks=0,
+  last_upload_date DATE, PK(athlete_id)
+
+xp_transactions: id, athlete_id FK, amount, reason, source_id, created_at
+
+video_uploads: id, athlete_id FK, cloudflare_stream_id, r2_skeleton_path,
+  sport, technique, duration_sec, moderation_status='pending', analysis_status='queued',
+  anime_clip_url, fighter_partner_id FK, is_1v1 BOOLEAN DEFAULT false, created_at
+
+ai_analyses: id, video_id FK, technique_detected, score 0-100,
+  phase_scores JSONB, errors JSONB, feedback_text, anime_narration JSONB,
+  elite_percentiles JSONB, pose_sequence_url, fighter_b_analysis_id, created_at
+
+technique_unlocks: (athlete_id, sport, technique_name) PK, unlocked_at,
+  unlock_score, is_prestige BOOLEAN
+
+weekly_challenges: id, week_start DATE, sport, challenge_type, target_technique,
+  target_value DECIMAL, xp_reward, description, is_auto_generated
+
+challenge_completions: (athlete_id, challenge_id) PK, completed_at
+
+rivalries: id, (athlete_a_id, athlete_b_id, sport) UNIQUE,
+  session_count=0, a_wins=0, b_wins=0, last_session
+
+RLS policies: athletes see only their own data, coaches see assigned videos,
+  1v1 analyses: each fighter sees ONLY their own errors (critical privacy requirement)
+
+<span class="cw">Part B: Node.js API routes (sportsai-api/src/routes/)</span>
+
+video.ts:
+  POST /upload-url → generate R2 signed URL + create video_uploads record
+  POST /:id/complete → Rekognition CSAM scan → queue analysis job → return status
+  GET /:id/status → return analysis_status + score + anime_clip_url
+
+analysis.ts:
+  GET /:id → return full analysis (auth: must own the video)
+  POST /:id/request-coach → create coach_reviews record + Stripe PaymentIntent
+
+xp.ts:
+  POST /award → award XP (internal only, called by other routes)
+  GET /me → return athlete_xp record + recent transactions
+
+challenges.ts:
+  GET / → return this week's challenges + completion status for auth'd user
+  POST /:id/complete → mark complete, award XP
+
+leaderboard.ts:
+  GET /friends → top 20 friends by weekly_xp
+  GET /regional → top 50 by improvement% this month in same city/sport
+  GET /global → top 100 by total XP per sport
+
+<span class="cw">Part C: Mock analysis job worker (sportsai-api/src/jobs/mockAnalysisWorker.ts)</span>
+BullMQ worker that processes the analysisQueue:
+1. Wait 12-18 seconds (simulates real processing time)
+2. Generate mock analysis data matching the Analysis interface
+3. Store result in ai_analyses table
+4. Update video_uploads.analysis_status = 'done'
+5. Award 50 XP via xpService
+6. Check if score improved vs last session → award bonus XP
+7. Check technique unlock prerequisites → unlock if met
+8. Send push notification: "Your analysis is ready"
+
+This worker runs in production until the real engine is ready.
+When EXPO_PUBLIC_USE_REAL_ENGINE=true, this worker is bypassed.
+
+All routes: Zod validation + Supabase JWT auth middleware.
+Generate TypeScript types from Supabase schema after migration.
+</div>
+  </div>
+</section>
+
+<!-- ONBOARDING SPEC -->
+<section id="onboarding-spec">
+  <span class="sl">// 06</span>
+  <h2>Spec 3 — Complete onboarding flow</h2>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-tool pt-trae">TRAE — Builder + image</span>
+      <span class="pb-title">All 5 onboarding screens — drag sportsai_onboarding.html screenshot into Trae first</span>
+      <button class="pb-copy" onclick="cp(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cm">Attach the screenshot of sportsai_onboarding.html to this Trae Builder prompt.
+Build all 5 onboarding screens to match the design exactly.</span>
+
+<span class="cg">Screen 1: app/onboarding/sport.tsx</span>
+Full-screen dark background (#07070f). No back button. Expo Router Stack.
+Heading "What do you train?" in Barlow Condensed 28px bold.
+Sub: "Your AI coach specializes in your sport."
+4 sport cards in 2x2 grid: Wrestling 🤼, MMA 🥊, BJJ 🥋, Volleyball 🏐
+Each card: emoji 28px, name Barlow Condensed 16px, desc DM Sans 10px muted.
+Selected: red border + rgba(255,45,78,.1) bg. One selection only.
+Progress dots: 5 dots at top, first active (red), rest dim.
+"Continue" button: full width, red, Barlow Condensed 18px, at bottom.
+Store in Zustand: useStore.getState().setOnboardingSport(sport)
+Navigate to /onboarding/level on continue.
+
+<span class="cg">Screen 2: app/onboarding/level.tsx</span>
+Heading "Where are you right now?"
+4 tappable rows: 🌱 Just starting, 💪 Training regularly, 🏆 Competing seriously, ⭐ Elite/coaching
+Each row: emoji + title + subtitle + radio circle right side.
+Selected: red border + red radio fill + checkmark.
+Progress dots: 2 active.
+Store selection, navigate to /onboarding/avatar.
+
+<span class="cg">Screen 3: app/onboarding/avatar.tsx</span>
+Avatar preview circle 80px (gradient, sport emoji).
+Section "Sport outfit": 4 emoji tappable options, updates preview.
+Section "Aura color": 4 color swatches (red, gold, blue, green), updates gradient.
+Goal section: "Win competitions" / "Improve technique" / "Train injury-free" — single select radio.
+"Build my fighter" button at bottom.
+Launch Ready Player Me WebView via @readyplayerme/react-native-webview-sdk in a Modal.
+On GLB URL returned: save to Supabase users.avatar_url + store.setAvatarUrl(url).
+
+<span class="cg">Screen 4: app/onboarding/record.tsx</span>
+Expo Camera component. AR guide overlay (green animated dashed rect via Skia Canvas).
+"OPTIMAL POSITION" label when camera placement is correct.
+3 tip cards: Side angle / 3-4m distance / 15-30 seconds.
+Record button (56px red circle). Hold to record 5-60s. Auto-stop at 60s.
+Technique dropdown (only unlocked — always shows "Stance & Movement" for new users).
+On record complete → call uploadService.uploadVideo() → navigate to /onboarding/result.
+"Skip for now" ghost button with text "Users who film now have 6× higher retention"
+
+<span class="cg">Screen 5: app/onboarding/result.tsx</span>
+Two states — Processing and Result.
+
+Processing state:
+- Rotating emoji 🔬 (react-native-reanimated rotation loop)
+- "Analyzing your technique" heading
+- 4-step progress list with animated dots: Extracting → Detecting → Comparing → Generating
+- "BATTLE POWER READING" card with animated counter counting up to a random 4000-8000 value
+
+Result state (triggered when analysisService returns):
+- Confetti effect (Animated.sequence with 3 emoji bouncing)
+- Score circle (100px, gradient stroke SVG, count-up animation to final score)
+- Belt unlock card (gold border, "🥋 White Belt Unlocked", scale-in animation)
+- XP awarded: "+50 XP" badge
+- 3 CTA cards: Fix error / Challenge friend / See full analysis
+- "Free for 30 days — no credit card" banner at bottom
+
+All animations: react-native-reanimated. All colors from src/theme/colors. StyleSheet.create only.
+</div>
+  </div>
+</section>
+
+<!-- GAMIFICATION SPEC -->
+<section id="gamification-spec">
+  <span class="sl">// 07</span>
+  <h2>Spec 4 — Full gamification system</h2>
+  <p class="lead">The most important spec in Phase 1. This is what makes athletes return every day. Every mechanic must work correctly before any other features are built on top.</p>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-tool pt-kiro">KIRO — New Spec</span>
+      <span class="pb-title">Complete XP, belt, streak, challenge, and skill unlock systems</span>
+      <button class="pb-copy" onclick="cp(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cg">Build the complete SportsAI gamification system. This is the addiction engine.</span>
+
+<span class="cw">1. XP Service (sportsai-api/src/services/xpService.ts)</span>
+awardXP(athleteId, event, sourceId) → updates DB, checks belt, checks unlocks, sends push
+
+XP values: upload=50, improved_10pct=120, improved_20pct=200, coach_review=200,
+streak_week=75, challenge_complete=150, technique_unlock=300, belt_promote=500,
+first_1v1_win=250, perfect_score_90plus=400
+
+Belt thresholds: white=0, yellow=500, orange=1200, green=2500, blue=5000,
+purple=9000, brown=15000, black=25000
+
+On belt promotion: return { promoted: true, new_belt, prev_belt }
+→ API returns this to mobile → triggers full-screen celebration animation
+
+<span class="cw">2. Streak Service (sportsai-api/src/services/streakService.ts)</span>
+updateStreak(athleteId) — called after every video upload
+Logic: if last_upload_date was within last 7 days → increment streak
+If last upload was 7-14 days ago → streak breaks, reset to 1
+If same week → no change (athlete already uploaded this week)
+Award 75 XP for each week streak maintained.
+
+Streak notifications (via node-cron):
+Every day at 09:00 athlete timezone: if no upload in last 5 days → "Streak ends in 2 days" push
+Every Sunday 18:00: if challenge incomplete → "48 hours left" push notification
+
+<span class="cw">3. Technique Unlock Service (sportsai-api/src/services/unlockService.ts)</span>
+checkUnlocks(athleteId, sport, technique, score) after every analysis
+
+Wrestling prerequisites:
+stance_movement: always unlocked (starting technique)
+single_leg_shot: requires stance_movement average >= 60 over 3+ sessions
+double_leg_shot: requires single_leg average >= 65
+high_crotch: requires single_leg average >= 70
+scramble_defense: requires double_leg average >= 65
+firemans_carry: requires high_crotch average >= 75 AND belt >= purple (prestige)
+
+On new unlock: store in technique_unlocks table, award 300 XP,
+send push notification: "🔓 {technique} UNLOCKED"
+If is_prestige: also notify all followers of this athlete
+
+<span class="cw">4. Weekly Challenge Engine (sportsai-api/src/jobs/weeklyReset.ts)</span>
+Every Monday 00:00 UTC:
+1. Reset all athlete_xp.weekly_xp = 0
+2. For each active athlete + sport: query last 3 sessions' phase scores
+3. Find their weakest phase (lowest average score)
+4. Generate 3 personalized challenges targeting that phase:
+   Challenge 1: score_threshold — "Score above 70 on {technique} this week"
+   Challenge 2: improvement — "Improve your {weak_phase} by 10 points"
+   Challenge 3: consistency — "Upload 3 sessions this week"
+5. Store in weekly_challenges table (week_start = this Monday)
+6. Send "New challenges are live" push to all athletes with push tokens
+
+<span class="cw">5. Leaderboard Queries (sportsai-api/src/routes/leaderboard.ts)</span>
+GET /friends: join users + athlete_xp via follows table, order by weekly_xp DESC, limit 20
+GET /regional: join by users.city field, rank by (current_score - last_week_score) DESC
+  This ranks by IMPROVEMENT not absolute score → beginners can compete with advanced
+GET /global: per sport, rank by total_xp DESC, limit 100, reset monthly
+
+<span class="cw">6. Client-side XP Display (src/services/xpService.ts — mobile)</span>
+showXPGain(amount, event): triggers floating "+{amount} XP" animation on screen
+  Animate: appear at bottom center, float up 60px, fade out over 1.2s
+  Sound: if user has haptics enabled → light impact feedback
+checkAndShowCelebration(xpResult):
+  If belt_promoted → navigate to BeltCelebration screen
+  If techniques_unlocked → show UnlockToast for each
+  Always → show floating XP gain animation
+
+All backend functions: TypeScript typed, Zod validated inputs, tested.
+Write tests for: XP calculation, belt threshold crossing, streak break/maintain, unlock prerequisites.
+</div>
+  </div>
+</section>
+
+<!-- ARENA SPEC -->
+<section id="arena-spec">
+  <span class="sl">// 08 — Phase 2 specs</span>
+  <h2>Spec 5 — 1v1 Arena complete system</h2>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-tool pt-kiro">KIRO — New Spec</span>
+      <span class="pb-title">1v1 Arena with Supabase Realtime, rivalry cards, private reports</span>
+      <button class="pb-copy" onclick="cp(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cg">Build the complete 1v1 Arena system for SportsAI.</span>
+
+<span class="cw">Core privacy rule (critical): Fighter A NEVER sees Fighter B's errors and vice versa.
+Each fighter sees ONLY their own private report. Shared breakdown requires BOTH to consent.</span>
+
+<span class="cw">Backend (sportsai-api/src/routes/arena.ts):</span>
+
+POST /challenges/send: create arena_challenge record, send push to opponent
+POST /challenges/:id/accept: update status, create arena_session, notify both fighters
+POST /sessions/:id/upload: accept video, split analysis for both fighters:
+  - Call analysisService twice (once per fighter's tracked skeleton)
+  - Store fighter_a_analysis_id and fighter_b_analysis_id in arena_sessions
+  - Each analysis stored with athlete_id = that fighter only
+  - No cross-analysis visibility
+GET /sessions/:id/result: return OWN analysis only (check auth matches fighter_a or fighter_b)
+POST /sessions/:id/consent-share: toggle consent flag, if both true → unlock shared_breakdown
+GET /rivalries/:opponentId: head-to-head stats, improvement comparison, session history
+
+Supabase Realtime channels:
+  arena:{sessionId} — both fighters subscribe
+  Events: partner_ready, analysis_complete, consent_updated
+
+<span class="cw">Mobile screens:</span>
+
+app/(tabs)/arena.tsx — main arena with:
+  Active rivalry card (if any) with rivalry stats
+  "Challenge a friend" search (username lookup)
+  Pending challenges list (incoming requests with accept/decline)
+  "Scout opponent" card (Elite gate — show lock for free/competitor users)
+
+app/arena/prefight.tsx:
+  Fighter A vs Fighter B comparison cards
+  "Underdog bonus: +50% XP" banner if you have lower score
+  Both fighters need to tap "Ready"
+  Use Supabase Realtime: subscribe to arena:{sessionId}, show "waiting..." until partner ready
+
+app/arena/session.tsx:
+  Camera view with 2-person AR guide overlay
+  Live confidence indicator: GREEN (both tracked) / AMBER (clinch) / RED (ground)
+  Technique selector, timer, "End session" button
+  On end: upload video → show processing screen → navigate to result
+
+app/arena/result.tsx:
+  60-second processing state (same animation as onboarding result)
+  Result: both fighter cards appear simultaneously with scores
+  Winner banner (higher technique score = technical winner)
+  "View your private report" → navigate to analysis/[id]
+  "Share comparison" toggle (uses Supabase Realtime to sync both fighters' consent)
+  If both consent: show shared_breakdown text
+  Rivalry card update: increment session_count, update win/loss
+
+Rivalry card component (src/components/RivalryCard.tsx):
+  Show after 3+ sessions with same opponent
+  Head-to-head record, improvement rate comparison, "who's improving faster" indicator
+  Push notification when rival improves: "⚔️ @rival just improved their score. You're still ahead."
+</div>
+  </div>
+</section>
+
+<!-- AI CHAT SPEC -->
+<section id="chat-spec">
+  <span class="sl">// 09</span>
+  <h2>Spec 6 — AI coach chat (real from Day 1)</h2>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-tool pt-kiro">KIRO — New Spec</span>
+      <span class="pb-title">AI coach chat — Claude API with full athlete history context</span>
+      <button class="pb-copy" onclick="cp(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cg">Build the AI coach chat system. This uses REAL Claude API from day 1 — not the mock engine.
+The coach reads the athlete's stored session history from Supabase and gives genuinely personalized advice.</span>
+
+<span class="cw">Backend (sportsai-api/src/routes/coach.ts):</span>
+
+POST /chat:
+  Auth required. Body: { message: string, conversation_id?: string }
+  
+  Rate limiting (Redis):
+    Free tier: 3 messages per 24 hours (key: coach_limit:{userId})
+    Competitor+: unlimited
+    On limit hit: return 429 with { upgrade_required: true, reason: 'daily_limit' }
+  
+  Context building:
+    Fetch athlete's last 30 ai_analyses (score, phase_scores, errors, technique, created_at)
+    Fetch athlete profile (sport, level, belt, goal from onboarding)
+    Fetch active weekly challenges
+    Build history_summary: "Last 5 sessions: {technique} scored {score} (entry:{e}, execution:{ex}, finish:{f})"
+    Calculate trends: improving/declining/flat per phase
+  
+  Claude API call (claude-sonnet-4-20250514, max_tokens=800):
+    System prompt: "You are an expert {sport} coach. You know this athlete's complete history:
+    Sport: {sport}, Level: {level}, Belt: {belt}, Goal: {goal}
+    Session history (last 30): {history_summary}
+    Current weaknesses: {top_3_recurring_errors}
+    Improving: {improving_phases}
+    
+    RULES: Always be specific — reference their actual scores and history.
+    Never give generic advice. Use {sport} terminology naturally.
+    Keep responses 150-250 words. Be encouraging but direct.
+    If they mention a tournament: ask when it is and tailor advice to timeline.
+    Never say 'it appears' — be confident in your assessments."
+    
+    Messages: full conversation history (last 20 messages)
+    
+  Store conversation in coach_messages table
+  Return: { response: string, remaining_today: number, conversation_id: string }
+
+GET /messages/:conversationId: return last 20 messages (paginated)
+GET /suggested: return 4 suggested questions based on athlete's current weakest phase
+
+<span class="cw">Mobile (app/coach.tsx):</span>
+Header: AI robot avatar + "AI Coach" + green "Online" dot + "Knows your last 30 sessions" subtitle
+FlatList of messages (inverted, newest at bottom)
+User bubbles: right-aligned, red bg, white text, 12px, border-radius 12 12 2 12
+AI bubbles: left-aligned, surface bg, "AI COACH · your data" header in green mono font 8px
+Suggested questions: horizontal ScrollView with tappable chips (if conversation is empty or < 3 messages)
+Input bar: full width, rounded, send button (red circle with arrow)
+
+Free limit banner (shows when remaining_today === 0):
+  "3 daily questions used · Upgrade Competitor for unlimited coaching"
+  "Upgrade" button → navigate to paywall screen
+
+Loading state: animated typing dots (3 dots bouncing in sequence, reanimated)
+Error state: "Connection issue" with retry button
+
+Persist messages to MMKV for offline reading
+Auto-scroll to bottom on new message with smooth animation
+Keyboard avoiding behavior with KeyboardAvoidingView
+</div>
+  </div>
+</section>
+
+<!-- SOCIAL SPEC -->
+<section id="social-spec">
+  <span class="sl">// 10</span>
+  <h2>Spec 7 — Social + leaderboard + retention notifications</h2>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-tool pt-trae">TRAE — Builder Mode</span>
+      <span class="pb-title">app/(tabs)/social.tsx — full social screen with 3 leaderboard types</span>
+      <button class="pb-copy" onclick="cp(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cg">Build the complete Social screen for SportsAI matching the design from sportsai_mobile_ui.html</span>
+
+<span class="cw">Tab bar at top: Friends / Regional / Global (pill-style segmented control)</span>
+
+<span class="cb">Friends tab:</span>
+- Section header: "Weekly XP · Resets Monday" in mono 9px muted
+- FlatList of ranked athletes (top 20)
+- Each row: rank number (gold for #1, silver #2, bronze #3), avatar circle (gradient),
+  name + sport + belt badge, XP value right-aligned
+- YOUR row: highlighted with red tint background + "← you" label next to name
+- Person directly above you: amber/gold tint ("this close")
+- Push notification rule: when anyone above you improves → "⚔️ @name improved. You're being chased."
+- "Challenge" button on long-press of any row → sends 1v1 challenge
+
+<span class="cb">Regional tab:</span>
+- Ranked by IMPROVEMENT % this month (not absolute score — beginners can compete)
+- Filter by: same city / same gym / same country (SegmentedControl)
+- Top 3 get "Monthly Champion" badge (visible on their profile for 30 days)
+- Section: "Your nearby athletes" showing within 5km (if location permission granted)
+
+<span class="cb">Global tab:</span>
+- Per sport tabs: Wrestling / MMA / BJJ / Volleyball
+- Top 100 by total XP (monthly leaderboard)
+- Top 3 visible prominently with larger cards
+- Your position shown at bottom even if outside top 100
+- "Season ends in X days" countdown banner at top
+- Tap any athlete → view their public profile (belt, recent unlocks, technique records)
+
+<span class="cb">Activity feed (below leaderboard tabs):</span>
+- Vertical feed of friend activities:
+  "🔓 @username unlocked Flying Knee" (+ "Tap to see their analysis")
+  "📈 @username scored their personal best: 89/100"
+  "🏆 @username won 3 arena sessions in a row"
+  "⚔️ @username challenged you" (+ Accept button inline)
+- Each item tappable → deep links to relevant screen
+- Pull to refresh
+
+All data from leaderboard API routes. TanStack Query with 60-second cache.
+Loading: skeleton placeholders (grey animated bars matching the row layout).
+Empty state: "Follow athletes to see their progress here" with search button.
+</div>
+  </div>
+</section>
+
+<!-- ANIME SPEC -->
+<section id="anime-spec">
+  <span class="sl">// 11</span>
+  <h2>Spec 8 — Anime fight cinematics + power system</h2>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-tool pt-kiro">KIRO — New Spec</span>
+      <span class="pb-title">DomoAI anime pipeline + Three.js power aura system</span>
+      <button class="pb-copy" onclick="cp(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cg">Build the complete anime fight cinematic system for SportsAI.</span>
+
+<span class="cw">Backend job (sportsai-api/src/jobs/animeWorker.ts) — runs after every analysis completes:</span>
+
+1. Extract 30-second highlight window (frames with highest technique scores)
+2. Call DomoAI API: POST https://api.domoai.app/v1/video2video
+   { video_url, style: "dragon_ball_z", strength: 0.75, preserve_motion: true }
+   DomoAI API key from DOMOAI_API_KEY env var
+3. Poll GET /jobs/{job_id} every 5 seconds until status = "completed" (max 120s timeout)
+4. Upload resulting anime clip to Cloudflare R2 (anime/ prefix)
+5. Generate anime narration via Claude API:
+   Prompt: "Based on this athlete's scores {scores}, generate:
+   power_level (score * 94), technique_card_name (dramatic DBZ-style for their best move),
+   battle_commentary (30 words in DBZ announcer style),
+   aura_color (hex: >=85→#FFD700, >=70→#4488FF, else #FF2D4E)"
+6. Update video_uploads.anime_clip_url + ai_analyses.anime_narration
+7. Send push: "Your anime fight scene is ready 🔥"
+
+Graceful degradation: if DomoAI fails → skip anime, don't fail the analysis.
+Cost tracking: log each call with duration + cost estimate.
+
+<span class="cw">Mobile components:</span>
+
+src/components/PowerAura.tsx (@react-three/fiber):
+  Props: { score: number, errorActive: boolean, position: [number,number,number] }
+  Particle sphere (radius 0.8, 32x32 segments, 400 points)
+  Color: score>=85→gold, score>=70→blue, errorActive→red, else white
+  Intensity: opacity = score/100 * 0.7
+  Animation: useFrame → rotate Y axis at 0.01 * (score/100) speed
+  Error flicker: Math.sin(clock.elapsedTime * 8) * 0.3 opacity oscillation
+
+src/components/TechniqueCard.tsx (Skia overlay, 2D):
+  Full-width bar overlay, 60px height, semi-transparent black bg
+  Technique name: Barlow Condensed CAPS 24px colored by score
+  "{score}% POWER" in mono font
+  Entry animation: slide in from right 200ms, hold 1.5s, fade out 300ms
+  Triggered by error/success timestamps from the analysis
+
+Anime result screen (app/anime-reveal.tsx):
+  Video player showing the DomoAI-processed anime clip
+  Power level counter (animated count-up to final power level)
+  Technique card overlay on best moment
+  Battle commentary text from anime_narration
+  Share button: react-native-view-shot capture + expo-sharing
+    Captured clip has SportsAI watermark bottom-right
+  "Generate another" button (requires Elite tier)
+</div>
+  </div>
+</section>
+
+<!-- AVATAR SPEC -->
+<section id="avatar-spec">
+  <span class="sl">// 12</span>
+  <h2>Spec 9 — Avatar system + 3D viewer</h2>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-tool pt-trae">TRAE — Builder Mode</span>
+      <span class="pb-title">AvatarViewer.tsx — Three.js GLB + Kalidokit bone animation</span>
+      <button class="pb-copy" onclick="cp(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cg">Build the complete avatar system for SportsAI.</span>
+
+<span class="cw">src/components/AvatarViewer.tsx</span>
+Props: {
+  glbUrl: string,           // Ready Player Me GLB URL from user profile
+  poseFrames?: PoseFrame[], // Pose data to animate the avatar (optional)
+  currentFrame?: number,    // Which frame to display (for scrubbing)
+  showAura?: boolean,       // Toggle power aura overlay
+  techniqueScore?: number,  // Drives aura color
+  errorJoints?: string[],   // Which joints to highlight red
+  style?: ViewStyle
+}
+
+Implementation:
+1. expo-gl Canvas wrapped in a View
+2. @react-three/fiber Canvas renders inside the expo-gl context
+3. Load GLB from URL using THREE.GLTFLoader (via expo-asset for caching)
+4. Display loading spinner while GLB loads (show placeholder skeleton if load takes > 2s)
+5. If poseFrames provided: use Kalidokit to convert keypoints → bone quaternions
+   kalidokit.Utils.clamp() + kalidokit.Face.solve() + kalidokit.Pose.solve()
+   Apply results to avatar's bone rotations (Hips, Spine, LeftArm, RightArm, LeftLeg, RightLeg)
+6. If currentFrame changes: update bone rotations to match that frame's pose data
+7. If errorJoints provided: change those bone's associated mesh material color to red (#ff2d4e)
+   Normal bones: rgba(245,244,239,0.8). Error bones: #ff2d4e with glow.
+8. If showAura: render PowerAura component around the avatar's hip position
+
+Elite comparison mode (showComparison prop):
+  Load two GLBs: athlete (left, positioned at x=-0.8) and elite (right, x=0.8)
+  Elite avatar: semi-transparent (opacity 0.6), blue tint
+  Sync both to same frame/timestamp
+  Labels: "YOU" and "ELITE" in Barlow Condensed 12px floating above each
+
+Avatar selection screen (app/profile/avatar.tsx):
+  Current avatar preview (full AvatarViewer component, 200px height)
+  "Customize" button → open Ready Player Me WebView (Modal)
+  RPM WebView: @readyplayerme/react-native-webview-sdk
+    On avatar created: save GLB URL to Supabase + store.setAvatarUrl(url)
+  "Upload selfie" button (Elite tier) → Avatar SDK integration
+    POST selfie to Avatar SDK REST API → receive personalized GLB head mesh
+    Combine with RPM body → save combined GLB URL
+    If not Elite: show upgrade prompt
+
+Avatar cosmetics (purchasable via IAP):
+  Outfit packs: wrestling singlet, MMA shorts, BJJ gi — each an alternate GLB material set
+  Belt FX: gold shimmer / flame effect / animated glow on belt bone
+  Arena themes: background environment for the 3D viewer
+  Store in Supabase user_cosmetics table
+  Apply in AvatarViewer based on active cosmetics
+
+Performance: memoize GLB loading (don't reload same URL), limit to 30fps in avatar viewer.
+</div>
+  </div>
+</section>
+
+<!-- ENGINE PLUG-IN -->
+<section id="engine-spec">
+  <span class="sl">// 13 — Phase 3</span>
+  <h2>Spec 10 — Real engine integration (when co-founder ships)</h2>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-tool pt-kiro">KIRO — New Spec (run when engine is ready)</span>
+      <span class="pb-title">Swap mock engine for real YOLO11 pose analysis service</span>
+      <button class="pb-copy" onclick="cp(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cg">The AI engine co-founder has shipped the real pose analysis service.
+Integrate it into the existing SportsAI app. The app already works with mock data.
+This spec only changes the data source — nothing else changes.</span>
+
+<span class="cw">What to change (ONLY these things):</span>
+
+1. Add to .env.production:
+   EXPO_PUBLIC_USE_REAL_ENGINE=true
+   EXPO_PUBLIC_AI_ENGINE_URL=https://[co-founder's Modal endpoint]
+
+2. Update src/services/analysisService.ts realAnalysis() function:
+   - Verify the API contract: engine must return exactly the Analysis interface from src/types/index.ts
+   - If any field is missing or differently named: add a mapping/transform layer in realAnalysis()
+   - The app MUST NOT change to accommodate the engine — the engine adapts to the app's interface
+   - Add error handling: if engine returns 500, fall back to mock data with a flag in the response
+
+3. Update src/services/analysisService.ts getPoseOverlay():
+   - Fetch real PoseFrame[] array from engine's /pose/{videoId} endpoint
+   - Verify frame format matches PoseFrame interface (keypoints, confidence, biomechanics, timestamp_ms)
+   - The AnnotationPlayer and SkeletonOverlay components already accept PoseFrame[] — zero changes needed
+
+4. Update sportsai-api/src/jobs/analysisWorker.ts:
+   - Replace mockAnalysisWorker with realAnalysisWorker
+   - Call the engine's FastAPI endpoint instead of generating mock data
+   - Keep same output shape (store in ai_analyses table with same schema)
+   - Keep same downstream logic (XP award, unlock check, push notification)
+
+5. Test the swap:
+   - Upload a test video → verify real score appears (not the mock range 55-85)
+   - Verify skeleton overlay displays on the annotation player
+   - Verify error markers appear at correct timestamps
+   - Verify XP is awarded correctly
+   - Verify push notification arrives after analysis
+
+<span class="cw">What NOT to change:</span>
+- Every screen (they all use the Analysis interface already)
+- The gamification system (XP, belts, challenges)
+- The AI coach chat (uses Supabase history, not the engine)
+- The anime pipeline (uses the analysis output, not the engine directly)
+- The 1v1 arena (analysis already split correctly)
+- Any UI component
+
+<span class="cw">Validation criteria:</span>
+- Mock mode still works when EXPO_PUBLIC_USE_REAL_ENGINE=false (for development)
+- Real mode returns analysis within 20 seconds for a 30-second video
+- Phase scores are in range 0-100
+- Errors list has at most 5 items
+- feedback_text is 150-300 words
+- Skeleton overlay renders smoothly at 30fps with real pose data
+</div>
+  </div>
+</section>
+
+<!-- COACH MARKETPLACE -->
+<section id="coach-spec">
+  <span class="sl">// 14</span>
+  <h2>Spec 11 — Human coach marketplace</h2>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-tool pt-kiro">KIRO — New Spec</span>
+      <span class="pb-title">Coach marketplace with Stripe Connect + web dashboard</span>
+      <button class="pb-copy" onclick="cp(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cg">Build the human coach marketplace for SportsAI.
+Athletes pay £12.99 for a human coach to review their video within 24 hours.
+Coaches earn 80% (£10.39). Platform takes 20% (£2.60). Stripe Connect handles splits.</span>
+
+<span class="cw">Backend (sportsai-api/src/routes/coaches.ts):</span>
+
+Coach onboarding:
+  POST /onboard → create Stripe Express account → return onboarding URL
+  GET /dashboard-link → return Stripe Express dashboard link for earnings
+
+Review flow:
+  POST /reviews/request:
+    Body: { videoId, coachId? (optional — auto-match if empty) }
+    Check: athlete has Competitor+ tier for this feature
+    Create Stripe PaymentIntent: amount=1299, application_fee_amount=260
+    transfer_data.destination = coach.stripe_account_id
+    Create coach_reviews record: status='pending', price_cents=1299, coach_payout_cents=1039
+    If no coachId: auto-match using scoring query (rating*0.4 + speed*0.4 + volume*0.2)
+    Send push to matched coach: "New review request — {sport} {technique}"
+    Return: { reviewId, coachName, estimatedHours: 24 }
+  
+  POST /reviews/:id/deliver:
+    Coach-only endpoint. Body: { reviewVideoUrl, reviewText, coachScore }
+    Update coach_reviews: status='delivered', review details
+    Record AI divergence in coach_ai_divergence table (for model improvement later)
+    Send push to athlete: "Your coach reviewed your session"
+    Award 200 XP to athlete
+
+Coach matching algorithm (SQL):
+  SELECT coaches WHERE sport_specialties @> [athlete.sport]
+  AND is_available = true
+  AND pending_reviews < 5
+  ORDER BY (avg_rating * 0.4 + (1.0/avg_response_hours) * 0.4 + (completed_reviews/100.0) * 0.2)
+  LIMIT 3
+
+<span class="cw">Coach Web Dashboard (sportsai-web/ — Next.js):</span>
+
+Pages:
+  /dashboard: pending count, weekly earnings, avg rating, today's reviews
+  /reviews: queue list with AI pre-analysis visible for each pending review
+    Each review shows: athlete name, technique, AI score, top 3 AI errors, video thumbnail
+    "Start Review" opens the review detail page
+  /reviews/[id]: 
+    LEFT: Video player (Cloudflare Stream embed)
+    CENTER: AI analysis read-only (score + errors with agree/disagree toggles)
+    RIGHT: Response composer (text area + record video button via MediaRecorder API)
+    "Deliver to Athlete" button (updates status, triggers push notification, releases payment)
+  /earnings: Stripe Connect embedded earnings dashboard
+
+Auth: Supabase magic link (email only for coaches — no social auth)
+Style: Tailwind CSS, dark theme (same color tokens as mobile app)
+</div>
+  </div>
+</section>
+
+<!-- TRAE SCREENS -->
+<section id="trae-screens">
+  <span class="sl">// 15 — Trae prompts</span>
+  <h2>Trae prompts — every remaining screen</h2>
+  <p class="lead">These prompts go directly into Trae Builder. Attach the relevant screenshot from sportsai_mobile_ui.html before each one for best results.</p>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-tool pt-trae">TRAE — Builder</span>
+      <span class="pb-title">Home screen + all shared components</span>
+      <button class="pb-copy" onclick="cp(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cg">Build app/(tabs)/home.tsx and all shared components it needs.</span>
+Match the design from the attached screenshot exactly.
+
+<span class="cw">home.tsx structure (top to bottom, ScrollView):</span>
+1. Avatar row: AvatarCircle (44px gradient) + name + sport/sessions text + BeltBadge component
+2. XPBar component: label "Weekly XP", value "840 / 1,200", filled bar (68% red→gold gradient)
+3. StreakWidget: flame emoji + streak number (32px Barlow Condensed gold) + "2 days" warning
+4. Active challenge card: ChallengeCard component with progress bar
+5. Today's AI drill card: blue border, "Today's AI drill" header, drill name + reps + "Upload after" text
+6. Social mini feed (last 3 friend activities)
+
+<span class="cw">Components to create:</span>
+BeltBadge: gold bg, belt name, belt emoji — inline chip
+XPBar: animated fill (spring animation on mount), xp numbers mono font
+StreakWidget: gradient bg (gold→red), animated flame, count, "ends in X days" if streak at risk
+ChallengeCard: challenge icon + title + progress bar + XP reward
+FloatingRecordButton: fixed bottom center, red circle, camera emoji, 56px, red glow shadow
+
+All data from TanStack Query hooks:
+  useAthleteXP() → fetches /api/xp/me
+  useChallenges() → fetches /api/challenges
+  useFriendFeed() → fetches /api/social/feed
+  
+Loading state: grey skeleton placeholders matching exact component shapes.
+Pull-to-refresh with RefreshControl (red tint).
+</div>
+  </div>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-tool pt-trae">TRAE — Builder</span>
+      <span class="pb-title">analysis/[id].tsx — score reveal + annotation player + AI feedback</span>
+      <button class="pb-copy" onclick="cp(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cg">Build app/analysis/[id].tsx — the most important screen. Match the attached design exactly.</span>
+
+Fetch analysis by ID from /api/analysis/:id using TanStack Query.
+
+<span class="cw">State 1 — Score reveal (2-second animation on mount):</span>
+Circular score ring (100px): animated stroke-dashoffset counting up from 0 to final score
+Barlow Condensed number counting up inside the ring (0 → score over 1.5s)
+If score improved vs last session: "+6" badge in green with bounce animation
+Phase bars: entry/execution/finish — each bar fills from left with spring animation (staggered 200ms apart)
+Stats row: "vs last" delta (green/red), "elite avg" (muted), "percentile" (gold)
+
+<span class="cw">State 2 — Annotation player (after score reveal):</span>
+AnnotationPlayer component with:
+  videoUrl from analysis.video_cloudflare_url
+  poseOverlay from analysisService.getPoseOverlay(id) (mock or real)
+  errorMarkers from analysis.errors
+  eliteComparison from api/elite-pose/:sport/:technique
+
+Error pill strip below player showing all errors — tap to jump
+Coaching text card below: "AI Coach" header (green mono), feedback text (14px muted)
+← → navigation between errors
+
+<span class="cw">State 3 — XP celebration (after user scrolls to bottom):</span>
+Floating "+120 XP" animation (slide up, fade out)
+If belt promoted: full-screen celebration with BeltCard component
+Share button: generates 5-second clip of best technique moment
+
+All animations: react-native-reanimated. No Animated from RN core.
+Error on load: "Analysis not found" with back button.
+</div>
+  </div>
+
+  <div class="prompt-block">
+    <div class="pb-header">
+      <span class="pb-tool pt-trae">TRAE — Builder</span>
+      <span class="pb-title">progress.tsx — score graph + skill tree + belt + badges</span>
+      <button class="pb-copy" onclick="cp(this)">Copy</button>
+    </div>
+    <div class="pb-body"><span class="cg">Build app/(tabs)/progress.tsx with 4 tabbed sections. Match attached design.</span>
+
+Tab bar: Graph / Skills / Belt / Badges (pill segmented control, red active)
+
+<span class="cw">Graph tab:</span>
+Heading: current score (28px bold) + "+16 this month" in green mono
+victory-native LineChart: session history per technique, last 8 sessions
+  Points: red dots, line: red gradient stroke, area fill: red with 10% opacity
+  X axis: session dates (mono 8px), Y axis: 0-100 (mono 8px)
+Technique filter: horizontal ScrollView with technique chips (active = red)
+TanStack Query: useSessionHistory(technique) → /api/analysis/history?technique=
+
+<span class="cw">Skills tab:</span>
+Tree visualization (not a standard list — actual node graph):
+  Use react-native-svg for the connecting lines between nodes
+  Each technique: rounded rect node (76px × 42px)
+  Done nodes: green border + green bg + "✓"
+  Active (in progress) node: red border + red glow pulse animation
+  Locked nodes: dim bg + "🔒"
+  Prestige node: gold border + trophy emoji
+  Lines between connected nodes: grey (locked) or green (done)
+  Tap any node: bottom sheet appears with technique details, current avg score, unlock requirements
+
+<span class="cw">Belt tab:</span>
+Current belt displayed large (80px circle with glow) + belt name (28px Barlow Condensed gold)
+XP progress to next belt (large animated bar)
+Requirements checklist for next belt (techniques required + min sessions + optional coach review)
+Each requirement: green check when met, grey clock when not
+Past belts: scrollable row of earned belt chips
+
+<span class="cw">Badges tab:</span>
+Masonry grid of earned badges (emoji + name + date earned)
+Locked badges shown as silhouettes (mystery mechanic — no name revealed until earned)
+Tap earned badge: modal with the session where it was earned + share button
+</div>
+  </div>
+</section>
+
+<!-- BUILD ORDER -->
+<section id="order">
+  <span class="sl">// 16 — Execution</span>
+  <h2>Exact build order — week by week</h2>
+
+  <table>
+    <thead><tr><th>Week</th><th>What to build</th><th>Tool</th><th>Done when</th></tr></thead>
+    <tbody>
+      <tr><td>Day 1</td><td>Steering files + hooks setup (.kiro/)</td><td>Manual</td><td>Kiro follows conventions automatically</td></tr>
+      <tr><td>Day 1–2</td><td>Project scaffold (Spec 1)</td><td>Kiro</td><td>expo start works, no TS errors</td></tr>
+      <tr><td>Day 2–3</td><td>Mock engine + Supabase schema (Spec 2)</td><td>Kiro</td><td>mock analysis returns data, schema migrated</td></tr>
+      <tr><td>Days 4–7</td><td>Onboarding 5 screens (Trae + image)</td><td>Trae</td><td>full flow works, belt unlocks on result screen</td></tr>
+      <tr><td>Week 2</td><td>Gamification system (Spec 4)</td><td>Kiro</td><td>XP awards, belt promotes, streaks work</td></tr>
+      <tr><td>Week 2</td><td>Home screen + components</td><td>Trae</td><td>XP bar, streak, challenge all live</td></tr>
+      <tr><td>Week 3</td><td>Record screen + upload pipeline</td><td>Trae + Kiro</td><td>video uploads, mock analysis queues + arrives</td></tr>
+      <tr><td>Week 3</td><td>Analysis screen + AnnotationPlayer</td><td>Trae</td><td>tap error → jumps to -2s, slow-mo works</td></tr>
+      <tr><td>Week 4</td><td>Progress screen (graph + skill tree)</td><td>Trae</td><td>history shows, unlock tree renders</td></tr>
+      <tr><td>Week 4</td><td>AI coach chat (Spec 6) — REAL Claude API</td><td>Kiro + Trae</td><td>sends message, gets personalized response</td></tr>
+      <tr><td>Week 5</td><td>1v1 Arena (Spec 5)</td><td>Kiro + Trae</td><td>both fighters get private analysis reports</td></tr>
+      <tr><td>Week 5</td><td>Social + leaderboard</td><td>Trae</td><td>3 leaderboard types, activity feed, rival card</td></tr>
+      <tr><td>Week 6</td><td>Avatar system (Spec 9)</td><td>Trae</td><td>RPM avatar loads, animates from pose data</td></tr>
+      <tr><td>Week 6</td><td>Anime cinematics (Spec 8)</td><td>Kiro + Trae</td><td>DomoAI clip generates, power aura shows</td></tr>
+      <tr><td>Week 7</td><td>Push notifications + all retention hooks</td><td>Kiro</td><td>streak warning, rival improvement, challenge expiry all fire</td></tr>
+      <tr><td>Week 8</td><td>Coach marketplace (Spec 11)</td><td>Kiro + Trae</td><td>Stripe payment works, coach sees review in web dashboard</td></tr>
+      <tr><td>Week 8</td><td>IAP + paywall screens</td><td>Trae</td><td>upgrade flow works end-to-end</td></tr>
+      <tr><td>On engine ready</td><td>Real engine plug-in (Spec 10)</td><td>Kiro</td><td>set env var, real scores appear, skeleton overlay works</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note ng"><strong>You can demo to investors at end of week 4.</strong> By then you have: working onboarding, home screen with all gamification, record + mock analysis with real-looking scores, annotation player with skeleton overlay, AI coach chat (real Claude API), and the skill unlock tree. That is enough to show the product vision completely. The rest is addictive depth — which you keep building through weeks 5–8.</div>
+
+  <div class="note ny"><strong>The AI coach chat is your most impressive feature and it's real from day 1.</strong> When an investor asks "but the AI analysis is mock data right?" — you say "the coaching conversation is fully real — the AI reads 30 sessions of real training history and gives genuinely personalized technique advice. That's the hardest part. The pose analysis engine is being built by my co-founder — it connects in one environment variable change." That's a confident, honest, fundable answer.</div>
+</section>
+
+</main>
+
+<script>
+const links=document.querySelectorAll('nav a');
+const secs=document.querySelectorAll('section[id]');
+window.addEventListener('scroll',()=>{
+  let cur='';
+  secs.forEach(s=>{if(window.scrollY>=s.offsetTop-120)cur=s.id;});
+  links.forEach(l=>{l.classList.remove('on');if(l.getAttribute('href')==='#'+cur)l.classList.add('on');});
+});
+links.forEach(l=>l.addEventListener('click',e=>{
+  e.preventDefault();
+  document.querySelector(l.getAttribute('href'))?.scrollIntoView({behavior:'smooth',block:'start'});
+}));
+
+function cp(btn){
+  const body=btn.closest('.prompt-block').querySelector('.pb-body');
+  navigator.clipboard.writeText(body.innerText).then(()=>{
+    const orig=btn.textContent;
+    btn.textContent='Copied!';
+    btn.classList.add('done');
+    setTimeout(()=>{btn.textContent=orig;btn.classList.remove('done');},2000);
+  });
+}
+</script>
+</body>
+</html>

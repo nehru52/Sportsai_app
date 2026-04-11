@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SportsAI Elite Live 1v1 Olympic — Competition Ready</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="frontend/enhanced.css">
+<style>
+:root{
+  --ink:#07070f;--surface:#0d0d1c;--card:#121225;--raised:#17172e;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#ececff;--muted:#5c5c8a;--dim:#252545;
+  --red:#ff2d4e;--gold:#ffc22d;--green:#00e676;--blue:#4d8cff;--purple:#c084fc;
+  
+  /* Competition Readiness Colors */
+  --ready-elite:#10b981;
+  --ready-near:#f59e0b;
+  --ready-dev:#f97316;
+  --ready-work:#ef4444;
+  
+  /* Three-Layer Architecture */
+  --layer1-tactical:#ff6b35;
+  --layer2-biomech:#00d4ff;
+  --layer3-insights:#a855f7;
+  
+  --head:'Barlow Condensed',sans-serif;--sans:'DM Sans',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+
+body{background:var(--ink);color:var(--text);font-family:var(--sans);min-height:100vh;margin:0;padding:0;overflow-x:hidden;}
+
+/* LIVE MATCH HEADER */
+.live-header{position:fixed;top:0;left:0;right:0;background:var(--surface);border-bottom:1px solid var(--border);z-index:100;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(10px);}
+.live-title{font-family:var(--head);font-size:20px;font-weight:800;letter-spacing:-0.5px;display:flex;align-items:center;gap:12px;}
+.live-status{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10px;color:var(--muted);}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+
+/* MATCH SCORE */
+.match-score{display:flex;align-items:center;gap:16px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 16px;}
+.team-score{text-align:center;}
+.team-name{font-family:var(--head);font-size:14px;font-weight:700;}
+.team-flag{font-size:16px;}
+.score-value{font-family:var(--mono);font-size:24px;font-weight:800;color:var(--gold);}
+.score-separator{font-family:var(--mono);font-size:18px;color:var(--muted);}
+
+/* COMPETITION READINESS PANEL */
+.readiness-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin:16px 24px;position:relative;overflow:hidden;}
+.readiness-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--ready-elite);border-radius:12px 12px 0 0;}
+.readiness-panel.near-ready::before{background:var(--ready-near);}
+.readiness-panel.development::before{background:var(--ready-dev);}
+.readiness-panel.work-needed::before{background:var(--ready-work);}
+
+.readiness-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.readiness-title{font-family:var(--head);font-size:16px;font-weight:700;}
+.readiness-level{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);}
+.readiness-score{font-family:var(--head);font-size:32px;font-weight:800;line-height:1;}
+
+.readiness-breakdown{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+.readiness-metric{text-align:center;}
+.readiness-ring{width:60px;height:60px;margin:0 auto 8px;position:relative;}
+.readiness-ring svg{width:100%;height:100%;}
+.readiness-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--head);font-size:14px;font-weight:700;}
+.readiness-label{font-size:8px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;}
+
+/* THREE-LAYER LIVE ANALYSIS */
+.analysis-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:16px 24px;}
+.analysis-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;position:relative;}
+.analysis-card.layer1{border-color:var(--layer1-tactical);}
+.analysis-card.layer2{border-color:var(--layer2-biomech);}
+.analysis-card.layer3{border-color:var(--layer3-insights);}
+
+.analysis-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.analysis-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.analysis-icon.layer1{background:rgba(255,107,53,.1);color:var(--layer1-tactical);}
+.analysis-icon.layer2{background:rgba(0,212,255,.1);color:var(--layer2-biomech);}
+.analysis-icon.layer3{background:rgba(168,85,247,.1);color:var(--layer3-insights);}
+
+.analysis-title{font-family:var(--head);font-size:13px;font-weight:700;}
+.analysis-status{font-family:var(--mono);font-size:9px;color:var(--muted);}
+
+.analysis-data{display:flex;flex-direction:column;gap:8px;}
+.data-row{display:flex;justify-content:space-between;align-items:center;}
+.data-label{font-size:10px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;}
+.data-value{font-family:var(--mono);font-size:11px;font-weight:600;}
+
+/* COURT VISUALIZATION */
+.court-container{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin:16px 24px;position:relative;}
+.court-title{font-family:var(--head);font-size:14px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.court-diagram{position:relative;width:100%;height:200px;background:linear-gradient(135deg,rgba(255,107,53,.05),rgba(0,212,255,.05));border-radius:8px;overflow:hidden;}
+.court-svg{position:absolute;top:0;left:0;width:100%;height:100%;}
+
+.player-marker-live{position:absolute;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold;color:white;font-family:var(--mono);cursor:pointer;transition:all .2s;border:2px solid rgba(255,255,255,.3);}
+.player-marker-live:hover{transform:scale(1.1);z-index:10;border-color:white;}
+.player-marker-live.tracked{background:var(--blue);}
+.player-marker-live.analyzed{background:var(--green);}
+.player-marker-live.focus{background:var(--red);animation:focusPulse 1.5s infinite;}
+@keyframes focusPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,45,78,.7)}70%{box-shadow:0 0 0 10px rgba(255,45,78,0)}}
+
+/* ACTION TIMELINE */
+.timeline-container{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin:16px 24px;}
+.timeline-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.timeline-title{font-family:var(--head);font-size:14px;font-weight:700;}
+.timeline-time{font-family:var(--mono);font-size:10px;color:var(--muted);}
+
+.timeline-bar{height:40px;background:var(--raised);border-radius:8px;position:relative;overflow:hidden;margin-bottom:12px;}
+.timeline-fill{height:100%;background:linear-gradient(90deg,var(--layer1-tactical),var(--layer2-biomech),var(--layer3-insights));border-radius:8px;animation:timelineProgress 3s ease-in-out infinite;}
+@keyframes timelineProgress{0%{width:0%}100%{width:100%}}
+
+.timeline-markers{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;justify-content:space-around;align-items:center;}
+.timeline-marker{width:6px;height:6px;border-radius:50%;background:white;position:relative;cursor:pointer;}
+.timeline-marker::after{content:attr(data-action);position:absolute;top:-24px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--muted);font-family:var(--mono);white-space:nowrap;}
+
+.action-stats{display:flex;justify-content:space-around;margin-top:12px;}
+.action-stat{text-align:center;}
+.action-icon{font-size:16px;margin-bottom:4px;}
+.action-count{font-family:var(--mono);font-size:12px;font-weight:600;}
+.action-label{font-size:8px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;}
+
+/* BIOMECHANICAL ALERTS */
+.alert-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin:16px 24px;}
+.alert-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.alert-icon{font-size:16px;}
+.alert-title{font-family:var(--head);font-size:13px;font-weight:700;}
+.alert-critical .alert-icon{color:var(--red);}
+.alert-warning .alert-icon{color:var(--gold);}
+.alert-good .alert-icon{color:var(--green);}
+
+.alert-item{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);}
+.alert-item:last-child{border-bottom:none;}
+.alert-joint{font-family:var(--mono);font-size:10px;}
+.alert-deviation{font-family:var(--mono);font-size:10px;color:var(--muted);}
+.alert-severity{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;text-transform:uppercase;}
+.severity-high{background:var(--red);color:white;}
+.severity-medium{background:var(--gold);color:black;}
+.severity-low{background:var(--green);color:white;}
+
+/* TRAINING RECOMMENDATIONS */
+.training-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin:16px 24px;}
+.training-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.training-title{font-family:var(--head);font-size:14px;font-weight:700;}
+
+.recommendation-item{background:var(--raised);border-radius:8px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+.recommendation-icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+.rec-tactical{background:rgba(255,107,53,.1);color:var(--layer1-tactical);}
+.rec-biomech{background:rgba(0,212,255,.1);color:var(--layer2-biomech);}
+.rec-insights{background:rgba(168,85,247,.1);color:var(--layer3-insights);}
+
+.recommendation-text{flex:1;font-size:11px;line-height:1.5;}
+.recommendation-priority{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;text-transform:uppercase;}
+.priority-high{background:var(--red);color:white;}
+.priority-medium{background:var(--gold);color:black;}
+.priority-low{background:var(--green);color:white;}
+
+/* REAL-TIME UPDATES */
+.update-indicator{position:fixed;top:80px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;z-index:50;transform:translateX(100%);transition:transform .3s ease;}
+.update-indicator.show{transform:translateX(0);}
+.update-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.update-icon{font-size:12px;color:var(--blue);}
+.update-title{font-family:var(--mono);font-size:10px;font-weight:600;}
+.update-time{font-family:var(--mono);font-size:9px;color:var(--muted);}
+.update-content{font-size:10px;color:var(--text);line-height:1.4;}
+
+/* BOTTOM CONTROLS */
+.bottom-controls{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:16px 24px;display:flex;gap:12px;z-index:100;}
+.control-btn{flex:1;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.control-btn:hover{background:var(--raised);border-color:var(--blue);}
+.control-btn.primary{background:linear-gradient(135deg,var(--red),var(--gold));border:none;color:white;}
+.control-btn.primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(232,23,44,.3);}
+
+/* LOADING STATES */
+.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(7,7,15,.95);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;visibility:hidden;transition:all .3s;}
+.loading-overlay.active{opacity:1;visibility:visible;}
+.loading-content{text-align:center;}
+.loading-spinner{width:40px;height:40px;border:3px solid var(--border);border-top:3px solid var(--blue);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.loading-text{font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:8px;}
+.loading-sub{font-size:10px;color:var(--muted);opacity:.8;}
+
+/* NOTIFICATIONS */
+.notification-live{position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 16px;z-index:200;display:flex;align-items:center;gap:10px;transition:transform .4s cubic-bezier(.34,1.56,.64,1);}
+.notification-live.show{transform:translateX(-50%) translateY(0);}
+.notification-icon{font-size:14px;}
+.notification-content{flex:1;}
+.notification-title{font-family:var(--mono);font-size:10px;font-weight:600;margin-bottom:2px;}
+.notification-text{font-size:9px;color:var(--muted);line-height:1.4;}
+.notification-close{font-size:16px;color:var(--muted);cursor:pointer;}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .analysis-grid{grid-template-columns:1fr;}
+  .readiness-breakdown{grid-template-columns:repeat(2,1fr);}
+  .live-header{flex-direction:column;gap:12px;align-items:flex-start;}
+  .match-score{align-self:center;}
+}
+
+@media(max-width:480px){
+  .readiness-panel,.analysis-card,.court-container,.timeline-container,.alert-panel,.training-panel{margin:12px 16px;}
+  .readiness-breakdown{grid-template-columns:1fr;}
+  .update-indicator{right:16px;}
+  .bottom-controls{margin:0 16px;padding:12px;}
+}
+</style>
+</head>
+<body>
+
+<!-- Live Match Header -->
+<div class="live-header">
+  <div class="live-title">
+    <span class="live-dot"></span>
+    LIVE OLYMPIC ANALYSIS
+  </div>
+  
+  <div class="match-score">
+    <div class="team-score">
+      <div class="team-flag">🇺🇸</div>
+      <div class="team-name">USA</div>
+      <div class="score-value">21</div>
+    </div>
+    <div class="score-separator">:</div>
+    <div class="team-score">
+      <div class="team-flag">🇧🇷</div>
+      <div class="team-name">BRA</div>
+      <div class="score-value">19</div>
+    </div>
+  </div>
+  
+  <div class="live-status">
+    <span>Set 2</span>
+    <span>•</span>
+    <span>14:32</span>
+  </div>
+</div>
+
+<!-- Competition Readiness Panel -->
+<div class="readiness-panel elite-ready" id="readinessPanel">
+  <div class="readiness-header">
+    <div>
+      <div class="readiness-title">Competition Readiness</div>
+      <div class="readiness-level">ELITE LEVEL</div>
+    </div>
+    <div class="readiness-score">89%</div>
+  </div>
+  
+  <div class="readiness-breakdown">
+    <div class="readiness-metric">
+      <div class="readiness-ring">
+        <svg width="60" height="60">
+          <circle cx="30" cy="30" r="26" fill="none" stroke="var(--dim)" stroke-width="4"/>
+          <circle cx="30" cy="30" r="26" fill="none" stroke="var(--ready-elite)" stroke-width="4" 
+                  stroke-dasharray="163" stroke-dashoffset="16" transform="rotate(-90 30 30)"/>
+        </svg>
+        <div class="readiness-text">92%</div>
+      </div>
+      <div class="readiness-label">Tactical</div>
+    </div>
+    
+    <div class="readiness-metric">
+      <div class="readiness-ring">
+        <svg width="60" height="60">
+          <circle cx="30" cy="30" r="26" fill="none" stroke="var(--dim)" stroke-width="4"/>
+          <circle cx="30" cy="30" r="26" fill="none" stroke="var(--ready-elite)" stroke-width="4" 
+                  stroke-dasharray="163" stroke-dashoffset="21" transform="rotate(-90 30 30)"/>
+        </svg>
+        <div class="readiness-text">87%</div>
+      </div>
+      <div class="readiness-label">Biomechanical</div>
+    </div>
+    
+    <div class="readiness-metric">
+      <div class="readiness-ring">
+        <svg width="60" height="60">
+          <circle cx="30" cy="30" r="26" fill="none" stroke="var(--dim)" stroke-width="4"/>
+          <circle cx="30" cy="30" r="26" fill="none" stroke="var(--ready-elite)" stroke-width="4" 
+                  stroke-dasharray="163" stroke-dashoffset="24" transform="rotate(-90 30 30)"/>
+        </svg>
+        <div class="readiness-text">85%</div>
+      </div>
+      <div class="readiness-label">Consistency</div>
+    </div>
+    
+    <div class="readiness-metric">
+      <div class="readiness-ring">
+        <svg width="60" height="60">
+          <circle cx="30" cy="30" r="26" fill="none" stroke="var(--dim)" stroke-width="4"/>
+          <circle cx="30" cy="30" r="26" fill="none" stroke="var(--ready-elite)" stroke-width="4" 
+                  stroke-dasharray="163" stroke-dashoffset="18" transform="rotate(-90 30 30)"/>
+        </svg>
+        <div class="readiness-text">89%</div>
+      </div>
+      <div class="readiness-label">Overall</div>
+    </div>
+  </div>
+</div>
+
+<!-- Three-Layer Live Analysis -->
+<div class="analysis-grid">
+  <!-- Layer 1: Tactical Analysis -->
+  <div class="analysis-card layer1">
+    <div class="analysis-header">
+      <div class="analysis-icon layer1">🎯</div>
+      <div>
+        <div class="analysis-title">Tactical Analysis</div>
+        <div class="analysis-status">Live • Set 2</div>
+      </div>
+    </div>
+    
+    <div class="analysis-data">
+      <div class="data-row">
+        <span class="data-label">Serve Pattern</span>
+        <span class="data-value">Zone 6 • 73%</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">Attack Tempo</span>
+        <span class="data-value">High Ball • 58%</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">Reception Quality</span>
+        <span class="data-value">2.8/3.0 • Excellent</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">Transition Speed</span>
+        <span class="data-value">1.2s • Elite</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Layer 2: Biomechanical Analysis -->
+  <div class="analysis-card layer2">
+    <div class="analysis-header">
+      <div class="analysis-icon layer2">🦴</div>
+      <div>
+        <div class="analysis-title">Biomechanical</div>
+        <div class="analysis-status">12 Players Tracked</div>
+      </div>
+    </div>
+    
+    <div class="analysis-data">
+      <div class="data-row">
+        <span class="data-label">Elbow Flexion</span>
+        <span class="data-value">168.2° • Elite</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">Torso Extension</span>
+        <span class="data-value">161.5° • Elite</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">Approach Angle</span>
+        <span class="data-value">44.8° • Elite</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">Consistency Score</span>
+        <span class="data-value">92% • Elite</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Layer 3: LLM Insights -->
+  <div class="analysis-card layer3">
+    <div class="analysis-header">
+      <div class="analysis-icon layer3">🧠</div>
+      <div>
+        <div class="analysis-title">AI Insights</div>
+        <div class="analysis-status">8 Recommendations</div>
+      </div>
+    </div>
+    
+    <div class="analysis-data">
+      <div class="data-row">
+        <span class="data-label">Next Action</span>
+        <span class="data-value">Quick Set • 78%</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">Optimal Zone</span>
+        <span class="data-value">Zone 4 • High %</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">Risk Level</span>
+        <span class="data-value">Low • Confident</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">Confidence</span>
+        <span class="data-value">94% • High</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Court Visualization -->
+<div class="court-container">
+  <div class="court-title">
+    <span>🏐</span>
+    Live Court Analysis
+  </div>
+  
+  <div class="court-diagram">
+    <svg class="court-svg" viewBox="0 0 400 200">
+      <!-- Court boundaries -->
+      <rect x="20" y="20" width="360" height="160" fill="none" stroke="var(--border2)" stroke-width="2"/>
+      <!-- Net -->
+      <line x1="200" y1="20" x2="200" y2="180" stroke="var(--border2)" stroke-width="1"/>
+      <!-- Attack lines -->
+      <line x1="20" y1="60" x2="200" y2="60" stroke="var(--border2)" stroke-width="1"/>
+      <line x1="200" y1="140" x2="380" y2="140" stroke="var(--border2)" stroke-width="1"/>
+      <!-- Zones -->
+      <line x1="80" y1="20" x2="80" y2="180" stroke="var(--border2)" stroke-width="1" stroke-dasharray="4,2"/>
+      <line x1="160" y1="20" x2="160" y2="180" stroke="var(--border2)" stroke-width="1" stroke-dasharray="4,2"/>
+      <line x1="240" y1="20" x2="240" y2="180" stroke="var(--border2)" stroke-width="1" stroke-dasharray="4,2"/>
+      <line x1="320" y1="20" x2="320" y2="180" stroke="var(--border2)" stroke-width="1" stroke-dasharray="4,2"/>
+    </svg>
+    
+    <!-- Live player markers -->
+    <div class="player-marker-live tracked" style="left: 15%; top: 25%;" data-player="1" data-position="Outside" data-readiness="92">1</div>
+    <div class="player-marker-live tracked focus" style="left: 35%; top: 25%;" data-player="3" data-position="Setter" data-readiness="89">3</div>
+    <div class="player-marker-live tracked" style="left: 55%; top: 25%;" data-player="7" data-position="Middle" data-readiness="91">7</div>
+    <div class="player-marker-live tracked" style="left: 75%; top: 25%;" data-player="11" data-position="Opposite" data-readiness="88">11</div>
+    <div class="player-marker-live analyzed" style="left: 25%; top: 75%;" data-player="2" data-position="Libero" data-readiness="94">2</div>
+    <div class="player-marker-live analyzed" style="left: 45%; top: 75%;" data-player="5" data-position="Outside" data-readiness="87">5</div>
+    <div class="player-marker-live analyzed" style="left: 65%; top: 75%;" data-player="9" data-position="Middle" data-readiness="85">9</div>
+    <div class="player-marker-live analyzed" style="left: 85%; top: 75%;" data-player="12" data-position="Opposite" data-readiness="86">12</div>
+    
+    <!-- Ball position indicator -->
+    <div class="player-marker-live" style="left: 60%; top: 45%; background: var(--gold); animation: ballBounce 2s infinite;" data-ball="true">🏐</div>
+  </div>
+  
+  <div style="display: flex; justify-content: space-between; margin-top: 12px; font-size: 10px; color: var(--muted); font-family: var(--mono);">
+    <div><span style="color: var(--blue);">●</span> Tracked (Jersey ID)</div>
+    <div><span style="color: var(--green);">●</span> Analyzed (Biomechanical)</div>
+    <div><span style="color: var(--red);">●</span> Focus Player</div>
+    <div><span style="color: var(--gold);">●</span> Ball Position</div>
+  </div>
+</div>
+
+<!-- Action Timeline -->
+<div class="timeline-container">
+  <div class="timeline-header">
+    <div class="timeline-title">Live Action Timeline</div>
+    <div class="timeline-time">14:32 • Set 2</div>
+  </div>
+  
+  <div class="timeline-bar">
+    <div class="timeline-fill" style="width: 68%"></div>
+  </div>
+  
+  <div class="timeline-markers">
+    <div class="timeline-marker" data-action="Serve" style="left: 12%"></div>
+    <div class="timeline-marker" data-action="Reception" style="left: 28%"></div>
+    <div class="timeline-marker" data-action="Set" style="left: 45%"></div>
+    <div class="timeline-marker" data-action="Spike" style="left: 62%"></div>
+    <div class="timeline-marker" data-action="Block" style="left: 78%"></div>
+    <div class="timeline-marker" data-action="Dig" style="left: 92%"></div>
+  </div>
+  
+  <div class="action-stats">
+    <div class="action-stat">
+      <div class="action-icon">🎯</div>
+      <div class="action-count">23</div>
+      <div class="action-label">Spikes</div>
+    </div>
+    <div class="action-stat">
+      <div class="action-icon">🎾</div>
+      <div class="action-count">18</div>
+      <div class="action-label">Serves</div>
+    </div>
+    <div class="action-stat">
+      <div class="action-icon">🛡️</div>
+      <div class="action-count">12</div>
+      <div class="action-label">Blocks</div>
+    </div>
+    <div class="action-stat">
+      <div class="action-icon">🛡️</div>
+      <div class="action-count">15</div>
+      <div class="action-label">Digs</div>
+    </div>
+  </div>
+</div>
+
+<!-- Biomechanical Alerts -->
+<div class="alert-panel alert-critical">
+  <div class="alert-header">
+    <div class="alert-icon">⚠️</div>
+    <div class="alert-title">Critical Biomechanical Alert</div>
+  </div>
+  
+  <div class="alert-item">
+    <span class="alert-joint">Elbow Flexion</span>
+    <span class="alert-deviation">-18.3° from elite</span>
+    <span class="alert-severity severity-high">HIGH</span>
+  </div>
+  
+  <div class="alert-item">
+    <span class="alert-joint">Torso Extension</span>
+    <span class="alert-deviation">-12.7° from elite</span>
+    <span class="alert-severity severity-medium">MED</span>
+  </div>
+</div>
+
+<div class="alert-panel alert-warning">
+  <div class="alert-header">
+    <div class="alert-icon">⚡</div>
+    <div class="alert-title">Performance Warnings</div>
+  </div>
+  
+  <div class="alert-item">
+    <span class="alert-joint">Approach Speed</span>
+    <span class="alert-deviation">Below optimal range</span>
+    <span class="alert-severity severity-medium">MED</span>
+  </div>
+  
+  <div class="alert-item">
+    <span class="alert-joint">Jump Timing</span>
+    <span class="alert-deviation">0.15s early</span>
+    <span class="alert-severity severity-low">LOW</span>
+  </div>
+</div>
+
+<!-- Training Recommendations -->
+<div class="training-panel">
+  <div class="training-header">
+    <div class="training-title">Live Training Recommendations</div>
+  </div>
+  
+  <div class="recommendation-item">
+    <div class="recommendation-icon rec-biomech">🦴</div>
+    <div class="recommendation-text">Maintain 'bow and arrow' position longer during approach. Focus on delaying arm swing until last 0.2s before contact.</div>
+    <div class="recommendation-priority priority-high">HIGH</div>
+  </div>
+  
+  <div class="recommendation-item">
+    <div class="recommendation-icon rec-tactical">🎯</div>
+    <div class="recommendation-text">Consider faster tempo sets to Zone 4. Current high ball frequency is predictable.</div>
+    <div class="recommendation-priority priority-medium">MED</div>
+  </div>
+  
+  <div class="recommendation-item">
+    <div class="recommendation-icon rec-insights">🧠</div>
+    <div class="recommendation-text">Opponent showing weakness in Zone 2 defense. Recommend targeting this area.</div>
+    <div class="recommendation-priority priority-medium">MED</div>
+  </div>
+</div>
+
+<!-- Real-time Update Indicator -->
+<div class="update-indicator" id="updateIndicator">
+  <div class="update-header">
+    <div class="update-icon">📊</div>
+    <div class="update-title">Analysis Updated</div>
+    <div class="update-time">Just now</div>
+  </div>
+  <div class="update-content">
+    New spike detected • Player #3 • Confidence: 94%
+  </div>
+</div>
+
+<!-- Bottom Controls -->
+<div class="bottom-controls">
+  <button class="control-btn" onclick="toggleAnalysis('tactical')">
+    <span>🎯</span>
+    Tactical
+  </button>
+  <button class="control-btn" onclick="toggleAnalysis('biomech')">
+    <span>🦴</span>
+    Biomech
+  </button>
+  <button class="control-btn" onclick="toggleAnalysis('insights')">
+    <span>🧠</span>
+    AI Insights
+  </button>
+  <button class="control-btn primary" onclick="exportLiveReport()">
+    <span>📊</span>
+    Export Report
+  </button>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-content">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Processing Live Analysis...</div>
+    <div class="loading-sub">Connecting to Olympic data stream</div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="frontend/enhanced.js"></script>
+<script>
+// Live 1v1 Olympic Analysis State
+let liveAnalysisState = {
+  tactical: true,
+  biomech: true,
+  insights: true,
+  autoUpdate: true,
+  updateInterval: null,
+  currentSet: 2,
+  matchTime: '14:32',
+  readinessLevel: 'elite',
+  readinessScore: 89
+};
+
+// Initialize live analysis
+document.addEventListener('DOMContentLoaded', function() {
+  initializeLiveAnalysis();
+  startLiveUpdates();
+  setupPlayerInteractions();
+  simulateLiveData();
+});
+
+function initializeLiveAnalysis() {
+  console.log('🏐 SportsAI Elite Live 1v1 Olympic Analysis Initialized');
+  
+  // Show initial loading
+  showLoading('Initializing Olympic-grade analysis...');
+  
+  setTimeout(() => {
+    hideLoading();
+    showNotification('🚀 Live analysis active', 'Connected to Olympic data stream');
+  }, 2000);
+}
+
+function startLiveUpdates() {
+  if (liveAnalysisState.autoUpdate) {
+    liveAnalysisState.updateInterval = setInterval(() => {
+      updateLiveData();
+      simulateNewActions();
+    }, 3000); // Update every 3 seconds
+  }
+}
+
+function updateLiveData() {
+  // Update match time
+  updateMatchTime();
+  
+  // Update readiness scores
+  updateReadinessScores();
+  
+  // Update tactical data
+  if (liveAnalysisState.tactical) {
+    updateTacticalData();
+  }
+  
+  // Update biomechanical data
+  if (liveAnalysisState.biomech) {
+    updateBiomechanicalData();
+  }
+  
+  // Update AI insights
+  if (liveAnalysisState.insights) {
+    updateAIInsights();
+  }
+}
+
+function updateMatchTime() {
+  // Simulate match time progression
+  const [minutes, seconds] = liveAnalysisState.matchTime.split(':').map(Number);
+  let totalSeconds = minutes * 60 + seconds + 3;
+  
+  if (totalSeconds >= 1800) { // 30 minutes per set
+    totalSeconds = 0;
+    liveAnalysisState.currentSet++;
+  }
+  
+  const newMinutes = Math.floor(totalSeconds / 60);
+  const newSeconds = totalSeconds % 60;
+  liveAnalysisState.matchTime = `${newMinutes.toString().padStart(2, '0')}:${newSeconds.toString().padStart(2, '0')}`;
+  
+  // Update UI
+  document.querySelector('.timeline-time').textContent = `${liveAnalysisState.matchTime} • Set ${liveAnalysisState.currentSet}`;
+}
+
+function updateReadinessScores() {
+  // Simulate slight variations in readiness scores
+  const variations = {
+    tactical: (Math.random() - 0.5) * 2,
+    biomech: (Math.random() - 0.5) * 3,
+    consistency: (Math.random() - 0.5) * 1.5,
+    overall: (Math.random() - 0.5) * 2
+  };
+  
+  // Update readiness rings
+  updateReadinessRing('tactical', 92 + variations.tactical);
+  updateReadinessRing('biomechanical', 87 + variations.biomech);
+  updateReadinessRing('consistency', 85 + variations.consistency);
+  updateReadinessRing('overall', 89 + variations.overall);
+}
+
+function updateReadinessRing(type, score) {
+  const ring = document.querySelector(`[data-readiness-ring="${type}"]`);
+  if (ring) {
+    const circle = ring.querySelector('circle:last-child');
+    const text = ring.querySelector('.readiness-text');
+    
+    if (circle && text) {
+      const radius = 26;
+      const circumference = 2 * Math.PI * radius;
+      const offset = circumference - (score / 100 * circumference);
+      
+      circle.style.strokeDasharray = circumference;
+      circle.style.strokeDashoffset = offset;
+      text.textContent = `${Math.round(score)}%`;
+    }
+  }
+}
+
+function updateTacticalData() {
+  // Simulate tactical data updates
+  const tacticalUpdates = [
+    { label: 'Serve Pattern', value: `Zone ${Math.floor(Math.random() * 6) + 1} • ${(Math.random() * 30 + 60).toFixed(0)}%` },
+    { label: 'Attack Tempo', value: ['High Ball', 'Second Tempo', 'First Tempo'][Math.floor(Math.random() * 3)] + ' • ' + (Math.random() * 20 + 50).toFixed(0) + '%' },
+    { label: 'Reception Quality', value: (Math.random() * 0.5 + 2.5).toFixed(1) + '/3.0 • ' + ['Good', 'Excellent', 'Average'][Math.floor(Math.random() * 3)] },
+    { label: 'Transition Speed', value: (Math.random() * 0.5 + 1.0).toFixed(1) + 's • ' + ['Elite', 'Good', 'Average'][Math.floor(Math.random() * 3)] }
+  ];
+  
+  const dataRows = document.querySelectorAll('.analysis-card.layer1 .data-row');
+  dataRows.forEach((row, index) => {
+    if (tacticalUpdates[index]) {
+      const label = row.querySelector('.data-label');
+      const value = row.querySelector('.data-value');
+      if (label && value) {
+        // Keep existing label, update value
+        value.textContent = tacticalUpdates[index].value;
+      }
+    }
+  });
+}
+
+function updateBiomechanicalData() {
+  // Simulate biomechanical data updates
+  const biomechUpdates = [
+    { label: 'Elbow Flexion', value: (Math.random() * 10 + 165).toFixed(1) + '° • Elite' },
+    { label: 'Torso Extension', value: (Math.random() * 8 + 158).toFixed(1) + '° • Elite' },
+    { label: 'Approach Angle', value: (Math.random() * 6 + 43).toFixed(1) + '° • Elite' },
+    { label: 'Consistency Score', value: (Math.random() * 8 + 88).toFixed(0) + '% • Elite' }
+  ];
+  
+  const dataRows = document.querySelectorAll('.analysis-card.layer2 .data-row');
+  dataRows.forEach((row, index) => {
+    if (biomechUpdates[index]) {
+      const value = row.querySelector('.data-value');
+      if (value) {
+        value.textContent = biomechUpdates[index].value;
+      }
+    }
+  });
+}
+
+function updateAIInsights() {
+  // Simulate AI insight updates
+  const insights = [
+    { label: 'Next Action', value: ['Quick Set', 'High Ball', 'Second Tempo'][Math.floor(Math.random() * 3)] + ' • ' + (Math.random() * 20 + 75).toFixed(0) + '%' },
+    { label: 'Optimal Zone', value: 'Zone ' + (Math.floor(Math.random() * 6) + 1) + ' • High %' },
+    { label: 'Risk Level', value: ['Low', 'Medium', 'High'][Math.floor(Math.random() * 3)] + ' • Confident' },
+    { label: 'Confidence', value: (Math.random() * 10 + 90).toFixed(0) + '% • High' }
+  ];
+  
+  const dataRows = document.querySelectorAll('.analysis-card.layer3 .data-row');
+  dataRows.forEach((row, index) => {
+    if (insights[index]) {
+      const value = row.querySelector('.data-value');
+      if (value) {
+        value.textContent = insights[index].value;
+      }
+    }
+  });
+}
+
+function simulateNewActions() {
+  // Simulate new volleyball actions
+  const actions = ['Serve', 'Reception', 'Set', 'Spike', 'Block', 'Dig'];
+  const randomAction = actions[Math.floor(Math.random() * actions.length)];
+  const confidence = (Math.random() * 15 + 85).toFixed(0);
+  
+  // Update timeline
+  updateTimelineMarker(randomAction);
+  
+  // Show notification
+  showNotification(`📊 New ${randomAction} detected • Confidence: ${confidence}%`, 'info');
+}
+
+function updateTimelineMarker(action) {
+  const markers = document.querySelectorAll('.timeline-marker');
+  const currentWidth = parseInt(document.querySelector('.timeline-fill').style.width) || 0;
+  
+  // Add new marker at current position
+  if (currentWidth < 95) {
+    const newMarker = document.createElement('div');
+    newMarker.className = 'timeline-marker';
+    newMarker.setAttribute('data-action', action);
+    newMarker.style.left = `${currentWidth + 2}%`;
+    newMarker.style.background = 'var(--gold)';
+    
+    document.querySelector('.timeline-markers').appendChild(newMarker);
+    
+    // Remove old markers if too many
+    if (markers.length > 8) {
+      markers[0].remove();
+    }
+  }
+  
+  // Update timeline fill
+  const newWidth = Math.min(currentWidth + 1, 100);
+  document.querySelector('.timeline-fill').style.width = `${newWidth}%`;
+}
+
+function setupPlayerInteractions() {
+  document.querySelectorAll('.player-marker-live').forEach(marker => {
+    marker.addEventListener('click', function() {
+      const playerId = this.getAttribute('data-player');
+      const position = this.getAttribute('data-position');
+      const readiness = this.getAttribute('data-readiness');
+      
+      // Highlight player
+      document.querySelectorAll('.player-marker-live').forEach(m => m.classList.remove('focus'));
+      this.classList.add('focus');
+      
+      // Show player details
+      showPlayerDetails(playerId, position, readiness);
+    });
+  });
+}
+
+function showPlayerDetails(playerId, position, readiness) {
+  showNotification(`👤 Player #${playerId} Details`, `
+    Position: ${position}
+    Readiness: ${readiness}%
+    Status: ${readiness >= 90 ? 'Elite' : readiness >= 80 ? 'Near Ready' : 'Development Needed'}
+  `, 'info');
+}
+
+function toggleAnalysis(type) {
+  liveAnalysisState[type] = !liveAnalysisState[type];
+  
+  const card = document.querySelector(`.analysis-card.${type === 'biomech' ? 'layer2' : type === 'insights' ? 'layer3' : 'layer1'}`);
+  if (card) {
+    if (liveAnalysisState[type]) {
+      card.style.opacity = '1';
+      card.style.filter = 'none';
+    } else {
+      card.style.opacity = '0.3';
+      card.style.filter = 'grayscale(100%)';
+    }
+  }
+  
+  showNotification(`${type.charAt(0).toUpperCase() + type.slice(1)} analysis ${liveAnalysisState[type] ? 'enabled' : 'disabled'}`, 'success');
+}
+
+function exportLiveReport() {
+  showLoading('Exporting live analysis report...');
+  
+  setTimeout(() => {
+    hideLoading();
+    showNotification('📊 Live report exported successfully!', 'Report includes all three-layer analysis data');
+  }, 2000);
+}
+
+function showNotification(title, content, type = 'info') {
+  const notification = document.createElement('div');
+  notification.className = 'notification-live';
+  notification.innerHTML = `
+    <div class="notification-icon">${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</div>
+    <div class="notification-content">
+      <div class="notification-title">${title}</div>
+      <div class="notification-text">${content}</div>
+    </div>
+    <div class="notification-close" onclick="this.parentElement.remove()">&times;</div>
+  `;
+  
+  document.body.appendChild(notification);
+  
+  // Show notification
+  setTimeout(() => {
+    notification.classList.add('show');
+  }, 100);
+  
+  // Auto remove after 4 seconds
+  setTimeout(() => {
+    notification.remove();
+  }, 4000);
+}
+
+function showLoading(message, subtext = '') {
+  const overlay = document.getElementById('loadingOverlay');
+  const text = overlay.querySelector('.loading-text');
+  const sub = overlay.querySelector('.loading-sub');
+  
+  text.textContent = message;
+  sub.textContent = subtext;
+  overlay.classList.add('active');
+}
+
+function hideLoading() {
+  document.getElementById('loadingOverlay').classList.remove('active');
+}
+
+// Ball animation
+const ballBounceKeyframes = `
+  @keyframes ballBounce {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-10px) scale(1.1); }
+  }
+`;
+
+const style = document.createElement('style');
+style.textContent = ballBounceKeyframes;
+document.head.appendChild(style);
+</script>
+
+</body>
+</html>

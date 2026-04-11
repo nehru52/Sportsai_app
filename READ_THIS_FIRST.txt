@@ -1,0 +1,429 @@
+READ THIS FIRST — What Is This Project and What Did We Build?
+=============================================================
+Written for: someone who wasn't here and has no idea what's going on
+Project name: SportsAI — a volleyball coach that lives inside a computer
+Location on your machine: C:\sportsai-backend\
+
+
+===========================================================
+THE BIG IDEA (explain it like I'm 5)
+===========================================================
+
+Imagine you're learning to spike a volleyball.
+Normally you'd need a real coach standing next to you saying:
+"Hey, your arm isn't pulling back far enough before you hit the ball."
+
+We built a computer program that does exactly that — automatically.
+
+You upload a video of yourself playing volleyball.
+The computer watches it, figures out what you're doing wrong,
+and tells you how to fix it — with words, with a drill, and with a video
+showing you side-by-side with an Olympic-level player.
+
+No human coach needed. Just upload a video and get feedback.
+
+That's the whole thing. Everything else below is just HOW it does that.
+
+
+===========================================================
+THE FOLDER STRUCTURE — what lives where
+===========================================================
+
+C:\sportsai-backend\
+│
+├── api.py                    ← THE FRONT DOOR. This is what you run to start everything.
+│
+├── data_collection\          ← THE BRAIN. All the smart code lives here.
+│   ├── smart_analyser.py     ← The main brain — runs the whole pipeline automatically
+│   ├── analyser.py           ← Compares your body measurements to elite athletes
+│   ├── pose_extractor.py     ← Watches video and draws dots on your body
+│   ├── pose_3d_lifter.py     ← Turns flat 2D dots into real 3D positions
+│   ├── kinematics.py         ← Measures joint angles and speeds
+│   ├── phase_detector.py     ← Figures out which part of the movement you're in
+│   ├── action_detector.py    ← Recognises what volleyball move is happening
+│   ├── action_localiser.py   ← Finds exactly WHERE in the video the move happens
+│   ├── coach_feedback.py     ← Writes the coaching advice in plain English
+│   ├── reference_library.py  ← Stores what elite athletes look like
+│   ├── skeleton_overlay.py   ← Draws the coloured skeleton on your video
+│   ├── visualiser.py         ← Makes heatmaps and graphs
+│   ├── player_tracker.py     ← Follows all players in a team video
+│   ├── ball_tracker.py       ← Follows the ball
+│   ├── court_detector.py     ← Finds the court boundaries in the video
+│   ├── progress_tracker.py   ← Remembers how you've improved over time
+│   ├── video_quality.py      ← Checks if your video is good enough before analysing
+│   ├── batch_processor.py    ← Downloads and processes many YouTube videos at once
+│   ├── youtube_downloader.py ← Downloads a single YouTube video
+│   ├── url_loader.py         ← Reads the list of YouTube URLs from a spreadsheet
+│   └── yolo11x-pose.pt       ← The actual AI model file (not code — this is the brain weights)
+│
+├── models\
+│   ├── AthletePose3D\        ← A downloaded tool that measures 3D body positions
+│   └── VolleyVision\         ← A downloaded tool that recognises volleyball actions
+│
+├── data\
+│   ├── input\
+│   │   └── volleyball_urls.csv   ← A spreadsheet of 51 YouTube volleyball videos
+│   ├── pose_data\
+│   │   └── volleyball\
+│   │       ├── spike\            ← 47 processed spike videos (the training data)
+│   │       ├── serve\            ← Empty — not collected yet
+│   │       ├── block\            ← Empty — not collected yet
+│   │       ├── dig\              ← Empty — not collected yet
+│   │       └── metadata.json     ← A log of every video that's been processed
+│   └── raw_videos\
+│       └── test_spike.mp4        ← A sample video for testing
+│
+├── config\
+│   └── volleyball_techniques.json  ← Defines what metrics to measure for each technique
+│
+├── all.txt                   ← Architecture notes and research (technical reading)
+├── WHAT_WE_BUILT.txt         ← Previous plain-English summary (read this too)
+└── READ_THIS_FIRST.txt       ← You are here
+
+
+===========================================================
+THE TOOLS WE DOWNLOADED (not code we wrote — tools we plugged in)
+===========================================================
+
+1. YOLO11x-pose  (file: data_collection/yolo11x-pose.pt)
+   -------------------------------------------------------
+   Think of this like a pair of magic glasses.
+   You show it a video frame and it draws 17 dots on every person it sees.
+   One dot on each shoulder, elbow, wrist, hip, knee, ankle, and the face.
+   Like a stick figure but very precise.
+   It's right about 70%+ of the time per joint.
+   Made by a company called Ultralytics. Free to use.
+
+2. MotionAGFormer  (inside models/AthletePose3D/)
+   -----------------------------------------------
+   YOLO gives us flat 2D dots (like a drawing on paper).
+   MotionAGFormer takes those flat dots and figures out the DEPTH —
+   so it knows not just WHERE your elbow is on screen,
+   but HOW FAR it is from the camera.
+   Like going from a flat drawing to a 3D sculpture.
+   It was trained specifically on athletes (12 sports).
+   It's 69% more accurate than generic models for sports movements.
+
+3. VolleyVision  (inside models/VolleyVision/)
+   ---------------------------------------------
+   A tool trained on 14,000 volleyball images.
+   It watches a video and says "that's a spike" or "that's a block."
+   It knows 5 actions: block, defense, serve, set, spike.
+   It's right 92% of the time. Very good.
+   Made by someone on GitHub (shukkkur). Free to use.
+
+4. Groq + Llama 3.3 70B  (used inside coach_feedback.py)
+   --------------------------------------------------------
+   This is the AI that writes the coaching advice in plain English.
+   Groq is a company that runs AI models very fast and for free.
+   Llama 3.3 is the actual AI brain — made by Meta (Facebook's parent company).
+   It's free, gives 14,400 requests per day.
+   This is the only part that needs the internet to work.
+   (We tried Google Gemini first but hit quota limits, then switched to Groq.)
+
+5. ByteTrack  (used inside player_tracker.py)
+   --------------------------------------------
+   Follows multiple people in a video at the same time.
+   Can track up to 12 players (6 vs 6 team video).
+   Gives each player a number and keeps that number on them
+   even when they move around or briefly go off screen.
+
+
+===========================================================
+HOW IT ALL WORKS — step by step
+===========================================================
+
+When you upload a video, here's what happens in order:
+
+STEP 1 — VIDEO QUALITY CHECK  (video_quality.py)
+   Before doing anything expensive, the computer checks:
+   - Is the video too blurry? (shaky camera = bad)
+   - Is it too dark or too bright?
+   - Is the resolution at least 480p?
+   - Is the video between 0.5 seconds and 5 minutes long?
+   - Is a person actually visible in the frame?
+   If any of these fail, it stops and tells you exactly what's wrong
+   and how to fix it. No wasted time on bad footage.
+
+STEP 2 — ACTION DETECTION  (action_detector.py)
+   VolleyVision scans the video and finds every moment where
+   a volleyball action happens (spike, serve, block, etc.)
+   It uses a sliding window of 5 frames — needs to see the same
+   action 3 times in a row before it counts it as real.
+   This stops it from getting confused by random movements.
+
+STEP 3 — CLIP EXTRACTION  (action_localiser.py)
+   Once it knows WHERE the spike (or serve, or block) happens,
+   it cuts out just that clip — a few seconds around the action.
+   This means the heavy analysis only runs on the relevant part,
+   not the whole video.
+
+STEP 4 — POSE EXTRACTION  (pose_extractor.py)
+   YOLO watches every frame of the clip and draws 17 dots on the player.
+   Output: a list of dot positions for every frame.
+   If the video is 60 frames, you get 60 sets of 17 dots.
+   This is called a "pose sequence."
+
+STEP 5 — 3D LIFTING  (pose_3d_lifter.py)
+   MotionAGFormer takes those flat 2D dots and adds depth.
+   It looks at 81 frames at a time (about 2.7 seconds at 30fps)
+   and figures out the 3D position of every joint.
+   Output: (frames × 17 joints × 3 coordinates) — a 3D skeleton over time.
+
+STEP 6 — BIOMECHANICS MEASUREMENT  (kinematics.py + pose_extractor.py)
+   Now we measure the actual body mechanics:
+   - Joint angles (how bent is your elbow? your knee?)
+   - Joint velocities (how fast is your arm moving?)
+   - A Butterworth filter smooths out the wobbly measurements
+     (like noise-cancelling headphones but for numbers)
+   
+   For a SPIKE specifically, it measures:
+   - arm_cock_angle: how far back your hitting arm pulls (like drawing a bow)
+   - jump_height: how high you get off the ground
+   - approach_speed: how fast your 3-step run-up is
+   - contact_point: where your hand meets the ball relative to your body
+   - follow_through: how fully your arm swings after hitting
+
+STEP 7 — PHASE DETECTION  (phase_detector.py)
+   The movement is split into phases:
+   Spike:  APPROACH → TAKEOFF → ARM_COCK → CONTACT → FOLLOW_THROUGH
+   Serve:  STANCE → TOSS → ARM_COCK → CONTACT → FOLLOW_THROUGH
+   Block:  READY → STEP → JUMP → REACH → LAND
+   Dig:    READY → MOVE → LOW_POSITION → CONTACT → RECOVERY
+   
+   This is important because we compare your CONTACT phase
+   to the elite's CONTACT phase — not just frame 1 to frame 1.
+   That's called phase-matching and it makes the comparison fair.
+
+STEP 8 — ELITE COMPARISON  (analyser.py + reference_library.py)
+   We have 47 processed videos of volleyball players at different levels.
+   The reference library loads all the elite ones and builds an average.
+   It normalises everything to 100 frames so a 400-frame video
+   and a 100-frame video can be compared fairly.
+   
+   Your measurements get compared to the elite average.
+   Each metric gets a verdict: GOOD or NEEDS IMPROVEMENT.
+   Overall verdict: ELITE (all good) / GOOD (60%+ good) / NEEDS WORK.
+
+STEP 9 — AI COACHING FEEDBACK  (coach_feedback.py)
+   The numbers go to the Groq AI (Llama 3.3).
+   For every problem found, the AI writes:
+   - What is actually happening in your body (1 sentence, plain English)
+   - What it should FEEL like when done correctly (sensation words)
+   - A specific drill with exact sets and reps
+   - Why that drill works
+   
+   The language adapts to your level:
+   - Beginner: "pull your elbow back like drawing a bow"
+   - Intermediate: "load your hips on the penultimate step"
+   - Advanced: "increase shoulder abduction angle at arm cocking phase"
+   
+   If the same problem shows up 3 sessions in a row,
+   the drill prescription escalates to something harder.
+
+STEP 10 — VIDEO RENDERING  (skeleton_overlay.py)
+   Two videos get made:
+   
+   Video 1 — Annotated Video:
+   Your original video with a skeleton drawn on you.
+   Green joints = doing well. Red joints = needs work.
+   A faint grey ghost skeleton shows where an elite athlete would be
+   at that exact same moment in the movement.
+   A panel on the right shows all your scores.
+   
+   Video 2 — Side-by-Side Comparison:
+   Left: your video with your skeleton.
+   Right: the elite skeleton animated next to yours.
+   Orange arrows show where YOUR joints are vs where they SHOULD be.
+   A banner shows which phase you're in.
+
+STEP 11 — PROGRESS TRACKING  (progress_tracker.py)
+   Every session gets saved to a file for that athlete.
+   Over time it tracks:
+   - Is each metric improving, declining, or stuck (plateau)?
+   - Are there injury risk patterns?
+     (e.g. landing_balance below 0.6 = unstable landing = knee injury risk)
+   - What's your best session ever?
+   
+   Injury risk flags trigger BEFORE you get hurt, not after.
+
+
+===========================================================
+THE API — the door to the whole system
+===========================================================
+
+api.py is the file that runs the web server.
+Think of it like a restaurant:
+- Your app or website = the customer
+- The API = the waiter
+- Our system = the kitchen
+
+The customer says "I want the side-by-side comparison for this spike video."
+The waiter (API) takes the video to the kitchen (our code).
+The kitchen analyses it and gives back the annotated video.
+The waiter delivers it back.
+
+HOW TO START IT:
+   Open a terminal and run:
+   cd C:\sportsai-backend
+   uvicorn api:app --reload --host 0.0.0.0 --port 8000
+
+   Then open your browser and go to:
+   http://localhost:8000/docs
+
+   You'll see a page with every available option.
+   Click any one, click "Try it out", upload a video, click Execute.
+
+THE FULL MENU (all 15+ things it can do):
+   POST /analyse/auto          → Full auto-detection, no hints needed (MAIN ONE TO USE)
+   POST /analyse/video         → Returns annotated MP4 with skeleton overlay
+   POST /analyse/compare       → Returns side-by-side vs elite MP4
+   POST /analyse/spike         → Biomechanics numbers for a spike
+   POST /analyse/serve         → Biomechanics numbers for a serve
+   POST /analyse/block         → Biomechanics numbers for a block
+   POST /analyse/dig           → Biomechanics numbers for a dig
+   POST /analyse/action        → What action is happening in the video?
+   POST /analyse/court         → Where is the court in the video?
+   POST /analyse/players       → Track all players with IDs
+   POST /analyse/ball          → Track the ball and detect rallies
+   POST /analyse/full          → Run EVERYTHING in one go
+   POST /check-video           → Check if video is good enough before analysing
+   POST /visualise/heatmap     → Court heatmap (where did players spend their time?)
+   POST /visualise/pose-chart  → Joint angle graph over time
+   POST /visualise/tracking    → Tracking video with all players labelled
+   POST /visualise/full        → All visualisations at once
+   GET  /progress/{id}/{tech}  → See how an athlete has improved over time
+
+
+===========================================================
+THE TRAINING DATA — what we collected
+===========================================================
+
+We downloaded 51 YouTube volleyball videos using batch_processor.py.
+The list of URLs is in: data/input/volleyball_urls.csv
+
+Of those 51 videos, 47 have been fully processed (for SPIKE only):
+- Elite level: Olympic/professional players
+- Advanced level: high-level club players
+- Intermediate level: college/recreational players
+
+For each processed video, two files get saved:
+- vb_spike_advanced_18_pose3d.npy     ← the 3D skeleton data (numbers)
+- vb_spike_advanced_18_biomechanics.json  ← the measurements (angles, speeds)
+
+The metadata.json file keeps a log of everything that's been processed.
+
+WHAT'S MISSING:
+- Serve data: URLs exist in the CSV but haven't been processed yet
+- Block data: same
+- Dig data: same
+So right now the system works best for SPIKES. The other techniques
+have the code ready but no training data to compare against yet.
+
+
+===========================================================
+THE CONFIG FILE — volleyball_techniques.json
+===========================================================
+
+This file (config/volleyball_techniques.json) defines what to measure
+for each of the 4 techniques. Think of it as the rulebook.
+
+For a spike it says: measure arm_cock_angle, jump_height, approach_speed,
+contact_point, and follow_through — and what units each one is in.
+
+For a dig it says: measure platform_angle, knee_bend, hip_drop,
+arm_extension, and recovery_position.
+
+This file is what you'd edit if you wanted to add a new metric
+or change what gets measured.
+
+
+===========================================================
+THE OTHER TXT FILES IN THIS FOLDER
+===========================================================
+
+all.txt
+   Technical architecture notes. Written for developers.
+   Covers: training strategy, data sources, GitHub repos to use,
+   how to expand to other sports, team video architecture gaps.
+   Read this if you want to understand the bigger plan.
+
+WHAT_WE_BUILT.txt
+   A previous plain-English summary similar to this one.
+   Written the night your cousin was working on it.
+   Good companion to this file — covers the feedback loop in more detail.
+
+cookies.txt / cookies.txt.txt
+   Used by the YouTube downloader to log in to YouTube
+   so it can download age-restricted or private videos.
+   You get this by exporting cookies from your browser.
+   If downloads are failing, this file might be expired.
+
+
+===========================================================
+WHAT'S STILL LEFT TO DO
+===========================================================
+
+1. Collect serve, block, and dig training data
+   Run batch_processor.py — it will download and process the remaining
+   URLs from volleyball_urls.csv automatically.
+
+2. Build a frontend (website or mobile app)
+   Right now the only interface is the /docs page in the browser.
+   A real app would let users upload videos from their phone.
+
+3. Jersey number recognition
+   So the system knows which player is which by their number,
+   not just by a tracking ID that resets every video.
+
+4. Formation detection
+   Knowing which rotation position (P1-P6) each player is in.
+
+5. Deploy to a real server
+   Right now it only runs on this laptop.
+   To make it work on the internet, it needs to be deployed to a cloud server.
+
+6. torchaudio
+   This is a Python library needed by some of the audio/video processing tools.
+   It may not be installed yet. To install it, run:
+   pip install torchaudio
+   (Make sure you're in the right Python environment first)
+
+
+===========================================================
+HOW TO CHECK IF EVERYTHING IS INSTALLED
+===========================================================
+
+Open a terminal and run:
+   cd C:\sportsai-backend
+   python -c "import torch; import ultralytics; import fastapi; print('Core OK')"
+
+If that prints "Core OK" — the main stuff is working.
+
+To check torchaudio specifically:
+   python -c "import torchaudio; print('torchaudio OK')"
+
+If it fails, install it:
+   pip install torchaudio
+
+To start the server:
+   uvicorn api:app --reload --host 0.0.0.0 --port 8000
+
+Then go to: http://localhost:8000/docs
+
+
+===========================================================
+QUICK SUMMARY — what this project is in one paragraph
+===========================================================
+
+We built an AI volleyball coach that runs on your laptop.
+You upload a video of someone playing volleyball.
+The computer draws a skeleton on them, measures how their body moves,
+compares it to Olympic-level athletes, and tells them exactly what to fix —
+with plain-English advice, a specific drill, and a side-by-side video
+showing them next to the correct movement.
+It works for spikes right now (47 training videos collected).
+Serve, block, and dig code is ready but needs training data collected.
+The whole thing runs through a web API at http://localhost:8000/docs.
+The only thing that needs the internet is the AI coaching text (Groq/Llama).
+

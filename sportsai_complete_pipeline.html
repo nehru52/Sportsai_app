@@ -1,0 +1,1685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SportsAI — Complete Technical Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --bg2: #111118;
+  --bg3: #16161f;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #e8e8f0;
+  --muted: #888899;
+  --dim: #555566;
+  --accent: #7c6cfc;
+  --accent2: #4ecdc4;
+  --accent3: #ff6b6b;
+  --accent4: #ffd93d;
+  --green: #6bcb77;
+  --mono: 'DM Mono', monospace;
+  --head: 'Syne', sans-serif;
+  --body: 'DM Sans', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  font-weight: 300;
+  line-height: 1.7;
+  font-size: 15px;
+}
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; width: 240px; height: 100vh;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  overflow-y: auto; padding: 32px 0;
+  z-index: 100;
+}
+nav .logo {
+  font-family: var(--head); font-size: 18px; font-weight: 800;
+  color: var(--text); padding: 0 24px 28px;
+  border-bottom: 1px solid var(--border);
+  letter-spacing: -0.5px;
+}
+nav .logo span { color: var(--accent); }
+nav ul { list-style: none; padding: 20px 0; }
+nav ul li { padding: 0; }
+nav ul li a {
+  display: block; padding: 8px 24px;
+  color: var(--muted); text-decoration: none;
+  font-size: 12px; font-family: var(--mono);
+  transition: all 0.15s; border-left: 2px solid transparent;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+nav ul li a:hover, nav ul li a.active {
+  color: var(--text); border-left-color: var(--accent);
+  background: rgba(124,108,252,0.08);
+}
+nav .section-label {
+  font-size: 9px; font-family: var(--mono); text-transform: uppercase;
+  letter-spacing: 2px; color: var(--dim); padding: 16px 24px 4px;
+}
+
+/* MAIN */
+main {
+  margin-left: 240px; padding: 0;
+  min-height: 100vh;
+}
+
+/* SECTIONS */
+section {
+  padding: 80px 60px; border-bottom: 1px solid var(--border);
+  max-width: 900px;
+}
+
+section h2 {
+  font-family: var(--head); font-size: 32px; font-weight: 800;
+  letter-spacing: -1px; line-height: 1.15; margin-bottom: 8px;
+  color: var(--text);
+}
+section .section-num {
+  font-family: var(--mono); font-size: 11px; color: var(--accent);
+  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px;
+  display: block;
+}
+section .lead {
+  font-size: 16px; color: var(--muted); margin-bottom: 40px;
+  line-height: 1.6; max-width: 680px; font-weight: 400;
+  border-left: 2px solid var(--accent); padding-left: 16px;
+}
+
+/* HERO */
+#hero {
+  padding: 100px 60px 80px;
+  background: linear-gradient(160deg, #0a0a0f 0%, #0f0e1a 100%);
+  position: relative; overflow: hidden; max-width: none;
+}
+#hero::before {
+  content: '';
+  position: absolute; top: -200px; right: -200px;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(124,108,252,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+#hero .tag {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--accent);
+  background: rgba(124,108,252,0.12); border: 1px solid rgba(124,108,252,0.25);
+  padding: 5px 12px; border-radius: 20px; display: inline-block; margin-bottom: 24px;
+}
+#hero h1 {
+  font-family: var(--head); font-size: 52px; font-weight: 800;
+  letter-spacing: -2px; line-height: 1.05; max-width: 700px;
+  margin-bottom: 20px;
+}
+#hero h1 span { color: var(--accent); }
+#hero p {
+  font-size: 17px; color: var(--muted); max-width: 560px;
+  line-height: 1.65; margin-bottom: 40px;
+}
+.phase-badges { display: flex; gap: 10px; flex-wrap: wrap; }
+.phase-badge {
+  font-family: var(--mono); font-size: 11px; padding: 6px 14px;
+  border-radius: 20px; border: 1px solid var(--border2);
+  color: var(--muted);
+}
+.phase-badge.p1 { border-color: rgba(107,203,119,0.4); color: var(--green); background: rgba(107,203,119,0.06); }
+.phase-badge.p2 { border-color: rgba(78,205,196,0.4); color: var(--accent2); background: rgba(78,205,196,0.06); }
+.phase-badge.p3 { border-color: rgba(124,108,252,0.4); color: var(--accent); background: rgba(124,108,252,0.06); }
+
+/* CARDS */
+.card {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 12px; padding: 24px; margin-bottom: 16px;
+}
+.card.accent { border-left: 3px solid var(--accent); }
+.card.green { border-left: 3px solid var(--green); }
+.card.warn { border-left: 3px solid var(--accent4); }
+.card.danger { border-left: 3px solid var(--accent3); }
+.card.teal { border-left: 3px solid var(--accent2); }
+.card h3 {
+  font-family: var(--head); font-size: 16px; font-weight: 700;
+  color: var(--text); margin-bottom: 8px; letter-spacing: -0.3px;
+}
+.card h4 {
+  font-family: var(--mono); font-size: 11px; color: var(--accent);
+  text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px;
+}
+.card p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+.card .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+.tag-sm {
+  font-family: var(--mono); font-size: 10px; padding: 3px 8px;
+  border-radius: 4px; background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border); color: var(--muted);
+}
+.tag-sm.free { background: rgba(107,203,119,0.1); border-color: rgba(107,203,119,0.3); color: var(--green); }
+.tag-sm.build { background: rgba(255,217,61,0.1); border-color: rgba(255,217,61,0.3); color: var(--accent4); }
+.tag-sm.buy { background: rgba(78,205,196,0.1); border-color: rgba(78,205,196,0.3); color: var(--accent2); }
+.tag-sm.moat { background: rgba(124,108,252,0.1); border-color: rgba(124,108,252,0.3); color: var(--accent); }
+
+/* CODE BLOCKS */
+pre {
+  background: #0d0d14; border: 1px solid var(--border);
+  border-radius: 8px; padding: 20px 24px; margin: 16px 0;
+  overflow-x: auto; font-family: var(--mono); font-size: 12px;
+  line-height: 1.7; color: #c8c8e0;
+}
+pre .comment { color: #445; }
+pre .keyword { color: var(--accent); }
+pre .string { color: var(--green); }
+pre .num { color: var(--accent4); }
+pre .func { color: var(--accent2); }
+.code-label {
+  font-family: var(--mono); font-size: 10px; color: var(--dim);
+  text-transform: uppercase; letter-spacing: 1.5px;
+  padding: 8px 24px; background: #0d0d14;
+  border: 1px solid var(--border); border-bottom: none;
+  border-radius: 8px 8px 0 0; display: block; margin-top: 16px;
+}
+.code-label + pre { border-radius: 0 0 8px 8px; margin-top: 0; }
+
+/* PIPELINE STEPS */
+.pipeline {
+  position: relative; padding-left: 32px; margin: 24px 0;
+}
+.pipeline::before {
+  content: ''; position: absolute; left: 12px; top: 8px; bottom: 8px;
+  width: 1px; background: linear-gradient(to bottom, var(--accent), var(--accent2), transparent);
+}
+.pipe-step { position: relative; margin-bottom: 28px; }
+.pipe-step::before {
+  content: attr(data-n);
+  position: absolute; left: -38px; top: 2px;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--accent); color: white;
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid var(--bg);
+}
+.pipe-step h3 {
+  font-family: var(--head); font-size: 15px; font-weight: 700;
+  color: var(--text); margin-bottom: 6px;
+}
+.pipe-step p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.pipe-step .tech-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+
+/* TABLES */
+table {
+  width: 100%; border-collapse: collapse; margin: 20px 0;
+  font-size: 13px;
+}
+th {
+  font-family: var(--mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 1.5px; color: var(--dim); padding: 8px 16px;
+  text-align: left; border-bottom: 1px solid var(--border);
+}
+td {
+  padding: 10px 16px; border-bottom: 1px solid var(--border);
+  color: var(--muted); vertical-align: top;
+}
+td:first-child { color: var(--text); font-family: var(--mono); font-size: 12px; }
+tr:last-child td { border-bottom: none; }
+
+/* TWO COLUMN */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+@media(max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+/* METRICS ROW */
+.metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 24px 0; }
+@media(max-width: 700px) { .metrics { grid-template-columns: 1fr 1fr; } }
+.metric {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px;
+}
+.metric .label { font-family: var(--mono); font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.metric .val { font-family: var(--head); font-size: 22px; font-weight: 700; color: var(--text); }
+.metric .sub { font-size: 11px; color: var(--dim); margin-top: 2px; }
+
+/* PHASE HEADER */
+.phase-header {
+  display: flex; align-items: center; gap: 16px; margin-bottom: 32px;
+  padding: 20px 24px; background: var(--bg3); border-radius: 12px;
+  border: 1px solid var(--border);
+}
+.phase-number {
+  font-family: var(--head); font-size: 48px; font-weight: 800;
+  color: var(--border2); line-height: 1;
+}
+.phase-header h2 { font-size: 22px; margin-bottom: 4px; }
+.phase-header .timeline {
+  font-family: var(--mono); font-size: 11px; color: var(--accent);
+}
+
+/* CALLOUT */
+.callout {
+  background: rgba(124,108,252,0.08); border: 1px solid rgba(124,108,252,0.2);
+  border-radius: 10px; padding: 16px 20px; margin: 20px 0;
+  font-size: 13px; color: var(--muted); line-height: 1.6;
+}
+.callout strong { color: var(--accent); font-weight: 500; }
+.callout.green { background: rgba(107,203,119,0.06); border-color: rgba(107,203,119,0.2); }
+.callout.green strong { color: var(--green); }
+.callout.warn { background: rgba(255,217,61,0.06); border-color: rgba(255,217,61,0.2); }
+.callout.warn strong { color: var(--accent4); }
+.callout.danger { background: rgba(255,107,107,0.06); border-color: rgba(255,107,107,0.2); }
+.callout.danger strong { color: var(--accent3); }
+
+/* ARCH DIAGRAM */
+.arch {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 12px; padding: 28px; margin: 24px 0;
+  font-family: var(--mono); font-size: 12px;
+}
+.arch-row {
+  display: flex; align-items: stretch; gap: 4px; margin-bottom: 4px;
+}
+.arch-box {
+  flex: 1; background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+  border-radius: 6px; padding: 12px; text-align: center;
+  color: var(--muted); font-size: 11px; line-height: 1.4;
+}
+.arch-box.hi { background: rgba(124,108,252,0.1); border-color: rgba(124,108,252,0.3); color: var(--accent); }
+.arch-box.mid { background: rgba(78,205,196,0.08); border-color: rgba(78,205,196,0.25); color: var(--accent2); }
+.arch-box.lo { background: rgba(107,203,119,0.08); border-color: rgba(107,203,119,0.25); color: var(--green); }
+.arch-box small { display: block; font-size: 9px; opacity: 0.6; margin-top: 3px; }
+.arch-arrow { display: flex; align-items: center; justify-content: center; color: var(--dim); font-size: 16px; padding: 2px; }
+.arch-label {
+  font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px;
+  color: var(--dim); text-align: right; margin-bottom: 6px;
+}
+
+/* SCROLLSPY */
+.active-link { color: var(--text) !important; border-left-color: var(--accent) !important; background: rgba(124,108,252,0.08) !important; }
+
+/* DIVIDER */
+.divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+h4.subsec {
+  font-family: var(--mono); font-size: 11px; text-transform: uppercase;
+  letter-spacing: 1.5px; color: var(--accent2); margin: 28px 0 14px;
+}
+
+p { margin-bottom: 12px; font-size: 14px; color: var(--muted); line-height: 1.7; }
+ul, ol { padding-left: 20px; margin-bottom: 12px; }
+li { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 4px; }
+li strong { color: var(--text); font-weight: 500; }
+
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Sports<span>AI</span></div>
+  <ul>
+    <div class="section-label">Overview</div>
+    <li><a href="#hero">Introduction</a></li>
+    <li><a href="#architecture">System Architecture</a></li>
+
+    <div class="section-label">Phase 1 — Prototype</div>
+    <li><a href="#p1-data">Data Collection</a></li>
+    <li><a href="#p1-ai">AI Pipeline Setup</a></li>
+    <li><a href="#p1-backend">Backend Stack</a></li>
+    <li><a href="#p1-app">Mobile App</a></li>
+    <li><a href="#p1-annotation">Annotation Player ★</a></li>
+    <li><a href="#p1-mvp">MVP Demo Flow</a></li>
+
+    <div class="section-label">Phase 2 — Funding</div>
+    <li><a href="#p2-value">Real Value Layer</a></li>
+    <li><a href="#p2-coaching">Coach Knowledge Engine</a></li>
+    <li><a href="#p2-marketplace">Marketplace Backend</a></li>
+    <li><a href="#p2-metrics">Traction Metrics</a></li>
+
+    <div class="section-label">Phase 3 — Olympic</div>
+    <li><a href="#p3-data">Elite Data Strategy</a></li>
+    <li><a href="#p3-realtime">Real-Time Streaming ★</a></li>
+    <li><a href="#p3-biomech">Biomechanics Engine</a></li>
+    <li><a href="#p3-infra">Production Infrastructure</a></li>
+    <li><a href="#p3-integrations">Pro Team Integrations</a></li>
+
+    <div class="section-label">Reference</div>
+    <li><a href="#costs">Full Cost Breakdown</a></li>
+    <li><a href="#timeline">Build Timeline</a></li>
+  </ul>
+</nav>
+
+<main>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="tag">Technical Blueprint v1.1 — Updated from peer review</div>
+  <h1>The Complete<br><span>SportsAI</span> Pipeline</h1>
+  <p>From raw data collection to Olympic-level athlete analysis. Every tool, every decision, every line of architecture — in order.</p>
+  <div class="phase-badges">
+    <span class="phase-badge p1">Phase 1 — Prototype (months 1–3)</span>
+    <span class="phase-badge p2">Phase 2 — Fundable product (months 4–9)</span>
+    <span class="phase-badge p3">Phase 3 — Elite / Olympic (months 10–24)</span>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section id="architecture">
+  <span class="section-num">00 — System Architecture</span>
+  <h2>The Full Stack Map</h2>
+  <p class="lead">Before anything else — understand how all four AI layers connect to the product layers. Print this. Every technical decision flows from it.</p>
+
+  <div class="arch">
+    <div class="arch-label">USER LAYER</div>
+    <div class="arch-row">
+      <div class="arch-box">Athlete Mobile App<small>React Native / Expo</small></div>
+      <div class="arch-box">Coach Web Dashboard<small>Next.js</small></div>
+      <div class="arch-box">Admin / Analytics<small>Next.js + Supabase</small></div>
+    </div>
+
+    <div class="arch-arrow">↕</div>
+
+    <div class="arch-label">API LAYER</div>
+    <div class="arch-row">
+      <div class="arch-box hi">API Gateway<small>Node.js / Express on Railway</small></div>
+      <div class="arch-box">Auth<small>Supabase Auth</small></div>
+      <div class="arch-box">Payments<small>Stripe Connect</small></div>
+    </div>
+
+    <div class="arch-arrow">↕</div>
+
+    <div class="arch-label">AI LAYER (4 sub-layers)</div>
+    <div class="arch-row">
+      <div class="arch-box lo">L1: Pose Detection<small>YOLO11-Pose / MediaPipe</small></div>
+      <div class="arch-box lo">L2: Sport Fine-tune<small>AthletePose3D + custom data</small></div>
+      <div class="arch-box mid">L3: Rules Engine<small>YOUR MOAT — Python service</small></div>
+      <div class="arch-box hi">L4: Feedback LLM<small>Claude API</small></div>
+    </div>
+
+    <div class="arch-arrow">↕</div>
+
+    <div class="arch-label">STORAGE LAYER</div>
+    <div class="arch-row">
+      <div class="arch-box">Video Storage<small>Cloudflare R2 + Stream</small></div>
+      <div class="arch-box">Database<small>Supabase (Postgres)</small></div>
+      <div class="arch-box">Pose Data Store<small>Supabase / Redis cache</small></div>
+      <div class="arch-box">Moderation<small>AWS Rekognition</small></div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Golden rule:</strong> Layers 1 and 2 are commodity infrastructure — use existing tools. Layer 3 is your competitive moat — build it yourself with coaches. Layer 4 is an API call — do not train your own LLM.
+  </div>
+</section>
+
+<!-- PHASE 1: DATA COLLECTION -->
+<section id="p1-data">
+  <span class="section-num">01 — Phase 1 / Data Collection</span>
+  <h2>Raw Data Collection</h2>
+  <p class="lead">Your data strategy before you write a single line of app code. This runs in parallel with development from week 1.</p>
+
+  <div class="phase-header">
+    <div class="phase-number">1</div>
+    <div>
+      <h2>Starting dataset: one sport, one subset of techniques</h2>
+      <div class="timeline">Weeks 1–8 · Target: 800–1,200 labeled clips · Budget: $3,000–8,000</div>
+    </div>
+  </div>
+
+  <h4 class="subsec">Step 1 — Download AthletePose3D (free, do this today)</h4>
+  <p>Published at CVPR 2025 by researchers specifically solving the gap between generic pose models and real athletic motion. 1.3 million frames, 12 sports, multiple camera angles, 3D ground truth from motion capture.</p>
+  <pre><span class="comment"># Clone and set up AthletePose3D</span>
+git clone https://github.com/calvinyeungck/AthletePose3D
+cd AthletePose3D
+pip install -r requirements.txt
+
+<span class="comment"># Download the pre-trained fine-tuned checkpoint</span>
+<span class="comment"># (reduces your fine-tuning time by 60%+)</span>
+python download_checkpoints.py --sport all</pre>
+
+  <div class="callout green">
+    <strong>What this gets you:</strong> A pose model already fine-tuned on athletic movement. Your error drops from ~214mm (generic model) to ~65mm immediately, before you collect a single frame of your own data.
+  </div>
+
+  <h4 class="subsec">Step 2 — Collect pro/Olympic footage (legally)</h4>
+  <div class="card warn">
+    <h4>Legal method — extract skeletons, not frames</h4>
+    <h3>The Copyright-Safe Pro Data Strategy</h3>
+    <p>You cannot store copyrighted broadcast frames. But pose coordinates extracted from those frames are not copyrightable — they are mathematical measurements of human body position. This is how every research lab does it.</p>
+    <div class="tag-row">
+      <span class="tag-sm free">✓ Legal</span>
+      <span class="tag-sm">Store: JSON coordinates only</span>
+      <span class="tag-sm">Delete: source video after extraction</span>
+    </div>
+  </div>
+
+  <pre><span class="comment"># skeleton_extractor.py — run on any video, store only the data</span>
+<span class="keyword">import</span> cv2, json
+<span class="keyword">from</span> ultralytics <span class="keyword">import</span> YOLO
+
+model = YOLO(<span class="string">'yolo11x-pose.pt'</span>)  <span class="comment"># fine-tuned checkpoint</span>
+
+<span class="keyword">def</span> <span class="func">extract_skeleton_sequence</span>(video_path, athlete_id, technique_label, skill_level):
+    cap = cv2.VideoCapture(video_path)
+    frames = []
+    frame_idx = <span class="num">0</span>
+    
+    <span class="keyword">while</span> cap.isOpened():
+        ret, frame = cap.read()
+        <span class="keyword">if not</span> ret: <span class="keyword">break</span>
+        
+        results = model(frame, verbose=<span class="num">False</span>)
+        
+        <span class="keyword">if</span> results[<span class="num">0</span>].keypoints <span class="keyword">is not None</span>:
+            kpts = results[<span class="num">0</span>].keypoints.xyn[<span class="num">0</span>].tolist()
+            conf = results[<span class="num">0</span>].keypoints.conf[<span class="num">0</span>].tolist()
+            
+            frames.append({
+                <span class="string">"frame"</span>: frame_idx,
+                <span class="string">"timestamp_ms"</span>: cap.get(cv2.CAP_PROP_POS_MSEC),
+                <span class="string">"keypoints"</span>: kpts,      <span class="comment"># normalized x,y per joint</span>
+                <span class="string">"confidence"</span>: conf,    <span class="comment"># per-joint confidence</span>
+                <span class="string">"fps"</span>: cap.get(cv2.CAP_PROP_FPS)
+            })
+        frame_idx += <span class="num">1</span>
+    
+    cap.release()
+    
+    <span class="comment"># Store only the skeleton data — not the video</span>
+    <span class="keyword">return</span> {
+        <span class="string">"athlete_id"</span>: athlete_id,
+        <span class="string">"technique"</span>: technique_label,
+        <span class="string">"skill_level"</span>: skill_level,  <span class="comment"># "elite", "advanced", "intermediate", "beginner"</span>
+        <span class="string">"frames"</span>: frames,
+        <span class="string">"source"</span>: <span class="string">"extracted"</span>     <span class="comment"># never store original video path</span>
+    }</pre>
+
+  <h4 class="subsec">Step 3 — Film your own labeled dataset with coaches</h4>
+  <p>This is the most valuable work you will do in Phase 1. Partner with 3–5 coaches. Film athletes at 3 skill levels executing each technique. Label every clip while filming — not after.</p>
+
+  <div class="two-col">
+    <div class="card green">
+      <h4>What to film</h4>
+      <h3>Wrestling (start here)</h3>
+      <p>Single-leg shot · Double-leg shot · Sprawl defense · High-crotch · Fireman's carry · Stand-up escape. Film from: front-angle, side-angle, 45° angle. Minimum 15 clips per technique per skill level = 270 clips minimum.</p>
+    </div>
+    <div class="card green">
+      <h4>Labeling protocol</h4>
+      <h3>Coach Annotation Schema</h3>
+      <p>Each clip gets: overall score 1–10, phase breakdown (entry/execution/finish), specific error flags (head_down, hips_too_high, no_level_change, etc.), and one coaching cue text. Coach narrates while reviewing.</p>
+    </div>
+  </div>
+
+  <h4 class="subsec">Step 4 — Use Roboflow for annotation management</h4>
+  <pre><span class="comment"># Roboflow handles labeling, versioning, augmentation</span>
+pip install roboflow
+
+<span class="keyword">from</span> roboflow <span class="keyword">import</span> Roboflow
+rf = Roboflow(api_key=<span class="string">"YOUR_KEY"</span>)
+project = rf.workspace().project(<span class="string">"wrestling-technique-classifier"</span>)
+
+<span class="comment"># Upload your extracted skeleton sequences + labels</span>
+<span class="comment"># Roboflow augments your dataset (flip, rotate, noise)</span>
+<span class="comment"># Multiplies your 800 clips into 3,000+ training samples</span>
+project.upload(<span class="string">"./labeled_clips/"</span>)</pre>
+</section>
+
+<!-- PHASE 1: AI PIPELINE -->
+<section id="p1-ai">
+  <span class="section-num">02 — Phase 1 / AI Pipeline</span>
+  <h2>Building the AI Pipeline</h2>
+  <p class="lead">Four layers. Only Layer 3 requires original work. Here is the exact implementation for each.</p>
+
+  <h4 class="subsec">Layer 1 — Pose Detection (free, existing)</h4>
+  <div class="card">
+    <h4>Tech choice</h4>
+    <h3>YOLO11-Pose for server-side · MediaPipe for on-device</h3>
+    <p>Use YOLO11x-Pose (fine-tuned on AthletePose3D) for server-side analysis — higher accuracy, runs on GPU. Use MediaPipe BlazePose for real-time on-device preview only — lower accuracy but instant feedback. Never claim on-device accuracy equals server accuracy.</p>
+    <div class="tag-row">
+      <span class="tag-sm free">YOLO11-Pose: free (Ultralytics)</span>
+      <span class="tag-sm free">MediaPipe: free (Google)</span>
+      <span class="tag-sm">Server: GPU required</span>
+    </div>
+  </div>
+
+  <pre><span class="comment"># pose_service.py — Python microservice, runs on GPU instance</span>
+<span class="keyword">from</span> ultralytics <span class="keyword">import</span> YOLO
+<span class="keyword">from</span> fastapi <span class="keyword">import</span> FastAPI
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+app = FastAPI()
+model = YOLO(<span class="string">'./checkpoints/yolo11x-pose-athletepose3d.pt'</span>)
+
+<span class="keyword">@app.post</span>(<span class="string">"/analyze"</span>)
+<span class="keyword">async def</span> <span class="func">analyze_video</span>(video_url: str, sport: str):
+    <span class="comment"># Download from Cloudflare R2</span>
+    frames = download_and_sample_frames(video_url, fps=<span class="num">30</span>)
+    
+    pose_sequence = []
+    <span class="keyword">for</span> frame_data <span class="keyword">in</span> frames:
+        results = model(frame_data[<span class="string">'frame'</span>], verbose=<span class="num">False</span>)
+        
+        <span class="comment"># Filter low-confidence frames — critical for combat sports</span>
+        conf_scores = results[<span class="num">0</span>].keypoints.conf[<span class="num">0</span>]
+        <span class="keyword">if</span> conf_scores.mean() < <span class="num">0.7</span>:
+            <span class="keyword">continue</span>  <span class="comment"># discard occlusion frames</span>
+        
+        pose_sequence.append(extract_biomechanics(results, frame_data))
+    
+    <span class="comment"># Pass to Layer 3 rules engine</span>
+    <span class="keyword">return</span> rules_engine.assess(pose_sequence, sport)
+
+<span class="keyword">def</span> <span class="func">extract_biomechanics</span>(results, frame_data):
+    kpts = results[<span class="num">0</span>].keypoints.xyn[<span class="num">0</span>].numpy()
+    <span class="keyword">return</span> {
+        <span class="string">"timestamp"</span>: frame_data[<span class="string">'ts'</span>],
+        <span class="string">"joints"</span>: {
+            <span class="string">"hip_angle"</span>: <span class="func">calc_angle</span>(kpts[<span class="num">11</span>], kpts[<span class="num">23</span>], kpts[<span class="num">25</span>]),
+            <span class="string">"knee_angle"</span>: <span class="func">calc_angle</span>(kpts[<span class="num">23</span>], kpts[<span class="num">25</span>], kpts[<span class="num">27</span>]),
+            <span class="string">"spine_angle"</span>: <span class="func">calc_angle</span>(kpts[<span class="num">5</span>], kpts[<span class="num">11</span>], kpts[<span class="num">23</span>]),
+            <span class="string">"head_height_norm"</span>: kpts[<span class="num">0</span>][<span class="num">1</span>],  <span class="comment"># normalized y</span>
+            <span class="string">"hip_height_norm"</span>: kpts[<span class="num">23</span>][<span class="num">1</span>],
+            <span class="string">"shoulder_width"</span>: abs(kpts[<span class="num">5</span>][<span class="num">0</span>] - kpts[<span class="num">6</span>][<span class="num">0</span>]),
+        },
+        <span class="string">"velocity"</span>: <span class="func">calc_velocity</span>(kpts, frame_data[<span class="string">'prev_kpts'</span>])
+    }</pre>
+
+  <h4 class="subsec">Layer 3 — Rules Engine (your moat, build this first)</h4>
+  <p>This is the single most important file in your codebase. Every threshold comes from your coaches and your elite athlete data. This is not ML — it is structured biomechanical knowledge.</p>
+
+  <div class="callout warn">
+    <strong>Phase 1 vs Phase 3 architecture — read this:</strong> This threshold-based rules engine is intentional scaffolding for Phase 1. A peer review correctly noted that hard-coded thresholds eventually fail across different body types (tall vs. stocky wrestlers) and as technique evolves across eras. The correct long-term architecture is a learned distribution model trained on 1,000+ elite sequences. <strong>But you cannot build that model without the data — and you don't have the data yet.</strong> The migration path: (1) Ship this threshold engine now. (2) Collect 500+ labeled sequences over Phase 1–2 using the coach divergence tracking table. (3) Replace Layer 3 with the <code>AdaptiveRulesEngine</code> in Phase 2 once you have the training data. The two are sequential, not competing.
+  </div>
+
+  <pre><span class="comment"># rules_engine/wrestling.py</span>
+<span class="comment"># Every threshold validated against AthletePose3D elite data + coach review</span>
+
+WRESTLING_RULES = {
+    <span class="string">"single_leg_shot"</span>: {
+        <span class="string">"entry_phase"</span>: {
+            <span class="string">"level_change"</span>: {
+                <span class="string">"metric"</span>: <span class="string">"hip_height_norm"</span>,
+                <span class="string">"elite_range"</span>: [<span class="num">0.55</span>, <span class="num">0.70</span>],   <span class="comment"># from pro data extraction</span>
+                <span class="string">"error_if_above"</span>: <span class="num">0.70</span>,
+                <span class="string">"severity"</span>: <span class="string">"high"</span>,
+                <span class="string">"cue"</span>: <span class="string">"Drop your level — hips should be near knee height on the step-in"</span>,
+                <span class="string">"visual_timestamp"</span>: <span class="string">"entry"</span>
+            },
+            <span class="string">"head_position"</span>: {
+                <span class="string">"metric"</span>: <span class="string">"head_angle"</span>,
+                <span class="string">"elite_range"</span>: [<span class="num">160</span>, <span class="num">180</span>],
+                <span class="string">"error_if_below"</span>: <span class="num">150</span>,
+                <span class="string">"severity"</span>: <span class="string">"medium"</span>,
+                <span class="string">"cue"</span>: <span class="string">"Head up — eyes on the opponent's chest"</span>,
+                <span class="string">"visual_timestamp"</span>: <span class="string">"entry"</span>
+            },
+        },
+        <span class="string">"execution_phase"</span>: {
+            <span class="string">"knee_drive"</span>: {
+                <span class="string">"metric"</span>: <span class="string">"knee_velocity_forward"</span>,
+                <span class="string">"elite_range"</span>: [<span class="num">0.8</span>, <span class="num">2.5</span>],   <span class="comment"># normalized velocity units</span>
+                <span class="string">"error_if_below"</span>: <span class="num">0.8</span>,
+                <span class="string">"severity"</span>: <span class="string">"high"</span>,
+                <span class="string">"cue"</span>: <span class="string">"Drive through — your penetration step needs more explosive force"</span>,
+                <span class="string">"visual_timestamp"</span>: <span class="string">"contact"</span>
+            },
+        }
+    },
+    <span class="string">"double_leg"</span>: { ... },
+    <span class="string">"sprawl"</span>: { ... }
+}
+
+<span class="keyword">def</span> <span class="func">assess_technique</span>(pose_sequence, technique_name):
+    rules = WRESTLING_RULES[technique_name]
+    errors = []
+    score = <span class="num">100</span>
+    
+    phases = detect_technique_phases(pose_sequence)
+    
+    <span class="keyword">for</span> phase_name, phase_rules <span class="keyword">in</span> rules.items():
+        phase_frames = phases.get(phase_name, [])
+        <span class="keyword">if not</span> phase_frames: <span class="keyword">continue</span>
+        
+        avg_metrics = average_phase_metrics(phase_frames)
+        
+        <span class="keyword">for</span> rule_name, rule <span class="keyword">in</span> phase_rules.items():
+            value = avg_metrics.get(rule[<span class="string">'metric'</span>])
+            <span class="keyword">if</span> value <span class="keyword">is None</span>: <span class="keyword">continue</span>
+            
+            error_triggered = <span class="num">False</span>
+            <span class="keyword">if</span> <span class="string">'error_if_above'</span> <span class="keyword">in</span> rule <span class="keyword">and</span> value > rule[<span class="string">'error_if_above'</span>]:
+                error_triggered = <span class="num">True</span>
+            <span class="keyword">if</span> <span class="string">'error_if_below'</span> <span class="keyword">in</span> rule <span class="keyword">and</span> value < rule[<span class="string">'error_if_below'</span>]:
+                error_triggered = <span class="num">True</span>
+            
+            <span class="keyword">if</span> error_triggered:
+                severity_deduction = {<span class="string">"high"</span>: <span class="num">20</span>, <span class="string">"medium"</span>: <span class="num">10</span>, <span class="string">"low"</span>: <span class="num">5</span>}
+                score -= severity_deduction[rule[<span class="string">'severity'</span>]]
+                errors.append({
+                    <span class="string">"phase"</span>: phase_name,
+                    <span class="string">"rule"</span>: rule_name,
+                    <span class="string">"severity"</span>: rule[<span class="string">'severity'</span>],
+                    <span class="string">"measured_value"</span>: <span class="keyword">round</span>(value, <span class="num">2</span>),
+                    <span class="string">"elite_range"</span>: rule[<span class="string">'elite_range'</span>],
+                    <span class="string">"cue"</span>: rule[<span class="string">'cue'</span>],
+                    <span class="string">"jump_to_timestamp"</span>: rule[<span class="string">'visual_timestamp'</span>]
+                })
+    
+    <span class="keyword">return</span> {<span class="string">"score"</span>: <span class="keyword">max</span>(<span class="num">0</span>, score), <span class="string">"errors"</span>: errors, <span class="string">"technique"</span>: technique_name}</pre>
+
+  <h4 class="subsec">Layer 3b — Adaptive Rules Engine (Phase 2 migration target)</h4>
+  <p>Once you have 500+ labeled sequences from the coach divergence loop, migrate Layer 3 to this architecture. It learns the elite distribution from data instead of relying on fixed thresholds — handling body-type variation and technique evolution automatically.</p>
+
+  <pre><span class="comment"># rules_engine/adaptive.py — Phase 2 replacement for threshold engine</span>
+<span class="comment"># Requirements: 500+ labeled elite sequences per technique before training</span>
+
+<span class="keyword">from</span> sklearn.mixture <span class="keyword">import</span> GaussianMixture
+<span class="keyword">from</span> sklearn.ensemble <span class="keyword">import</span> IsolationForest
+<span class="keyword">import</span> joblib, numpy <span class="keyword">as</span> np
+
+<span class="keyword">class</span> <span class="func">AdaptiveRulesEngine</span>:
+    <span class="string">"""
+    Replaces hard-coded thresholds with a learned elite distribution.
+    Train when you have 500+ labeled elite sequences per technique.
+    Until then, use the threshold-based rules_engine/wrestling.py.
+    """</span>
+    <span class="keyword">def</span> <span class="func">__init__</span>(self, sport: str, technique: str):
+        self.sport = sport
+        self.technique = technique
+        <span class="comment"># Gaussian Mixture Model fitted on elite athlete sequences</span>
+        self.elite_gmm = joblib.load(f<span class="string">'models/{sport}_{technique}_gmm.pkl'</span>)
+        <span class="comment"># Isolation Forest for anomaly detection (catches novel errors)</span>
+        self.anomaly_detector = joblib.load(f<span class="string">'models/{sport}_{technique}_iso.pkl'</span>)
+
+    <span class="keyword">def</span> <span class="func">assess</span>(self, pose_sequence):
+        features = self._extract_features(pose_sequence)
+
+        <span class="comment"># Similarity to elite distribution (replaces hard threshold)</span>
+        log_likelihood = self.elite_gmm.score_samples([features])[<span class="num">0</span>]
+        similarity_score = self._normalize_score(log_likelihood)
+
+        <span class="comment"># Detect anomalous movement patterns (catches errors your rules missed)</span>
+        anomaly_score = self.anomaly_detector.decision_function([features])[<span class="num">0</span>]
+        errors = self._classify_errors(features, anomaly_score)
+
+        <span class="keyword">return</span> {
+            <span class="string">'score'</span>: similarity_score,
+            <span class="string">'percentile'</span>: self._percentile(similarity_score),
+            <span class="string">'errors'</span>: errors,
+            <span class="string">'confidence'</span>: min(<span class="num">1.0</span>, len(self.training_sequences) / <span class="num">1000</span>)
+        }
+
+<span class="comment"># Training script — run once you hit 500+ labeled sequences</span>
+<span class="keyword">def</span> <span class="func">train_adaptive_engine</span>(sport, technique, labeled_sequences):
+    features = [extract_features(seq) <span class="keyword">for</span> seq <span class="keyword">in</span> labeled_sequences
+                <span class="keyword">if</span> seq[<span class="string">'skill_level'</span>] == <span class="string">'elite'</span>]
+    
+    gmm = GaussianMixture(n_components=<span class="num">5</span>, covariance_type=<span class="string">'full'</span>)
+    gmm.fit(features)
+    joblib.dump(gmm, f<span class="string">'models/{sport}_{technique}_gmm.pkl'</span>)
+    
+    iso = IsolationForest(contamination=<span class="num">0.1</span>, random_state=<span class="num">42</span>)
+    iso.fit(features)
+    joblib.dump(iso, f<span class="string">'models/{sport}_{technique}_iso.pkl'</span>)
+    <span class="keyword">print</span>(f<span class="string">"Trained on {len(features)} elite sequences. Ready to replace threshold engine."</span>)</pre>
+
+  <h4 class="subsec">Layer 4 — LLM Feedback Generation</h4>
+  <pre><span class="comment"># feedback_generator.py — Claude API turns structured data into coaching language</span>
+<span class="keyword">import</span> anthropic
+
+client = anthropic.Anthropic(api_key=<span class="string">"YOUR_KEY"</span>)
+
+SYSTEM_PROMPT = <span class="string">"""
+You are an expert wrestling coach analyzing technique video.
+You receive structured biomechanical data and must produce coaching feedback.
+
+RULES:
+- Be specific, not generic. Reference the exact error and when it happened.
+- Lead with what was done WELL before addressing errors.
+- Use wrestling terminology naturally.
+- Suggest one primary drill to fix the most critical error.
+- Keep feedback to 200-280 words.
+- Tone: encouraging but direct. Like a coach who believes in the athlete.
+- Never say "it appears" or "it seems" — be confident.
+"""</span>
+
+<span class="keyword">async def</span> <span class="func">generate_feedback</span>(assessment, athlete_history=<span class="keyword">None</span>):
+    user_content = f<span class="string">"""
+Technique: {assessment['technique']}
+Overall Score: {assessment['score']}/100
+
+Errors found:
+{format_errors(assessment['errors'])}
+
+Athlete history (last 3 sessions): {athlete_history or 'First session'}
+"""</span>
+    
+    response = client.messages.create(
+        model=<span class="string">"claude-sonnet-4-20250514"</span>,
+        max_tokens=<span class="num">1000</span>,
+        system=SYSTEM_PROMPT,
+        messages=[{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: user_content}]
+    )
+    
+    <span class="keyword">return</span> response.content[<span class="num">0</span>].text</pre>
+</section>
+
+<!-- PHASE 1: BACKEND -->
+<section id="p1-backend">
+  <span class="section-num">03 — Phase 1 / Backend</span>
+  <h2>Backend Stack</h2>
+  <p class="lead">The full backend for Phase 1. Designed to scale without a rewrite. Every technology choice is justified.</p>
+
+  <h4 class="subsec">Infrastructure choices — and why</h4>
+  <table>
+    <thead><tr><th>Layer</th><th>Technology</th><th>Why this, not alternatives</th><th>Cost at 1K users</th></tr></thead>
+    <tbody>
+      <tr><td>Database</td><td>Supabase (Postgres)</td><td>Relational queries matter for coaching history, athlete progress, marketplace matching. Comes with auth + storage + real-time built in. Firebase's NoSQL breaks when you need complex queries.</td><td>Free → $25/mo</td></tr>
+      <tr><td>Video storage</td><td>Cloudflare R2 + Stream</td><td>R2 has zero egress fees vs S3's $0.09/GB. Stream handles transcoding, thumbnails, adaptive bitrate automatically. At 10,000 videos/month, saves $600+/mo vs AWS.</td><td>~$50/mo</td></tr>
+      <tr><td>API server</td><td>Node.js / Express on Railway</td><td>Railway auto-deploys from GitHub, handles env vars, scales horizontally. No DevOps needed. Migrate to AWS ECS when you hit 100K users.</td><td>$5–20/mo</td></tr>
+      <tr><td>AI microservice</td><td>Python / FastAPI on Modal</td><td>Modal runs GPU workloads serverless — you pay per second of GPU time, not 24/7 instances. YOLO11 inference on their A10G = $0.000583/second. A 30-second video costs ~$0.30 to analyze.</td><td>$0.30/video</td></tr>
+      <tr><td>Video moderation</td><td>AWS Rekognition</td><td>CSAM scanning is legally mandatory if minors upload content. $0.001/image. 30fps × 30sec = 900 frames = $0.90/video. Non-negotiable.</td><td>~$0.90/video</td></tr>
+      <tr><td>Payments</td><td>Stripe Connect</td><td>Only payment processor with built-in marketplace splits, coach 1099 tax forms, and automatic escrow. Do not use PayPal or manual payouts.</td><td>2.9% + $0.30/txn</td></tr>
+      <tr><td>Push notifications</td><td>Expo Push + OneSignal</td><td>Expo's built-in push handles both iOS and Android for free. OneSignal for segmented campaigns later.</td><td>Free</td></tr>
+    </tbody>
+  </table>
+
+  <h4 class="subsec">Database schema — core tables</h4>
+  <pre><span class="comment">-- Supabase SQL schema (simplified)</span>
+
+<span class="keyword">CREATE TABLE</span> users (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email TEXT UNIQUE NOT NULL,
+  role TEXT CHECK (role IN (<span class="string">'athlete'</span>, <span class="string">'coach'</span>, <span class="string">'admin'</span>)),
+  sport TEXT,
+  skill_level TEXT CHECK (skill_level IN (<span class="string">'beginner'</span>, <span class="string">'intermediate'</span>, <span class="string">'advanced'</span>, <span class="string">'elite'</span>)),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+<span class="keyword">CREATE TABLE</span> video_uploads (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  athlete_id UUID REFERENCES users(id),
+  cloudflare_stream_id TEXT NOT NULL,
+  r2_skeleton_path TEXT,          <span class="comment">-- where the extracted pose JSON lives</span>
+  sport TEXT,
+  technique TEXT,
+  duration_sec INTEGER,
+  moderation_status TEXT DEFAULT <span class="string">'pending'</span>,  <span class="comment">-- pending|clean|flagged</span>
+  analysis_status TEXT DEFAULT <span class="string">'queued'</span>,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+<span class="keyword">CREATE TABLE</span> ai_analyses (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  video_id UUID REFERENCES video_uploads(id),
+  technique_detected TEXT,
+  score INTEGER CHECK (score BETWEEN <span class="num">0</span> AND <span class="num">100</span>),
+  errors JSONB,                   <span class="comment">-- array of error objects from rules engine</span>
+  feedback_text TEXT,             <span class="comment">-- Claude-generated coaching text</span>
+  pose_sequence_url TEXT,         <span class="comment">-- R2 URL to full pose JSON</span>
+  processing_time_ms INTEGER,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+<span class="keyword">CREATE TABLE</span> coach_reviews (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  video_id UUID REFERENCES video_uploads(id),
+  coach_id UUID REFERENCES users(id),
+  ai_analysis_id UUID REFERENCES ai_analyses(id),
+  review_video_url TEXT,          <span class="comment">-- coach's Loom-style response video</span>
+  review_text TEXT,
+  coach_score INTEGER,
+  edited_errors JSONB,            <span class="comment">-- coach corrections to AI errors</span>
+  status TEXT DEFAULT <span class="string">'pending'</span>,  <span class="comment">-- pending|delivered|rated</span>
+  price_cents INTEGER,
+  coach_payout_cents INTEGER,     <span class="comment">-- 80% of price</span>
+  stripe_payment_intent TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+<span class="keyword">CREATE TABLE</span> athlete_progress (
+  athlete_id UUID REFERENCES users(id),
+  technique TEXT,
+  session_date DATE,
+  score INTEGER,
+  top_errors TEXT[],
+  PRIMARY KEY (athlete_id, technique, session_date)
+);</pre>
+
+  <h4 class="subsec">Video upload flow — complete with moderation</h4>
+  <pre><span class="comment">// api/video/upload.js — Node.js route</span>
+<span class="keyword">const</span> { createClient } = require(<span class="string">'@supabase/supabase-js'</span>)
+<span class="keyword">const</span> { RekognitionClient, DetectModerationLabelsCommand } = require(<span class="string">'@aws-sdk/client-rekognition'</span>)
+<span class="keyword">const</span> stripe = require(<span class="string">'stripe'</span>)(process.env.STRIPE_SECRET)
+
+router.post(<span class="string">'/upload'</span>, authenticate, <span class="keyword">async</span> (req, res) => {
+  <span class="keyword">const</span> { videoBuffer, sport, technique } = req.body
+  
+  <span class="comment">// 1. CSAM moderation — BEFORE storing anything</span>
+  <span class="keyword">const</span> rekog = <span class="keyword">new</span> RekognitionClient({ region: <span class="string">'us-east-1'</span> })
+  <span class="keyword">const</span> sampleFrame = extractMiddleFrame(videoBuffer)
+  <span class="keyword">const</span> moderationResult = <span class="keyword">await</span> rekog.send(<span class="keyword">new</span> DetectModerationLabelsCommand({
+    Image: { Bytes: sampleFrame },
+    MinConfidence: <span class="num">60</span>
+  }))
+  
+  <span class="keyword">if</span> (hasSafetyConcerns(moderationResult)) {
+    <span class="keyword">return</span> res.status(<span class="num">400</span>).json({ error: <span class="string">'Content policy violation'</span> })
+  }
+  
+  <span class="comment">// 2. Upload to Cloudflare Stream (handles transcoding)</span>
+  <span class="keyword">const</span> streamUpload = <span class="keyword">await</span> uploadToCloudflareStream(videoBuffer)
+  
+  <span class="comment">// 3. Create DB record</span>
+  <span class="keyword">const</span> { data: upload } = <span class="keyword">await</span> supabase
+    .from(<span class="string">'video_uploads'</span>)
+    .insert({ athlete_id: req.user.id, cloudflare_stream_id: streamUpload.uid, sport, technique })
+    .select().single()
+  
+  <span class="comment">// 4. Queue AI analysis (async — don't block the response)</span>
+  <span class="keyword">await</span> analysisQueue.add({ video_id: upload.id, stream_url: streamUpload.playback.hls })
+  
+  res.json({ upload_id: upload.id, status: <span class="string">'queued'</span> })
+})</pre>
+</section>
+
+<!-- PHASE 1: MOBILE APP -->
+<section id="p1-app">
+  <span class="section-num">04 — Phase 1 / Mobile App</span>
+  <h2>Mobile App Structure</h2>
+  <p class="lead">React Native with Expo. Two interfaces: athlete app and coach web dashboard. Ship the athlete app first.</p>
+
+  <div class="two-col">
+    <div class="card accent">
+      <h4>Athlete app — React Native</h4>
+      <h3>5 screens for MVP</h3>
+      <p>Record or upload video → Sport/technique selection → Upload progress → AI report with annotated timestamps → Coach review (when available). Nothing else. No gear, no social feed.</p>
+      <div class="tag-row">
+        <span class="tag-sm buy">Expo Camera</span>
+        <span class="tag-sm buy">Expo Video</span>
+        <span class="tag-sm">React Navigation</span>
+      </div>
+    </div>
+    <div class="card teal">
+      <h4>Coach dashboard — Next.js web</h4>
+      <h3>4 screens for MVP</h3>
+      <p>Pending review queue → Video player with pose overlay → Review recording (Loom-style) → Earnings dashboard. Coaches will use laptops — build web first, app later.</p>
+      <div class="tag-row">
+        <span class="tag-sm buy">Next.js 14</span>
+        <span class="tag-sm">Cloudflare Stream player</span>
+        <span class="tag-sm">Stripe Connect</span>
+      </div>
+    </div>
+  </div>
+
+  <pre><span class="comment">// App.js — core navigation structure</span>
+<span class="keyword">import</span> { NavigationContainer } <span class="keyword">from</span> <span class="string">'@react-navigation/native'</span>
+<span class="keyword">import</span> { createBottomTabNavigator } <span class="keyword">from</span> <span class="string">'@react-navigation/bottom-tabs'</span>
+
+<span class="comment">// Athlete stack</span>
+<span class="keyword">const</span> AthleteStack = () => (
+  &lt;Stack.Navigator&gt;
+    &lt;Stack.Screen name=<span class="string">"Home"</span> component={HomeScreen} /&gt;        <span class="comment">// recent analyses + streak</span>
+    &lt;Stack.Screen name=<span class="string">"Record"</span> component={RecordScreen} /&gt;     <span class="comment">// camera + upload</span>
+    &lt;Stack.Screen name=<span class="string">"Analysis"</span> component={AnalysisScreen} /&gt; <span class="comment">// AI report + video</span>
+    &lt;Stack.Screen name=<span class="string">"Progress"</span> component={ProgressScreen} /&gt; <span class="comment">// score history</span>
+    &lt;Stack.Screen name=<span class="string">"Coaches"</span> component={CoachScreen} /&gt;    <span class="comment">// request human review</span>
+  &lt;/Stack.Navigator&gt;
+)</pre>
+
+  <div class="callout warn">
+    <strong>Critical UX decision:</strong> The AI report must show video with timestamped annotations — not just a text list of errors. When the app says "your hip angle was too high at 0:03," tapping that timestamp jumps to the exact frame. Without this, athletes don't trust or act on the feedback. This is the single feature that makes the product feel real.
+  </div>
+</section>
+
+<!-- ANNOTATION PLAYER — new section from peer review -->
+<section id="p1-annotation">
+  <span class="section-num">04b — Phase 1 / Annotation Player</span>
+  <h2>The Annotation Player</h2>
+  <p class="lead">This is the most important screen in the entire product. A peer review correctly flagged it as underspecified. Everything else is plumbing — this screen is where trust is built or lost. Treat it as its own component with its own spec.</p>
+
+  <div class="callout">
+    <strong>Why this screen determines product success:</strong> Every sports AI product that has failed did so because the analysis output was a wall of numbers or a vague text report. The moment an athlete taps an error and sees exactly what went wrong — at that exact moment — is when they believe the AI. Before that tap, it's a demo. After it, it's a product they tell their teammates about.
+  </div>
+
+  <h4 class="subsec">The 5 interactions — all required, not optional</h4>
+
+  <div class="card accent">
+    <h4>Interaction 1 — The most important one</h4>
+    <h3>Tap error → jump to 2 seconds BEFORE the error</h3>
+    <p>Not to the error frame. 2 seconds before it. Athletes need to see the setup that caused the mistake — not just the mistake. "Your hip was too high at 0:04" is useless if the video starts at 0:04. Jump to 0:02 and let them watch it unfold. This is a practitioner-level insight that separates coaching software from analytics software.</p>
+  </div>
+
+  <div class="card teal">
+    <h4>Interaction 2</h4>
+    <h3>Automatic slow-motion at error moment</h3>
+    <p>When the video reaches the flagged timestamp, drop to 0.25x speed automatically. Resume normal speed after 2 seconds. The athlete sees the error in detail without having to manually scrub. Implement with Cloudflare Stream's playback rate API.</p>
+  </div>
+
+  <div class="card green">
+    <h4>Interaction 3 — The viral feature</h4>
+    <h3>Elite comparison toggle overlay</h3>
+    <p>One button: "Compare to elite." The screen splits or overlays the athlete's skeleton with an elite athlete performing the same technique, synced to the same phase (entry/execution/finish — not absolute time). The gap is instantly visible. This is the feature athletes screenshot and post. Build the share sheet on day one.</p>
+  </div>
+
+  <div class="card warn">
+    <h4>Interaction 4</h4>
+    <h3>Swipe left/right between errors</h3>
+    <p>Each swipe jumps to the next flagged error, pre-loaded and ready. No scrubbing. No list-tapping. Just swipe through your mistakes in sequence. Athletes should be able to review all 3 errors in under 30 seconds.</p>
+  </div>
+
+  <div class="card">
+    <h4>Interaction 5</h4>
+    <h3>Pinch to zoom on body region</h3>
+    <p>Athlete pinches to zoom into the knee, hip, or head area during the error frame. The skeleton overlay stays anchored. This is especially important for fine-grained errors like head position or hand placement that are hard to see at full-frame zoom.</p>
+  </div>
+
+  <h4 class="subsec">React Native component spec</h4>
+  <pre><span class="comment">// AnnotationPlayer.tsx — the most important component you will build</span>
+<span class="keyword">import</span> { Video, ResizeMode } <span class="keyword">from</span> <span class="string">'expo-av'</span>
+<span class="keyword">import</span> { Gesture, GestureDetector } <span class="keyword">from</span> <span class="string">'react-native-gesture-handler'</span>
+<span class="keyword">import</span> Animated <span class="keyword">from</span> <span class="string">'react-native-reanimated'</span>
+<span class="keyword">import</span> { Canvas, Path, Circle } <span class="keyword">from</span> <span class="string">'@shopify/react-native-skia'</span>
+
+<span class="keyword">interface</span> AnnotationPlayerProps {
+  videoUrl: string               <span class="comment">// Cloudflare Stream HLS URL</span>
+  poseOverlay: PoseSequence      <span class="comment">// 30fps skeleton JSON from R2</span>
+  errorMarkers: ErrorMarker[]    <span class="comment">// [{timestamp_ms, rule, severity, cue}]</span>
+  eliteComparison?: PoseSequence <span class="comment">// elite skeleton for same technique</span>
+}
+
+<span class="keyword">const</span> AnnotationPlayer = ({ videoUrl, poseOverlay, errorMarkers, eliteComparison }) => {
+  <span class="keyword">const</span> videoRef = useRef(null)
+  <span class="keyword">const</span> [currentError, setCurrentError] = useState(<span class="num">0</span>)
+  <span class="keyword">const</span> [showElite, setShowElite] = useState(<span class="num">false</span>)
+  <span class="keyword">const</span> [currentPose, setCurrentPose] = useState(<span class="keyword">null</span>)
+
+  <span class="comment">// Jump to 2s BEFORE the error timestamp</span>
+  <span class="keyword">const</span> jumpToError = <span class="keyword">async</span> (errorIdx) => {
+    <span class="keyword">const</span> error = errorMarkers[errorIdx]
+    <span class="keyword">const</span> jumpMs = Math.max(<span class="num">0</span>, error.timestamp_ms - <span class="num">2000</span>) <span class="comment">// 2s before</span>
+    <span class="keyword">await</span> videoRef.current.setPositionAsync(jumpMs)
+    <span class="keyword">await</span> videoRef.current.setRateAsync(<span class="num">1.0</span>, <span class="num">true</span>)
+
+    <span class="comment">// Auto slow-mo when reaching the error frame</span>
+    <span class="keyword">const</span> slowMoTimer = setTimeout(<span class="keyword">async</span> () => {
+      <span class="keyword">await</span> videoRef.current.setRateAsync(<span class="num">0.25</span>, <span class="num">true</span>)
+      setTimeout(<span class="keyword">async</span> () => {
+        <span class="keyword">await</span> videoRef.current.setRateAsync(<span class="num">1.0</span>, <span class="num">true</span>)
+      }, <span class="num">2000</span>)
+    }, <span class="num">2000</span>) <span class="comment">// fires when we reach the error timestamp</span>
+    setCurrentError(errorIdx)
+  }
+
+  <span class="comment">// Swipe gesture: left = next error, right = previous</span>
+  <span class="keyword">const</span> swipe = Gesture.Pan().onEnd((e) => {
+    <span class="keyword">if</span> (e.translationX < -<span class="num">50</span> && currentError < errorMarkers.length - <span class="num">1</span>)
+      runOnJS(jumpToError)(currentError + <span class="num">1</span>)
+    <span class="keyword">if</span> (e.translationX > <span class="num">50</span> && currentError > <span class="num">0</span>)
+      runOnJS(jumpToError)(currentError - <span class="num">1</span>)
+  })
+
+  <span class="keyword">return</span> (
+    &lt;GestureDetector gesture={swipe}&gt;
+      &lt;View style={styles.container}&gt;
+        &lt;Video ref={videoRef} source={{ uri: videoUrl }}
+          style={styles.video} resizeMode={ResizeMode.CONTAIN} /&gt;
+
+        <span class="comment">{/* Skeleton overlay — rendered on Skia canvas */}</span>
+        &lt;Canvas style={StyleSheet.absoluteFill}&gt;
+          {currentPose && &lt;SkeletonOverlay pose={currentPose}
+            highlight={errorMarkers[currentError]?.joints} /&gt;}
+          {showElite && eliteComparison && &lt;SkeletonOverlay
+            pose={syncedElitePose} color="rgba(78,205,196,0.6)" /&gt;}
+        &lt;/Canvas&gt;
+
+        <span class="comment">{/* Error pill strip at bottom */}</span>
+        &lt;ErrorStrip errors={errorMarkers} current={currentError}
+          onTap={jumpToError} /&gt;
+
+        <span class="comment">{/* Elite toggle */}</span>
+        &lt;TouchableOpacity onPress={() => setShowElite(!showElite)}
+          style={[styles.eliteBtn, showElite && styles.eliteBtnActive]}&gt;
+          &lt;Text&gt;{showElite ? 'Hide elite' : 'Compare to elite'}&lt;/Text&gt;
+        &lt;/TouchableOpacity&gt;
+      &lt;/View&gt;
+    &lt;/GestureDetector&gt;
+  )
+}
+
+<span class="comment">// Key library choices:
+// - expo-av: video playback + rate control
+// - @shopify/react-native-skia: GPU-accelerated skeleton drawing
+// - react-native-gesture-handler: swipe between errors
+// - react-native-reanimated: smooth overlay transitions</span></pre>
+
+  <div class="callout green">
+    <strong>The share mechanic:</strong> Add a "Share" button that captures a 5-second clip of the athlete's skeleton side-by-side with the elite comparison, exports it as a short video with your watermark. This is your organic growth engine. Cost to implement: 1 day using <code>expo-media-library</code> + <code>react-native-view-shot</code>. Value: priceless.
+  </div>
+</section>
+
+<!-- PHASE 1: MVP DEMO -->
+<section id="p1-mvp">
+  <span class="section-num">05 — Phase 1 / MVP Demo</span>
+  <h2>MVP Demo Flow for Investors</h2>
+  <p class="lead">Your prototype demo must show this exact flow live. Practice it until it runs in under 4 minutes.</p>
+
+  <div class="pipeline">
+    <div class="pipe-step" data-n="1">
+      <h3>Athlete films a wrestling shot on phone</h3>
+      <p>30 seconds, side angle, in a gym. Real athlete — not a professional, someone clearly learning. This makes the error detection more impressive.</p>
+    </div>
+    <div class="pipe-step" data-n="2">
+      <h3>Upload → "Analyzing…" screen (12–20 seconds)</h3>
+      <p>Realistic timing: upload 3–5s, queue 2–5s, pose extraction 2s, rules engine 0.5s, LLM feedback 1–2s = 12–20s total on 4G. Never claim "instant." The loading screen must show each stage explicitly: <em>"Extracting movement data... Comparing to 10,000+ elite sequences... Generating your personalized report..."</em> — this turns the wait into a demonstration of value. Show elapsed time per stage. Under-promise, over-deliver.</p>
+    </div>
+    <div class="pipe-step" data-n="3">
+      <h3>AI report appears — score + 3 errors</h3>
+      <p>Show: overall score (e.g. 64/100), top 3 errors with severity, and the coaching cue for each. Then hit play on the annotated video — skeleton overlay visible, errors highlighted in red at the exact timestamps.</p>
+    </div>
+    <div class="pipe-step" data-n="4">
+      <h3>Show the elite athlete comparison</h3>
+      <p>Side-by-side: athlete's skeleton vs. Olympic-level skeleton for the same technique. This is the visual that lands with investors. The gap is obvious. The product's value is obvious.</p>
+    </div>
+    <div class="pipe-step" data-n="5">
+      <h3>Request coach review — $18</h3>
+      <p>One tap. "A certified wrestling coach will review this and respond within 24 hours." Show the athlete's Stripe payment. Then switch to the coach dashboard — they see the queue, the AI pre-analysis, and record their 3-minute response video. The AI saved them 10 minutes of frame-by-frame work.</p>
+    </div>
+    <div class="pipe-step" data-n="6">
+      <h3>Show the progress graph</h3>
+      <p>After 4 sessions, show the technique score improving from 58 → 74 over 3 weeks. This is retention. This is why athletes keep coming back. This is your LTV story.</p>
+    </div>
+  </div>
+
+  <div class="metrics">
+    <div class="metric"><div class="label">Demo build time</div><div class="val">6–8 wks</div><div class="sub">2 developers</div></div>
+    <div class="metric"><div class="label">Minimum demo users</div><div class="val">10</div><div class="sub">Real athletes, real sessions</div></div>
+    <div class="metric"><div class="label">Target demo score</div><div class="val">3/5</div><div class="sub">Coach agreement rate with AI errors</div></div>
+  </div>
+</section>
+
+<!-- PHASE 2: VALUE LAYER -->
+<section id="p2-value">
+  <span class="section-num">06 — Phase 2 / Real Value</span>
+  <h2>The Real Value Added Layer</h2>
+  <p class="lead">What takes this from "interesting demo" to "product people pay for every month." These are the features that drive retention, word of mouth, and LTV.</p>
+
+  <div class="card accent">
+    <h4>Feature 1 — Most important</h4>
+    <h3>Before/After Comparison Mode</h3>
+    <p>Athletes film the same technique monthly. The app overlays skeleton from session 1 vs session 4, side by side, synced to the same moment in the technique. Watching your own form improve is the most motivating thing in sports. This is the #1 retention driver. No competitor has it because it requires stored skeleton data — which you have.</p>
+  </div>
+
+  <div class="card teal">
+    <h4>Feature 2</h4>
+    <h3>Weak-Phase Identification</h3>
+    <p>After 3+ sessions, the system identifies your consistently failing phase. "Your entry is improving (was 45, now 68) but your finish phase is your persistent weakness (score: 41). Here are 3 drills targeting specifically your finish mechanics." This personalization is impossible without session history — it's your moat deepening over time.</p>
+  </div>
+
+  <div class="card green">
+    <h4>Feature 3 — Coach efficiency</h4>
+    <h3>AI Pre-Digest for Coaches</h3>
+    <p>When a coach opens a review request, they don't see a raw video. They see: AI score, top 3 flagged errors with timestamps, the athlete's history, and the AI's draft coaching notes. The coach edits, records their 2-minute video response, approves. Time per review: 8 minutes instead of 25. Coaches can now do 30 reviews/week instead of 10. Their effective hourly rate doubles.</p>
+  </div>
+
+  <div class="card warn">
+    <h4>Feature 4 — The hook</h4>
+    <h3>Elite Athlete Benchmark Score</h3>
+    <p>Every metric is benchmarked against your extracted pro/elite dataset. "Your hip height during entry (0.72 norm) vs Olympic average (0.63 norm) — you're 14% higher than elite. Here's what that looks like side by side." This makes the data feel meaningful instead of abstract. It answers "so what?" for every number.</p>
+  </div>
+</section>
+
+<!-- PHASE 2: COACH KNOWLEDGE ENGINE -->
+<section id="p2-coaching">
+  <span class="section-num">07 — Phase 2 / Coach Knowledge</span>
+  <h2>Encoding Coach Knowledge at Scale</h2>
+  <p class="lead">The structured process to turn what coaches know into what the AI knows. This is a 6-month ongoing program, not a one-time event.</p>
+
+  <h4 class="subsec">The Coach Knowledge Interview Protocol</h4>
+  <p>Run this with each coach you onboard. Record everything. This is where your rules engine thresholds come from.</p>
+
+  <div class="pipeline">
+    <div class="pipe-step" data-n="1">
+      <h3>Session 1 — Error Taxonomy (2 hours)</h3>
+      <p>Ask: "For the single-leg shot, what are the 5 most common errors you see in beginners? In advanced athletes?" Record them categorizing clips from your dataset. You're building a vocabulary of errors — each one must eventually map to a measurable metric.</p>
+    </div>
+    <div class="pipe-step" data-n="2">
+      <h3>Session 2 — Biomechanical Translation (3 hours)</h3>
+      <p>For each error from Session 1: "When you see this, what EXACTLY are you watching? Which body part? What angle? What timing? How early can you predict it will happen?" Push until every error has a joint + angle + timing attached. "Hips too high" → "hip height normalized above 0.70 at moment of step-in." </p>
+    </div>
+    <div class="pipe-step" data-n="3">
+      <h3>Session 3 — Elite Baseline Calibration (2 hours)</h3>
+      <p>Show the coach your extracted elite athlete skeleton data. Ask them to rate each clip 1–10. Use their ratings to validate your threshold ranges. If they rate a clip 9/10 but your rules engine gives it 65/100, your thresholds are wrong — not the coach.</p>
+    </div>
+    <div class="pipe-step" data-n="4">
+      <h3>Ongoing — Coach Correction Loop</h3>
+      <p>Every time a coach edits the AI's analysis (changes the score, adds an error the AI missed, removes a false positive), that correction is stored. After 100+ corrections per technique, you have a training dataset to improve the rules engine. This is how the AI gets smarter without you doing anything extra.</p>
+    </div>
+  </div>
+
+  <pre><span class="comment">-- Track every AI vs coach divergence — this is your training data</span>
+<span class="keyword">CREATE TABLE</span> coach_ai_divergence (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  review_id UUID REFERENCES coach_reviews(id),
+  ai_score INTEGER,
+  coach_score INTEGER,
+  score_delta INTEGER GENERATED ALWAYS AS (coach_score - ai_score) STORED,
+  ai_errors JSONB,
+  coach_removed_errors TEXT[],    <span class="comment">-- AI false positives</span>
+  coach_added_errors JSONB,       <span class="comment">-- errors AI missed</span>
+  technique TEXT,
+  sport TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+<span class="comment">-- Query: which rules have the most false positives?</span>
+<span class="keyword">SELECT</span> 
+  jsonb_array_elements_text(coach_removed_errors) <span class="keyword">as</span> rule_name,
+  COUNT(*) <span class="keyword">as</span> false_positive_count
+<span class="keyword">FROM</span> coach_ai_divergence
+<span class="keyword">WHERE</span> technique = <span class="string">'single_leg_shot'</span>
+<span class="keyword">GROUP BY</span> rule_name
+<span class="keyword">ORDER BY</span> false_positive_count <span class="keyword">DESC</span>;</pre>
+</section>
+
+<!-- PHASE 2: MARKETPLACE -->
+<section id="p2-marketplace">
+  <span class="section-num">08 — Phase 2 / Marketplace</span>
+  <h2>Marketplace Backend</h2>
+  <p class="lead">The coach marketplace is where you make money at scale. The architecture must handle payments, matching, SLAs, and trust — without becoming your full-time job.</p>
+
+  <h4 class="subsec">Stripe Connect setup — exact implementation</h4>
+  <pre><span class="comment">// stripe/onboard-coach.js</span>
+<span class="keyword">const</span> stripe = require(<span class="string">'stripe'</span>)(process.env.STRIPE_SECRET)
+
+<span class="comment">// Create a Stripe Express account for each coach</span>
+<span class="keyword">async function</span> <span class="func">onboardCoach</span>(userId, email) {
+  <span class="keyword">const</span> account = <span class="keyword">await</span> stripe.accounts.create({
+    type: <span class="string">'express'</span>,
+    email,
+    capabilities: {
+      card_payments: { requested: <span class="keyword">true</span> },
+      transfers: { requested: <span class="keyword">true</span> }
+    },
+    settings: { payouts: { schedule: { interval: <span class="string">'weekly'</span> } } }
+  })
+  
+  <span class="keyword">await</span> supabase.from(<span class="string">'users'</span>).update({
+    stripe_account_id: account.id
+  }).eq(<span class="string">'id'</span>, userId)
+  
+  <span class="comment">// Return onboarding link — coach completes KYC via Stripe</span>
+  <span class="keyword">const</span> link = <span class="keyword">await</span> stripe.accountLinks.create({
+    account: account.id,
+    refresh_url: <span class="string">'https://yourapp.com/coach/onboard'</span>,
+    return_url: <span class="string">'https://yourapp.com/coach/dashboard'</span>,
+    type: <span class="string">'account_onboarding'</span>
+  })
+  
+  <span class="keyword">return</span> link.url
+}
+
+<span class="comment">// Process athlete payment with automatic coach split</span>
+<span class="keyword">async function</span> <span class="func">chargeForReview</span>(athleteId, coachId, reviewId) {
+  <span class="keyword">const</span> coach = <span class="keyword">await</span> getCoach(coachId)
+  <span class="keyword">const</span> totalCents = <span class="num">1800</span>  <span class="comment">// $18.00</span>
+  <span class="keyword">const</span> coachCents = <span class="num">1440</span>   <span class="comment">// $14.40 (80%)</span>
+  <span class="keyword">const</span> platformCents = <span class="num">360</span> <span class="comment">// $3.60 (20%)</span>
+  
+  <span class="keyword">const</span> paymentIntent = <span class="keyword">await</span> stripe.paymentIntents.create({
+    amount: totalCents,
+    currency: <span class="string">'usd'</span>,
+    application_fee_amount: platformCents,
+    transfer_data: { destination: coach.stripe_account_id },
+    metadata: { review_id: reviewId, athlete_id: athleteId }
+  })
+  
+  <span class="keyword">return</span> paymentIntent
+}</pre>
+
+  <h4 class="subsec">Coach matching algorithm</h4>
+  <pre><span class="comment">-- Find available coach for a review request</span>
+<span class="keyword">SELECT</span> c.id, c.display_name, c.avg_rating, c.response_time_hrs,
+       c.completed_reviews, c.sport_specialties
+<span class="keyword">FROM</span> users c
+<span class="keyword">JOIN</span> coach_availability ca ON c.id = ca.coach_id
+<span class="keyword">WHERE</span> c.role = <span class="string">'coach'</span>
+  AND <span class="string">'wrestling'</span> = ANY(c.sport_specialties)
+  AND ca.is_available = <span class="keyword">true</span>
+  AND c.id NOT IN (
+    <span class="comment">-- exclude coaches with 5+ pending reviews (overloaded)</span>
+    <span class="keyword">SELECT</span> coach_id <span class="keyword">FROM</span> coach_reviews 
+    <span class="keyword">WHERE</span> status = <span class="string">'pending'</span> 
+    <span class="keyword">GROUP BY</span> coach_id <span class="keyword">HAVING</span> COUNT(*) >= <span class="num">5</span>
+  )
+<span class="keyword">ORDER BY</span> (c.avg_rating * <span class="num">0.4</span> + (1.0 / c.response_time_hrs) * <span class="num">0.4</span> 
+  + (c.completed_reviews / <span class="num">100.0</span>) * <span class="num">0.2</span>) <span class="keyword">DESC</span>
+<span class="keyword">LIMIT</span> <span class="num">3</span>;</pre>
+</section>
+
+<!-- PHASE 2: METRICS -->
+<section id="p2-metrics">
+  <span class="section-num">09 — Phase 2 / Funding Metrics</span>
+  <h2>What Metrics You Need Before Raising</h2>
+  <p class="lead">Seed investors in 2025/26 fund traction, not ideas. These are the numbers you must have — and what's acceptable vs. what's great.</p>
+
+  <table>
+    <thead><tr><th>Metric</th><th>Minimum to raise</th><th>Strong raise</th><th>How to measure</th></tr></thead>
+    <tbody>
+      <tr><td>Paying users</td><td>50</td><td>200+</td><td>Stripe active subscriptions + one-time reviews</td></tr>
+      <tr><td>MRR</td><td>$2,000</td><td>$8,000+</td><td>Stripe MRR dashboard</td></tr>
+      <tr><td>Day-30 retention</td><td>15%</td><td>25%+</td><td>Cohort analysis in Supabase</td></tr>
+      <tr><td>AI/coach agreement rate</td><td>60%</td><td>75%+</td><td>coach_ai_divergence table, score delta &lt;15pts</td></tr>
+      <tr><td>Active coaches</td><td>10</td><td>30+</td><td>Coaches with ≥1 review in last 30 days</td></tr>
+      <tr><td>Coach NPS</td><td>30</td><td>50+</td><td>Monthly 2-question survey via email</td></tr>
+      <tr><td>Videos analyzed</td><td>500 total</td><td>2,000+</td><td>video_uploads table count</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>The one number that matters most:</strong> AI/coach agreement rate. This proves your technology actually works. A 75%+ agreement rate (where coaches say the AI found the right errors) is the hardest and most credible proof point you can show an investor. It's your scientific validation.
+  </div>
+</section>
+
+<!-- PHASE 3: ELITE DATA -->
+<section id="p3-data">
+  <span class="section-num">10 — Phase 3 / Olympic Level</span>
+  <h2>Elite & Olympic Data Strategy</h2>
+  <p class="lead">This is where the product becomes genuinely world-class. You are building the largest structured database of elite athletic biomechanics in the world. That database is the asset.</p>
+
+  <div class="phase-header">
+    <div class="phase-number">3</div>
+    <div>
+      <h2>The elite data flywheel</h2>
+      <div class="timeline">Months 10–24 · Requires: partnerships + budget + credibility from Phase 2</div>
+    </div>
+  </div>
+
+  <h4 class="subsec">Data source hierarchy — from easiest to best</h4>
+  <div class="pipeline">
+    <div class="pipe-step" data-n="1">
+      <h3>Tier 1 — Public research datasets (free, start now)</h3>
+      <p>AthletePose3D (CVPR 2025) · MADS dataset (martial arts, volleyball) · Penn Action Dataset · FineGym (gymnastics, 25K video clips) · SportsMOT (multi-sport tracking). All downloadable, research licensed. Extract skeleton sequences from everything. This is your baseline elite benchmark.</p>
+    </div>
+    <div class="pipe-step" data-n="2">
+      <h3>Tier 2 — Broadcast extraction (months 6–12)</h3>
+      <p>Use your skeleton extractor pipeline on Olympics, World Championship, UFC highlight footage. Run YOLO11-Pose fine-tuned on AthletePose3D. Store only coordinate JSON, delete frames. Build the largest labeled collection of elite technique skeletons per sport. This becomes your "compare to pro" feature's ground truth.</p>
+    </div>
+    <div class="pipe-step" data-n="3">
+      <h3>Tier 3 — Partner with national federations (months 12–18)</h3>
+      <p>Approach USA Wrestling, USA Volleyball, national MMA associations. Offer: free platform access for their development athletes + anonymized aggregate insights. In return: access to their training footage with athlete consent. This gives you labeled data with known performance outcomes — the gold standard.</p>
+    </div>
+    <div class="pipe-step" data-n="4">
+      <h3>Tier 4 — Direct Olympic athlete partnerships (months 18–24)</h3>
+      <p>By this point you have proof of value. Approach individual Olympic coaches and athletes. Offer: custom dashboards, performance reports, career progression tracking. In return: their consent to use de-identified biomechanical data to improve models. Compensation: platform revenue share or direct fee. 5–10 Olympic athletes in your training data = enormous credibility and precision improvement.</p>
+    </div>
+  </div>
+
+  <h4 class="subsec">Elite benchmark database schema</h4>
+  <pre><span class="comment">-- The database that makes "compare to pro" possible</span>
+<span class="keyword">CREATE TABLE</span> elite_technique_benchmarks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  sport TEXT NOT NULL,
+  technique TEXT NOT NULL,
+  metric_name TEXT NOT NULL,         <span class="comment">-- e.g. "hip_height_at_entry"</span>
+  phase TEXT NOT NULL,               <span class="comment">-- "entry" | "execution" | "finish"</span>
+  
+  <span class="comment">-- Distribution from elite athlete data</span>
+  mean_value DECIMAL,
+  std_deviation DECIMAL,
+  p10_value DECIMAL,                 <span class="comment">-- 10th percentile (warning zone)</span>
+  p25_value DECIMAL,
+  p50_value DECIMAL,                 <span class="comment">-- median</span>
+  p75_value DECIMAL,
+  p90_value DECIMAL,                 <span class="comment">-- top-performer zone</span>
+  
+  sample_size INTEGER,               <span class="comment">-- how many elite athletes contributed</span>
+  data_sources TEXT[],               <span class="comment">-- which datasets/events</span>
+  last_updated DATE,
+  
+  UNIQUE(sport, technique, metric_name, phase)
+);
+
+<span class="comment">-- Query: where does this athlete sit vs elite distribution?</span>
+<span class="keyword">SELECT</span>
+  b.metric_name,
+  a.measured_value,
+  b.p50_value <span class="keyword">as</span> elite_median,
+  b.p90_value <span class="keyword">as</span> elite_top10pct,
+  PERCENT_RANK() OVER (ORDER BY a.measured_value) <span class="keyword">as</span> athlete_percentile
+<span class="keyword">FROM</span> athlete_session_metrics a
+<span class="keyword">JOIN</span> elite_technique_benchmarks b 
+  ON b.sport = a.sport 
+  AND b.technique = a.technique 
+  AND b.metric_name = a.metric_name
+<span class="keyword">WHERE</span> a.athlete_id = $1 AND a.session_id = $2;</pre>
+</section>
+
+<!-- PHASE 3: REAL-TIME STREAMING — new section from peer review -->
+<section id="p3-realtime">
+  <span class="section-num">10b — Phase 3 / Real-Time</span>
+  <h2>Real-Time Streaming Infrastructure</h2>
+  <p class="lead">The original document was async-only. For Phase 3 elite and Olympic teams, live form correction during practice is a core requirement — and it justifies the Elite tier pricing. This is a peer-review addition: correctly scoped to Phase 3 only.</p>
+
+  <div class="callout warn">
+    <strong>Do not build this in Phase 1 or 2.</strong> Real-time streaming adds ~$4,500/month in infrastructure at 100 daily active elite athletes. It only makes financial sense behind the Elite tier ($49.99/month) and only when you have real team contracts. The async pipeline is sufficient for everything before that.
+  </div>
+
+  <h4 class="subsec">Architecture — two quality tiers</h4>
+  <div class="two-col">
+    <div class="card green">
+      <h4>On-device real-time (consumer)</h4>
+      <h3>MediaPipe at 15fps — lower fidelity</h3>
+      <p>Runs entirely on the athlete's phone GPU. No server cost. ~70% of server-side accuracy. Good enough for instant form cues during solo drills. Latency: &lt;100ms. Cannot run fine-tuned model — uses base MediaPipe only. Always show a "Live mode — lower accuracy" indicator.</p>
+      <div class="tag-row"><span class="tag-sm free">$0 server cost</span><span class="tag-sm">~70% accuracy</span></div>
+    </div>
+    <div class="card accent">
+      <h4>Server-side real-time (elite)</h4>
+      <h3>WebSocket + GPU stream — full fidelity</h3>
+      <p>Video frames stream to GPU server at 15fps. YOLO11-Pose (fine-tuned) processes each frame. Results pushed back via WebSocket in ~200ms. Full accuracy. Costs $0.05/minute of active streaming. Gate behind Elite tier only.</p>
+      <div class="tag-row"><span class="tag-sm build">$0.05/min</span><span class="tag-sm moat">Full accuracy</span></div>
+    </div>
+  </div>
+
+  <h4 class="subsec">WebSocket server implementation</h4>
+  <pre><span class="comment">// realtime/server.js — Node.js WebSocket server (Phase 3, Elite tier only)</span>
+<span class="keyword">const</span> WebSocket = require(<span class="string">'ws'</span>)
+<span class="keyword">const</span> wss = <span class="keyword">new</span> WebSocket.Server({ port: <span class="num">8080</span> })
+
+wss.on(<span class="string">'connection'</span>, <span class="keyword">async</span> (ws, req) => {
+  <span class="keyword">const</span> { athleteId, sport, tier } = <span class="keyword">await</span> authenticateWS(req)
+
+  <span class="comment">// Gate: real-time only for Elite tier</span>
+  <span class="keyword">if</span> (tier !== <span class="string">'elite'</span>) {
+    ws.close(<span class="num">4003</span>, <span class="string">'Real-time requires Elite plan'</span>)
+    <span class="keyword">return</span>
+  }
+
+  <span class="keyword">const</span> athleteBaseline = <span class="keyword">await</span> loadAthleteBaseline(athleteId)
+  <span class="keyword">let</span> frameBuffer = []
+  <span class="keyword">let</span> lastFeedbackAt = <span class="num">0</span>
+
+  ws.on(<span class="string">'message'</span>, <span class="keyword">async</span> (data) => {
+    <span class="keyword">const</span> { type, frameBase64, timestamp } = JSON.parse(data)
+
+    <span class="keyword">if</span> (type === <span class="string">'frame'</span>) {
+      <span class="comment">// Send frame to Python pose service</span>
+      <span class="keyword">const</span> pose = <span class="keyword">await</span> poseService.analyzeFrame(frameBase64, sport)
+      frameBuffer.push({ pose, timestamp })
+
+      <span class="comment">// Emit quick-check feedback every 500ms (not every frame)</span>
+      <span class="keyword">if</span> (Date.now() - lastFeedbackAt > <span class="num">500</span>) {
+        <span class="keyword">const</span> quickCheck = rulesEngine.quickCheck(pose, athleteBaseline)
+        
+        <span class="comment">// Only interrupt athlete for high-severity, immediate errors</span>
+        <span class="keyword">if</span> (quickCheck.severity === <span class="string">'immediate'</span>) {
+          ws.send(JSON.stringify({
+            type: <span class="string">'correction'</span>,
+            cue: quickCheck.cue,           <span class="comment">// e.g. "Head down — look up NOW"</span>
+            joint: quickCheck.joint,       <span class="comment">// which joint to highlight</span>
+            timestamp: Date.now()
+          }))
+        }
+        lastFeedbackAt = Date.now()
+      }
+    }
+  })
+
+  ws.on(<span class="string">'close'</span>, <span class="keyword">async</span> () => {
+    <span class="comment">// On session end, run full async analysis on buffered frames</span>
+    <span class="keyword">await</span> fullAnalysisQueue.add({ frames: frameBuffer, athleteId, sport })
+  })
+})
+
+<span class="comment">// Cost control: track active minutes per athlete</span>
+<span class="comment">// Alert when monthly cost approaches Elite tier revenue</span></pre>
+
+  <h4 class="subsec">Cost model — must be monitored</h4>
+  <table>
+    <thead><tr><th>Scenario</th><th>Athletes</th><th>Min/day</th><th>Daily cost</th><th>Monthly cost</th><th>Revenue needed</th></tr></thead>
+    <tbody>
+      <tr><td>Early (10 elite athletes)</td><td>10</td><td>30</td><td>$15</td><td>$450</td><td>9× Elite subs cover it</td></tr>
+      <tr><td>Growth (100 elite athletes)</td><td>100</td><td>30</td><td>$150</td><td>$4,500</td><td>90× Elite subs at $49.99</td></tr>
+      <tr><td>Team contract (1 team, 20 athletes)</td><td>20</td><td>60</td><td>$60</td><td>$1,800</td><td>1 team license at $2K/mo</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- PHASE 3: BIOMECHANICS ENGINE -->
+<section id="p3-biomech">
+  <span class="section-num">11 — Phase 3 / Biomechanics Engine</span>
+  <h2>Olympic-Grade Biomechanics Engine</h2>
+  <p class="lead">Phase 1 rules engine uses simple thresholds. Phase 3 adds temporal modeling, multi-joint coordination analysis, and predictive injury scoring.</p>
+
+  <h4 class="subsec">Upgrade 1 — Temporal sequence modeling</h4>
+  <p>Simple threshold checks miss timing. An elite single-leg shot isn't just about each joint angle — it's about the exact sequence of how they move. Add an LSTM layer on top of your rules engine to learn technique "fingerprints" from your elite skeleton dataset.</p>
+
+  <pre><span class="comment"># temporal_model.py — phase 3 upgrade</span>
+<span class="keyword">import</span> torch
+<span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn
+
+<span class="keyword">class</span> <span class="func">TechniqueClassifier</span>(nn.Module):
+    <span class="string">"""
+    Takes a sequence of pose frames → classifies technique quality
+    Trained on your elite skeleton dataset + coach-labeled quality scores
+    """</span>
+    <span class="keyword">def</span> <span class="func">__init__</span>(self, input_size=<span class="num">66</span>, hidden_size=<span class="num">256</span>, num_classes=<span class="num">4</span>):
+        <span class="comment"># input_size = 33 joints × 2 (x,y) coordinates</span>
+        <span class="comment"># num_classes = elite / advanced / intermediate / beginner</span>
+        super().__init__()
+        self.lstm = nn.LSTM(input_size, hidden_size, num_layers=<span class="num">2</span>, 
+                           batch_first=<span class="num">True</span>, dropout=<span class="num">0.3</span>)
+        self.attention = nn.MultiheadAttention(hidden_size, num_heads=<span class="num">8</span>)
+        self.classifier = nn.Sequential(
+            nn.Linear(hidden_size, <span class="num">128</span>),
+            nn.ReLU(),
+            nn.Dropout(<span class="num">0.3</span>),
+            nn.Linear(<span class="num">128</span>, num_classes)
+        )
+    
+    <span class="keyword">def</span> <span class="func">forward</span>(self, pose_sequence):
+        <span class="comment"># pose_sequence: [batch, frames, 66 keypoint values]</span>
+        lstm_out, _ = self.lstm(pose_sequence)
+        attended, _ = self.attention(lstm_out, lstm_out, lstm_out)
+        <span class="keyword">return</span> self.classifier(attended[:, -<span class="num">1</span>, :])  <span class="comment"># last hidden state</span>
+
+<span class="comment"># Training: your elite skeleton sequences + coach quality labels</span>
+<span class="comment"># 5,000+ labeled sequences → usable model</span>
+<span class="comment"># 20,000+ → production-grade model</span></pre>
+
+  <h4 class="subsec">Upgrade 2 — Injury risk scoring</h4>
+  <div class="callout danger">
+    <strong>Legal caveat:</strong> Never call this "injury prediction" or "diagnosis." Call it "movement risk indicators." Consult a sports medicine lawyer before shipping this feature. Position as informational, not clinical.
+  </div>
+
+  <pre><span class="comment"># injury_risk.py — based on published sports medicine biomechanics research</span>
+<span class="comment"># Every threshold here must cite a peer-reviewed source</span>
+
+INJURY_RISK_INDICATORS = {
+    <span class="string">"acl_risk"</span>: {
+        <span class="string">"condition"</span>: <span class="string">"knee valgus during landing"</span>,
+        <span class="string">"metric"</span>: <span class="string">"knee_valgus_angle"</span>,
+        <span class="string">"high_risk_threshold"</span>: <span class="num">15</span>,          <span class="comment"># degrees, cite: Hewett et al.</span>
+        <span class="string">"message"</span>: <span class="string">"Movement pattern associated with increased knee load. Consider strengthening hip abductors."</span>
+    },
+    <span class="string">"lower_back_load"</span>: {
+        <span class="string">"condition"</span>: <span class="string">"excessive lumbar flexion under load"</span>,
+        <span class="string">"metric"</span>: <span class="string">"spine_flexion_at_contact"</span>,
+        <span class="string">"high_risk_threshold"</span>: <span class="num">45</span>,
+        <span class="string">"message"</span>: <span class="string">"High lumbar load detected. Reinforce neutral spine position in drills."</span>
+    }
+}
+
+<span class="keyword">def</span> <span class="func">calculate_risk_indicators</span>(pose_sequence, sport):
+    risks = []
+    <span class="keyword">for</span> risk_name, risk_config <span class="keyword">in</span> INJURY_RISK_INDICATORS.items():
+        value = extract_metric(pose_sequence, risk_config[<span class="string">'metric'</span>])
+        <span class="keyword">if</span> value > risk_config[<span class="string">'high_risk_threshold'</span>]:
+            risks.append({
+                <span class="string">"indicator"</span>: risk_name,
+                <span class="string">"value"</span>: value,
+                <span class="string">"message"</span>: risk_config[<span class="string">'message'</span>],
+                <span class="string">"disclaimer"</span>: <span class="string">"This is a movement quality indicator, not a medical diagnosis."</span>
+            })
+    <span class="keyword">return</span> risks</pre>
+</section>
+
+<!-- PHASE 3: INFRASTRUCTURE -->
+<section id="p3-infra">
+  <span class="section-num">12 — Phase 3 / Production Infrastructure</span>
+  <h2>Production Infrastructure at Scale</h2>
+  <p class="lead">When you have 50,000+ athletes and Olympic teams using the platform, the infrastructure changes significantly. Here is what you migrate to and when.</p>
+
+  <table>
+    <thead><tr><th>Component</th><th>Phase 1 (0–2K users)</th><th>Phase 3 (50K+ users)</th><th>Migration trigger</th></tr></thead>
+    <tbody>
+      <tr><td>API server</td><td>Railway (single instance)</td><td>AWS ECS + ALB (auto-scaling)</td><td>When Railway costs &gt;$200/mo</td></tr>
+      <tr><td>AI inference</td><td>Modal serverless GPU</td><td>AWS g5.xlarge fleet + SQS queue</td><td>When queue latency exceeds 2 mins peak</td></tr>
+      <tr><td>Database</td><td>Supabase Pro</td><td>AWS RDS Aurora Postgres + read replicas</td><td>At 1M rows in video_uploads</td></tr>
+      <tr><td>Video</td><td>Cloudflare R2 + Stream</td><td>Cloudflare R2 + Stream (keep this — it scales)</td><td>No migration needed</td></tr>
+      <tr><td>Caching</td><td>None / Supabase built-in</td><td>Redis (Upstash serverless)</td><td>When analysis results take &gt;200ms to return</td></tr>
+      <tr><td>Background jobs</td><td>Bull (Node.js)</td><td>AWS SQS + Lambda workers</td><td>When job queue exceeds 1K items</td></tr>
+      <tr><td>Monitoring</td><td>Railway logs</td><td>Datadog APM + PagerDuty</td><td>Before first pro team contract</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout green">
+    <strong>The architecture decision that matters most:</strong> Keep your pose extraction service (Python/FastAPI) completely decoupled from your main Node.js API from Day 1. They communicate via a job queue. This means you can scale the GPU inference layer independently without touching the rest of the app — critical when you go from 50 to 5,000 videos per day.
+  </div>
+</section>
+
+<!-- PHASE 3: PRO INTEGRATIONS -->
+<section id="p3-integrations">
+  <span class="section-num">13 — Phase 3 / Pro Team Integrations</span>
+  <h2>Professional & Olympic Team Integrations</h2>
+  <p class="lead">This is the B2B revenue layer — team licenses, federation dashboards, and the features that pro coaches need that consumer athletes don't.</p>
+
+  <div class="two-col">
+    <div class="card accent">
+      <h4>Pro team dashboard features</h4>
+      <h3>What Olympic Coaches Need</h3>
+      <p>Roster-level view of all athlete metrics · Technique trend analysis across a season · Pre/post competition comparison · Injury risk monitoring across the team · Export to CSV for their own analysis. This is a $500–2,000/month SaaS product per team.</p>
+    </div>
+    <div class="card teal">
+      <h4>Integration points</h4>
+      <h3>What Pro Teams Already Use</h3>
+      <p>Hudl (existing video storage) — build a Hudl import so coaches don't re-upload. GPS/wearable data (Catapult, PlayerTek) — correlate movement quality with load data. EHR/injury management systems — flag high-risk athletes to medical staff.</p>
+    </div>
+  </div>
+
+  <pre><span class="comment">// Team license pricing model (B2B)</span>
+<span class="keyword">const</span> TEAM_TIERS = {
+  collegiate: {
+    price_monthly: <span class="num">299</span>,
+    athletes: <span class="num">30</span>,
+    analyses_per_month: <span class="num">200</span>,
+    features: [<span class="string">'roster_dashboard'</span>, <span class="string">'season_trends'</span>, <span class="string">'csv_export'</span>]
+  },
+  national_program: {
+    price_monthly: <span class="num">999</span>,
+    athletes: <span class="num">unlimited</span>,
+    analyses_per_month: <span class="num">1000</span>,
+    features: [<span class="string">'all'</span>, <span class="string">'api_access'</span>, <span class="string">'custom_benchmarks'</span>, <span class="string">'dedicated_support'</span>]
+  },
+  olympic_program: {
+    price_monthly: <span class="num">3000</span>,
+    athletes: <span class="num">unlimited</span>,
+    analyses_per_month: <span class="num">unlimited</span>,
+    features: [<span class="string">'all'</span>, <span class="string">'custom_model_fine_tuning'</span>, <span class="string">'wearable_integration'</span>, 
+               <span class="string">'on_site_setup'</span>, <span class="string">'biannual_review'</span>]
+  }
+}</pre>
+</section>
+
+<!-- COSTS -->
+<section id="costs">
+  <span class="section-num">14 — Reference</span>
+  <h2>Full Cost Breakdown</h2>
+  <p class="lead">Real numbers. Every line justified. No hand-waving.</p>
+
+  <table>
+    <thead><tr><th>Cost Item</th><th>Phase 1</th><th>Phase 2</th><th>Phase 3</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Supabase</td><td>$0–25/mo</td><td>$25–100/mo</td><td>$300+/mo (RDS)</td><td>Free tier generous</td></tr>
+      <tr><td>Cloudflare R2 + Stream</td><td>$20–50/mo</td><td>$100–300/mo</td><td>$500–2K/mo</td><td>Much cheaper than S3</td></tr>
+      <tr><td>Modal GPU (AI inference)</td><td>$0.30/video</td><td>$0.30/video</td><td>Reserved GPU fleet</td><td>Serverless — no idle cost</td></tr>
+      <tr><td>AWS Rekognition (moderation)</td><td>$0.90/video</td><td>$0.90/video</td><td>$0.90/video</td><td>Non-negotiable</td></tr>
+      <tr><td>Claude API (feedback)</td><td>$0.02/analysis</td><td>$0.02/analysis</td><td>$0.02/analysis</td><td>Negligible</td></tr>
+      <tr><td>Railway (API hosting)</td><td>$5–20/mo</td><td>$20–100/mo</td><td>→ AWS ECS</td><td>Migrate at 50K users</td></tr>
+      <tr><td>Stripe fees</td><td>2.9% + $0.30</td><td>2.9% + $0.30</td><td>Negotiate custom</td><td>On each transaction</td></tr>
+      <tr><td>Data labeling (Roboflow)</td><td>$3–8K one-time</td><td>$2K/sport added</td><td>Ongoing with coaches</td><td>Per-sport cost</td></tr>
+      <tr><td>Coach knowledge sessions</td><td>$500/coach</td><td>$500/coach</td><td>Revenue share</td><td>5 coaches = $2,500</td></tr>
+      <tr><td>Legal / COPPA compliance</td><td>$5–10K</td><td>$10–20K/yr</td><td>$30–80K/yr</td><td>Cannot skip</td></tr>
+      <tr><td>Total burn (excl. salaries)</td><td>~$15K setup</td><td>~$5–8K/mo</td><td>~$30K+/mo</td><td>Pre-revenue</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- TIMELINE -->
+<section id="timeline">
+  <span class="section-num">15 — Reference</span>
+  <h2>Realistic Build Timeline</h2>
+  <p class="lead">Assumes 1 technical founder + 1 part-time developer. Be honest: if you're solo, add 40% to every estimate.</p>
+
+  <div class="pipeline">
+    <div class="pipe-step" data-n="1">
+      <h3>Weeks 1–2: Foundation</h3>
+      <p>Supabase project setup · Railway API deployment · Cloudflare R2 + Stream configured · Download AthletePose3D · Stripe Connect test mode · YOLO11-Pose running locally on GPU. Everything should be wired together before you write product features.</p>
+    </div>
+    <div class="pipe-step" data-n="2">
+      <h3>Weeks 3–6: Data + Rules Engine</h3>
+      <p>Begin filming labeled dataset with coaches · Skeleton extractor pipeline running on broadcast footage · First version of wrestling rules engine with 2 techniques · Claude API integration for feedback generation. This is the most important work — don't rush it.</p>
+    </div>
+    <div class="pipe-step" data-n="3">
+      <h3>Weeks 7–10: App + Backend</h3>
+      <p>React Native app: 5 screens · Video upload flow with moderation · Full analysis pipeline end-to-end · Coach web dashboard: queue + review flow · Stripe payments live. First real test with 5 athletes.</p>
+    </div>
+    <div class="pipe-step" data-n="4">
+      <h3>Weeks 11–14: Validation + Demo Prep</h3>
+      <p>20 athletes, 5 coaches using it daily · Collecting AI/coach divergence data · Refining thresholds · Building the investor demo flow · First MRR. This is also when you apply to accelerators if that's the path.</p>
+    </div>
+    <div class="pipe-step" data-n="5">
+      <h3>Months 4–9: Phase 2</h3>
+      <p>Second sport · Before/after comparison feature · Coach AI pre-digest · Athlete progress graphs · Growing toward 200 paying users and $8K MRR. At this point you have enough data to tell a compelling seed story.</p>
+    </div>
+    <div class="pipe-step" data-n="6">
+      <h3>Months 10–24: Phase 3</h3>
+      <p>Elite benchmark database · LSTM temporal model · National federation partnerships · Team license B2B product · Production infrastructure migration. This phase is funded — you're not bootstrapping it.</p>
+    </div>
+  </div>
+
+  <div class="callout green">
+    <strong>The single most honest piece of advice in this document:</strong> The first 6 weeks should be 80% data collection and rules engine, 20% app. Most founders reverse this ratio. A beautiful app with a dumb AI is a demo. A rough app with a precise AI is a product.
+  </div>
+</section>
+
+</main>
+
+<script>
+const sections = document.querySelectorAll('section[id]')
+const links = document.querySelectorAll('nav a')
+
+window.addEventListener('scroll', () => {
+  let current = ''
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 120) current = s.id
+  })
+  links.forEach(l => {
+    l.classList.remove('active')
+    if (l.getAttribute('href') === '#' + current) l.classList.add('active')
+  })
+})
+
+links.forEach(l => {
+  l.addEventListener('click', e => {
+    e.preventDefault()
+    const target = document.querySelector(l.getAttribute('href'))
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  })
+})
+</script>
+</body>
+</html>

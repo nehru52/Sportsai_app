@@ -1,0 +1,111 @@
+# SportsAI Elite Volleyball Analysis System - Enhanced Requirements
+# Updated for three-layer architecture with post-match analysis
+
+# Core AI/ML Frameworks
+torch>=1.12.0
+torchvision>=0.13.0
+transformers>=4.20.0
+accelerate>=0.12.0
+
+# Computer Vision & Tracking
+opencv-python>=4.6.0
+ultralytics>=8.0.0  # YOLO for ByteTrack
+bytetrack>=0.1.0    # Multi-object tracking
+mediapipe>=0.9.0    # Pose estimation
+scipy>=1.8.0        # Signal processing for motion analysis
+
+# Vision Transformers & Specialized Models
+timm>=0.6.0         # Vision transformers
+vit-pytorch>=0.35.0  # Vision Transformer implementations
+segment-anything>=1.0  # SAM2 integration
+
+# OCR for Jersey Recognition
+easyocr>=1.6.0      # Alternative OCR solution
+tesseract>=0.1.3     # Tesseract OCR
+pytesseract>=0.3.8  # Python wrapper for Tesseract
+
+# Data Processing & Analysis
+numpy>=1.21.0
+pandas>=1.4.0
+scikit-learn>=1.1.0
+matplotlib>=3.5.0
+seaborn>=0.11.0
+plotly>=5.8.0       # Interactive visualizations
+
+# Web Framework & API
+fastapi>=0.85.0
+uvicorn>=0.18.0
+python-multipart>=0.0.5
+pydantic>=1.10.0
+
+# Database & Storage
+sqlite3             # Built-in SQLite support
+sqlalchemy>=1.4.0   # ORM for database operations
+redis>=4.3.0        # Caching and job queue
+
+# Async Processing
+celery>=5.2.0       # Distributed task queue
+aioredis>=2.0.0     # Async Redis support
+asyncio             # Built-in async support
+
+# Email & Notifications
+smtplib2>=0.2.0     # Email notifications
+email-validator>=1.2.0  # Email validation
+
+# Configuration & Environment
+python-dotenv>=0.20.0
+pydantic-settings>=2.0.0
+
+# Logging & Monitoring
+loguru>=0.6.0       # Advanced logging
+prometheus-client>=0.14.0  # Metrics collection
+
+# Development & Testing
+pytest>=7.0.0
+pytest-asyncio>=0.19.0
+pytest-cov>=3.0.0
+black>=22.0.0       # Code formatting
+flake8>=4.0.0       # Code linting
+mypy>=0.971         # Type checking
+
+# Video Processing
+moviepy>=1.0.3      # Video editing and processing
+ffmpeg-python>=0.2.0  # FFmpeg Python bindings
+imageio>=2.19.0     # Video I/O
+imageio-ffmpeg>=0.4.7  # FFmpeg plugin for imageio
+
+# Machine Learning Utilities
+mlflow>=1.28.0      # ML experiment tracking
+wandb>=0.12.0       # Weights & Biases integration
+optuna>=2.10.0      # Hyperparameter optimization
+
+# Specialized Sports Analysis
+sport-analytics>=0.1.0  # Sports-specific analytics
+tracking-ml>=0.1.0      # Multi-object tracking utilities
+
+# Additional Utilities
+rich>=12.0.0        # Rich text and beautiful formatting
+typer>=0.6.0        # CLI framework
+click>=8.1.0        # Command line interface creation
+
+# Performance Optimization
+numba>=0.56.0       # JIT compilation for performance
+pytorch-lightning>=1.7.0  # PyTorch training framework
+
+# Cloud & Deployment
+gunicorn>=20.1.0    # WSGI server
+docker>=5.0.0       # Docker integration
+kubernetes>=24.0.0  # Kubernetes deployment support
+
+# Security
+cryptography>=37.0.0  # Encryption and security
+passlib>=1.7.4      # Password hashing
+bcrypt>=3.2.2       # Password hashing
+
+# Documentation
+mkdocs>=1.4.0       # Documentation generation
+mkdocs-material>=8.3.0  # Material theme for MkDocs
+
+# Note: Some packages may require specific versions or additional setup
+# ByteTrack and TrOCR may need to be installed from source or specific repositories
+# VideoMAE and ActionFormer models need to be downloaded separately

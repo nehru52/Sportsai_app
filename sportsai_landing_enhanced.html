@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SportsAI Elite — Three-Layer Olympic Analysis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="frontend/enhanced.css">
+<link rel="stylesheet" href="frontend/style.css">
+</head>
+<body>
+
+<!-- Enhanced Navigation -->
+<nav class="nav-enhanced">
+  <a href="#" class="nav-brand-enhanced">Sports<span>AI</span> Elite</a>
+  <div class="nav-menu-enhanced">
+    <a href="#three-layer" class="nav-link-enhanced active">Three-Layer</a>
+    <a href="#post-match" class="nav-link-enhanced">Post-Match</a>
+    <a href="#competition" class="nav-link-enhanced">Competition</a>
+    <a href="#benchmarks" class="nav-link-enhanced">FIVB</a>
+    <a href="#training" class="nav-link-enhanced">Training</a>
+  </div>
+</nav>
+
+<!-- Enhanced Hero Section -->
+<section id="hero" class="hero-enhanced">
+  <div class="hero-glow"></div>
+  <div class="hero-eyebrow">🏆 OLYMPIC-GRADE ANALYSIS</div>
+  <h1>
+    Three-Layer
+    <span class="line2">Volleyball Intelligence</span>
+  </h1>
+  <p class="hero-sub-enhanced">
+    Tactical analysis meets biomechanical precision. Upload any match video and get comprehensive insights 
+    with FIVB benchmarks, multi-player tracking, and AI-powered coaching recommendations.
+  </p>
+  
+  <div class="hero-cta-enhanced">
+    <button class="btn-enhanced btn-primary-enhanced" onclick="showQuickAnalysis()">
+      ⚡ Quick Analysis
+    </button>
+    <button class="btn-enhanced btn-secondary-enhanced" onclick="showPostMatchModal()">
+      🌙 Post-Match Analysis
+    </button>
+    <button class="btn-enhanced btn-secondary-enhanced" onclick="showTrainingModal()">
+      🧠 Generate Training Data
+    </button>
+  </div>
+  
+  <div class="hero-stats-enhanced">
+    <div class="stat">
+      <div class="stat-num">3</div>
+      <div class="stat-label">Analysis Layers</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">400+</div>
+      <div class="stat-label">FIVB Benchmarks</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">12</div>
+      <div class="stat-label">Player Tracking</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">8</div>
+      <div class="stat-label">Week Training</div>
+    </div>
+  </div>
+</section>
+
+<!-- Three-Layer Architecture Section -->
+<section id="three-layer" class="three-layer-section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">THREE-LAYER ARCHITECTURE</div>
+      <h2>Complete Volleyball Intelligence</h2>
+      <p>From tactical patterns to biomechanical precision to AI-powered insights</p>
+    </div>
+    
+    <div class="three-layer-grid">
+      <!-- Layer 1: Tactical -->
+      <div class="layer-card layer1" data-layer="tactical">
+        <div class="layer-icon layer1">🎯</div>
+        <h3>Layer 1: Tactical Analysis</h3>
+        <p>Parse Data Volley files, analyze rally sequences, serve patterns, and transition efficiency with FIVB benchmarks.</p>
+        
+        <div class="layer-features">
+          <div class="feature-item">
+            <span class="feature-icon">📊</span>
+            <span>Data Volley Integration</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">🎾</span>
+            <span>Serve/Attack Pattern Analysis</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">⚡</span>
+            <span>Transition Efficiency Metrics</span>
+          </div>
+        </div>
+        
+        <div class="layer-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" data-progress="0"></div>
+          </div>
+          <span class="progress-text">Ready</span>
+        </div>
+        
+        <div class="layer-data" data-layer-data="tactical"></div>
+      </div>
+      
+      <!-- Layer 2: Biomechanical -->
+      <div class="layer-card layer2" data-layer="biomechanical">
+        <div class="layer-icon layer2">🦴</div>
+        <h3>Layer 2: Biomechanical Analysis</h3>
+        <p>Multi-player tracking with ByteTrack + TrOCR, pose estimation, and elite benchmark comparison.</p>
+        
+        <div class="layer-features">
+          <div class="feature-item">
+            <span class="feature-icon">🏃</span>
+            <span>12-Player Tracking</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">🔢</span>
+            <span>Jersey Recognition</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">📐</span>
+            <span>FIVB Elite Benchmarks</span>
+          </div>
+        </div>
+        
+        <div class="layer-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" data-progress="0"></div>
+          </div>
+          <span class="progress-text">Ready</span>
+        </div>
+        
+        <div class="layer-data" data-layer-data="biomechanical"></div>
+      </div>
+      
+      <!-- Layer 3: LLM Insights -->
+      <div class="layer-card layer3" data-layer="llm">
+        <div class="layer-icon layer3">🧠</div>
+        <h3>Layer 3: LLM Insights</h3>
+        <p>AI-powered coaching recommendations, 8-week training programs, and competition readiness assessment.</p>
+        
+        <div class="layer-features">
+          <div class="feature-item">
+            <span class="feature-icon">💡</span>
+            <span>Contextual Coaching</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">📅</span>
+            <span>8-Week Training Plans</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">🏆</span>
+            <span>Competition Readiness</span>
+          </div>
+        </div>
+        
+        <div class="layer-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" data-progress="0"></div>
+          </div>
+          <span class="progress-text">Ready</span>
+        </div>
+        
+        <div class="layer-data" data-layer-data="llm"></div>
+      </div>
+    </div>
+    
+    <div class="integration-display">
+      <div class="integration-header">
+        <h4>Integrated Analysis Pipeline</h4>
+        <div class="overall-progress">
+          <div class="progress-bar">
+            <div class="progress-fill integration" data-progress="0"></div>
+          </div>
+          <span class="overall-progress-text">0% Complete</span>
+        </div>
+      </div>
+      
+      <div class="action-timeline">
+        <div class="timeline-bar">
+          <div class="timeline-fill"></div>
+        </div>
+        <div class="timeline-markers"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Post-Match Analysis Section -->
+<section id="post-match" class="post-match-section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">OVERNIGHT PROCESSING</div>
+      <h2>Comprehensive Post-Match Analysis</h2>
+      <p>Upload full match videos for overnight processing with detailed tactical, biomechanical, and coaching insights.</p>
+    </div>
+    
+    <div class="post-match-workflow">
+      <div class="workflow-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h4>Upload Match</h4>
+          <p>Submit match video and optional Data Volley (.dvw) file</p>
+        </div>
+      </div>
+      
+      <div class="workflow-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h4>Overnight Processing</h4>
+          <p>6-8 hour comprehensive analysis with priority queue</p>
+        </div>
+      </div>
+      
+      <div class="workflow-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h4>Detailed Report</h4>
+          <p>Complete analysis with training recommendations</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="upload-section-enhanced">
+      <div class="upload-zone-enhanced" data-upload-type="post-match" data-auto-analyze="false">
+        <div class="upload-icon">📹</div>
+        <h4>Upload Match Video</h4>
+        <p>Drag and drop or click to select match video file</p>
+        <input type="file" accept="video/*" class="file-input-hidden">
+        <div class="file-info"></div>
+        <div class="upload-progress" style="display: none;">
+          <div class="upload-progress-bar"></div>
+        </div>
+      </div>
+      
+      <div class="upload-zone-enhanced" data-upload-type="dvw-file">
+        <div class="upload-icon">📊</div>
+        <h4>Data Volley File (Optional)</h4>
+        <p>Upload .dvw file for enhanced tactical analysis</p>
+        <input type="file" accept=".dvw" class="file-input-hidden">
+        <div class="file-info"></div>
+      </div>
+    </div>
+    
+    <div class="analysis-form-enhanced">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Athlete ID</label>
+          <input type="text" placeholder="athlete_001" id="athleteId">
+        </div>
+        <div class="form-group">
+          <label>Tournament Name</label>
+          <input type="text" placeholder="Elite Championship" id="tournamentName">
+        </div>
+        <div class="form-group">
+          <label>Priority</label>
+          <select id="priority">
+            <option value="normal">Normal</option>
+            <option value="high">High Priority</option>
+            <option value="low">Low Priority</option>
+          </select>
+        </div>
+      </div>
+      
+      <button class="btn-enhanced btn-primary-enhanced" onclick="submitPostMatchAnalysis()">
+        Submit for Analysis
+      </button>
+    </div>
+    
+    <div class="job-status-display hidden">
+      <div class="status-header">
+        <h4>Analysis Status</h4>
+        <span class="job-status">Pending</span>
+      </div>
+      <div class="job-progress">
+        <div class="progress-bar">
+          <div class="job-progress-bar"></div>
+        </div>
+        <span class="job-progress-text">0% Complete</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Competition Readiness Section -->
+<section id="competition" class="competition-section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">COMPETITION READINESS</div>
+      <h2>Olympic-Level Assessment</h2>
+      <p>Four-tier competition readiness system with position-specific benchmarks and timeline recommendations.</p>
+    </div>
+    
+    <div class="readiness-dashboard">
+      <div class="readiness-overview">
+        <div class="readiness-card elite" data-readiness-level="elite">
+          <div class="readiness-score">85%</div>
+          <div class="readiness-level">Competition Ready</div>
+          <div class="readiness-description">Elite performance standards met</div>
+        </div>
+        
+        <div class="readiness-breakdown">
+          <div class="readiness-metric">
+            <div class="progress-ring" data-readiness-ring="overall">
+              <svg width="80" height="80">
+                <circle class="progress-ring-bg" cx="40" cy="40" r="36"></circle>
+                <circle class="progress-ring-fill" cx="40" cy="40" r="36"></circle>
+              </svg>
+              <div class="progress-text">85%</div>
+            </div>
+            <div class="metric-label">Overall Readiness</div>
+          </div>
+          
+          <div class="readiness-metric">
+            <div class="progress-ring" data-readiness-ring="tactical">
+              <svg width="80" height="80">
+                <circle class="progress-ring-bg" cx="40" cy="40" r="36"></circle>
+                <circle class="progress-ring-fill" cx="40" cy="40" r="36"></circle>
+              </svg>
+              <div class="progress-text">78%</div>
+            </div>
+            <div class="metric-label">Tactical</div>
+          </div>
+          
+          <div class="readiness-metric">
+            <div class="progress-ring" data-readiness-ring="biomechanical">
+              <svg width="80" height="80">
+                <circle class="progress-ring-bg" cx="40" cy="40" r="36"></circle>
+                <circle class="progress-ring-fill" cx="40" cy="40" r="36"></circle>
+              </svg>
+              <div class="progress-text">68%</div>
+            </div>
+            <div class="metric-label">Biomechanical</div>
+          </div>
+          
+          <div class="readiness-metric">
+            <div class="progress-ring" data-readiness-ring="consistency">
+              <svg width="80" height="80">
+                <circle class="progress-ring-bg" cx="40" cy="40" r="36"></circle>
+                <circle class="progress-ring-fill" cx="40" cy="40" r="36"></circle>
+              </svg>
+              <div class="progress-text">79%</div>
+            </div>
+            <div class="metric-label">Consistency</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="readiness-recommendations">
+        <h4>Key Recommendations</h4>
+        <div class="recommendation-card">
+          <div class="rec-number">1</div>
+          <div class="rec-content">
+            <div class="rec-text">Address identified biomechanical deviations in spike technique</div>
+          </div>
+        </div>
+        <div class="recommendation-card">
+          <div class="rec-number">2</div>
+          <div class="rec-content">
+            <div class="rec-text">Improve reception consistency for higher first-contact quality</div>
+          </div>
+        </div>
+        <div class="recommendation-card">
+          <div class="rec-number">3</div>
+          <div class="rec-content">
+            <div class="rec-text">Incorporate more first-tempo attacks for tactical variety</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="readiness-timeline">
+      <h4>Timeline to Competition Ready</h4>
+      <div class="timeline-steps">
+        <div class="timeline-step completed">
+          <div class="step-marker"></div>
+          <div class="step-content">
+            <h5>Assessment Complete</h5>
+            <p>Comprehensive analysis finished</p>
+          </div>
+        </div>
+        <div class="timeline-step active">
+          <div class="step-marker"></div>
+          <div class="step-content">
+            <h5>Technique Refinement</h5>
+            <p>6-8 weeks focused training</p>
+          </div>
+        </div>
+        <div class="timeline-step">
+          <div class="step-marker"></div>
+          <div class="step-content">
+            <h5>Integration Phase</h5>
+            <p>Competition simulation</p>
+          </div>
+        </div>
+        <div class="timeline-step">
+          <div class="step-marker"></div>
+          <div class="step-content">
+            <h5>Competition Ready</h5>
+            <p>Peak performance achieved</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FIVB Benchmarks Section -->
+<section id="benchmarks" class="benchmarks-section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">FIVB ELITE BENCHMARKS</div>
+      <h2>World Championship Standards</h2>
+      <p>Biomechanical benchmarks from 2014 FIVB World Championship data with position-specific variations.</p>
+    </div>
+    
+    <div class="benchmark-visualization">
+      <div class="benchmark-controls">
+        <div class="technique-selector">
+          <button class="tech-pill active" data-tech="spike">Spike</button>
+          <button class="tech-pill" data-tech="serve">Serve</button>
+          <button class="tech-pill" data-tech="block">Block</button>
+          <button class="tech-pill" data-tech="dig">Dig</button>
+        </div>
+        <div class="position-selector">
+          <select id="positionSelect">
+            <option value="general">General</option>
+            <option value="middle">Middle</option>
+            <option value="opposite">Opposite</option>
+            <option value="outside">Outside</option>
+            <option value="libero">Libero</option>
+            <option value="setter">Setter</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="benchmark-chart" id="benchmarkChart">
+        <div class="benchmark-item">
+          <div class="benchmark-joint">ELBOW FLEXION</div>
+          <div class="benchmark-bar">
+            <div class="benchmark-fill elite" style="width: 85%"></div>
+          </div>
+          <div class="benchmark-assessment">ELITE</div>
+        </div>
+        <div class="benchmark-item">
+          <div class="benchmark-joint">TORSO EXTENSION</div>
+          <div class="benchmark-bar">
+            <div class="benchmark-fill good" style="width: 70%"></div>
+          </div>
+          <div class="benchmark-assessment">GOOD</div>
+        </div>
+        <div class="benchmark-item">
+          <div class="benchmark-joint">APPROACH ANGLE</div>
+          <div class="benchmark-bar">
+            <div class="benchmark-fill needs-work" style="width: 50%"></div>
+          </div>
+          <div class="benchmark-assessment">NEEDS WORK</div>
+        </div>
+        <div class="benchmark-item">
+          <div class="benchmark-joint">KNEE FLEXION</div>
+          <div class="benchmark-bar">
+            <div class="benchmark-fill significant" style="width: 30%"></div>
+          </div>
+          <div class="benchmark-assessment">SIGNIFICANT</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="benchmark-details">
+      <div class="benchmark-stats">
+        <h4>Elite Standards</h4>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-value">166.4°</div>
+            <div class="stat-label">Elbow Flexion</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">159.8°</div>
+            <div class="stat-label">Torso Extension</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">45.2°</div>
+            <div class="stat-label">Approach Angle</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">118.7°</div>
+            <div class="stat-label">Knee Flexion</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="position-variations">
+        <h4>Position Variations</h4>
+        <div class="variation-list">
+          <div class="variation-item">
+            <span class="position-name">Middle</span>
+            <span class="variation-value">+2.1° approach angle</span>
+          </div>
+          <div class="variation-item">
+            <span class="position-name">Opposite</span>
+            <span class="variation-value">-1.8° approach angle</span>
+          </div>
+          <div class="variation-item">
+            <span class="position-name">Outside</span>
+            <span class="variation-value">+0.15 m/s velocity</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Training Data Generation Section -->
+<section id="training" class="training-section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">LLM TRAINING DATA</div>
+      <h2>AI Training Dataset Generation</h2>
+      <p>Generate synthetic training data for volleyball-specific language models with FIVB biomechanical standards.</p>
+    </div>
+    
+    <div class="training-interface">
+      <div class="generation-controls">
+        <div class="control-group">
+          <label>Techniques</label>
+          <div class="tech-selector">
+            <button class="tech-pill active" data-tech="spike">Spike</button>
+            <button class="tech-pill active" data-tech="serve">Serve</button>
+            <button class="tech-pill active" data-tech="block">Block</button>
+            <button class="tech-pill active" data-tech="dig">Dig</button>
+          </div>
+        </div>
+        
+        <div class="control-group">
+          <label>Samples per Technique</label>
+          <input type="range" min="100" max="10000" value="1000" id="sampleCount">
+          <span class="sample-count-display">1000</span>
+        </div>
+        
+        <div class="control-group">
+          <label>Quality Threshold</label>
+          <input type="range" min="0.5" max="1.0" step="0.1" value="0.7" id="qualityThreshold">
+          <span class="quality-display">0.7</span>
+        </div>
+      </div>
+      
+      <div class="generation-preview">
+        <h4>Sample Training Pair</h4>
+        <div class="training-pair">
+          <div class="input-section">
+            <h5>Input</h5>
+            <div class="input-data">
+              <div class="joint-angles">
+                <strong>Joint Angles:</strong>
+                <ul>
+                  <li>Elbow Flexion: 143.2°</li>
+                  <li>Torso Extension: 142.1°</li>
+                  <li>Knee Flexion: 118.7°</li>
+                </ul>
+              </div>
+              <div class="context">
+                <strong>Context:</strong>
+                <ul>
+                  <li>Technique: Spike</li>
+                  <li>Position: Opposite</li>
+                  <li>Set Tempo: High Ball</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+          <div class="target-section">
+            <h5>Target Output</h5>
+            <div class="target-data">
+              <div class="correction">
+                <strong>Correction:</strong>
+                <p>Maintain 'bow and arrow' position longer during approach. Focus on delaying arm swing until last 0.2s before contact.</p>
+              </div>
+              <div class="drill">
+                <strong>Drill:</strong>
+                <p>Wall blocks with delayed arm swing - focus on maintaining 90° elbow flexion until last 0.2s before contact</p>
+              </div>
+              <div class="assessment">
+                <strong>Assessment:</strong> <span class="assessment-badge needs-improvement">Needs Improvement</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="generation-actions">
+        <button class="btn-enhanced btn-primary-enhanced" onclick="generateTrainingData()">
+          Generate Training Dataset
+        </button>
+        <button class="btn-enhanced btn-secondary-enhanced" onclick="downloadTrainingData()">
+          Download Sample
+        </button>
+      </div>
+    </div>
+    
+    <div class="dataset-stats">
+      <h4>Dataset Statistics</h4>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-value">4,000</div>
+          <div class="stat-label">Total Samples</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">4</div>
+          <div class="stat-label">Techniques</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">0.82</div>
+          <div class="stat-label">Avg Quality</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">5</div>
+          <div class="stat-label">Positions</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Court Visualization Section -->
+<section class="court-visualization-section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">MULTI-PLAYER TRACKING</div>
+      <h2>Real-Time Court Analysis</h2>
+      <p>Visualize player positions, formations, and movement patterns with ByteTrack + TrOCR integration.</p>
+    </div>
+    
+    <div class="court-display">
+      <div class="court-diagram">
+        <svg class="court-svg" viewBox="0 0 400 200">
+          <!-- Court boundaries -->
+          <rect x="20" y="20" width="360" height="160" fill="none" stroke="var(--border2)" stroke-width="2"/>
+          <!-- Net -->
+          <line x1="200" y1="20" x2="200" y2="180" stroke="var(--border2)" stroke-width="1"/>
+          <!-- Attack lines -->
+          <line x1="20" y1="60" x2="200" y2="60" stroke="var(--border2)" stroke-width="1"/>
+          <line x1="200" y1="140" x2="380" y2="140" stroke="var(--border2)" stroke-width="1"/>
+        </svg>
+        
+        <!-- Player markers will be added dynamically -->
+        <div class="player-marker tracked" style="left: 15%; top: 25%;">1</div>
+        <div class="player-marker tracked" style="left: 35%; top: 25%;">3</div>
+        <div class="player-marker tracked" style="left: 55%; top: 25%;">7</div>
+        <div class="player-marker tracked" style="left: 75%; top: 25%;">11</div>
+        <div class="player-marker analyzed" style="left: 25%; top: 75%;">2</div>
+        <div class="player-marker analyzed" style="left: 45%; top: 75%;">5</div>
+        <div class="player-marker analyzed" style="left: 65%; top: 75%;">9</div>
+        <div class="player-marker analyzed" style="left: 85%; top: 75%;">12</div>
+      </div>
+      
+      <div class="tracking-stats">
+        <h4>Tracking Statistics</h4>
+        <div class="stat-grid">
+          <div class="stat-item">
+            <div class="stat-value">12</div>
+            <div class="stat-label">Players Tracked</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">8</div>
+            <div class="stat-label">Jerseys Detected</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">92%</div>
+            <div class="stat-label">Tracking Quality</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">15</div>
+            <div class="stat-label">Occlusion Events</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="formation-analysis">
+      <h4>Formation Analysis</h4>
+      <div class="formation-grid">
+        <div class="formation-card">
+          <h5>Serve Receive</h5>
+          <div class="formation-diagram">5-1 Formation Detected</div>
+        </div>
+        <div class="formation-card">
+          <h5>Defensive</h5>
+          <div class="formation-diagram">Perimeter Defense</div>
+        </div>
+        <div class="formation-card">
+          <h5>Transition</h5>
+          <div class="formation-diagram">Quick Transition Pattern</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Results Section -->
+<section class="results-section hidden">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">ANALYSIS RESULTS</div>
+      <h2>Comprehensive Analysis Complete</h2>
+      <p>View detailed results across all three analysis layers with integrated insights and recommendations.</p>
+    </div>
+    
+    <div class="results-summary">
+      <div class="results-overview">
+        <div class="overall-score">
+          <div class="score-circle">
+            <div class="score-value">87</div>
+            <div class="score-label">Analysis Score</div>
+          </div>
+        </div>
+        
+        <div class="results-metrics">
+          <div class="metric-group">
+            <h4>Tactical Analysis</h4>
+            <div class="metric">234 actions analyzed</div>
+            <div class="metric">127 rallies processed</div>
+          </div>
+          <div class="metric-group">
+            <h4>Biomechanical Analysis</h4>
+            <div class="metric">89 actions analyzed</div>
+            <div class="metric">68% elite alignment</div>
+          </div>
+          <div class="metric-group">
+            <h4>LLM Insights</h4>
+            <div class="metric">12 recommendations</div>
+            <div class="metric">8-week training plan</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="results-actions">
+      <button class="btn-enhanced btn-primary-enhanced" onclick="downloadFullReport()">
+        📄 Download Full Report
+      </button>
+      <button class="btn-enhanced btn-secondary-enhanced" onclick="shareResults()">
+        🔗 Share Results
+      </button>
+      <button class="btn-enhanced btn-secondary-enhanced" onclick="scheduleFollowUp()">
+        📅 Schedule Follow-up
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="loading-overlay hidden">
+  <div class="loading-content">
+    <div class="loading-spinner"></div>
+    <div class="loading-message">Processing...</div>
+    <div class="loading-progress">
+      <div class="progress-bar">
+        <div class="progress-fill"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modals -->
+<div id="quickAnalysisModal" class="modal-enhanced">
+  <div class="modal-content-enhanced">
+    <div class="modal-header-enhanced">
+      <h3 class="modal-title-enhanced">Quick Analysis</h3>
+      <button class="modal-close-enhanced" onclick="closeModal('quickAnalysisModal')">&times;</button>
+    </div>
+    <div class="modal-body-enhanced">
+      <!-- Quick analysis form will be populated here -->
+    </div>
+  </div>
+</div>
+
+<div id="postMatchModal" class="modal-enhanced">
+  <div class="modal-content-enhanced">
+    <div class="modal-header-enhanced">
+      <h3 class="modal-title-enhanced">Post-Match Analysis</h3>
+      <button class="modal-close-enhanced" onclick="closeModal('postMatchModal')">&times;</button>
+    </div>
+    <div class="modal-body-enhanced">
+      <!-- Post-match form will be populated here -->
+    </div>
+  </div>
+</div>
+
+<div id="trainingModal" class="modal-enhanced">
+  <div class="modal-content-enhanced">
+    <div class="modal-header-enhanced">
+      <h3 class="modal-title-enhanced">Training Data Generation</h3>
+      <button class="modal-close-enhanced" onclick="closeModal('trainingModal')">&times;</button>
+    </div>
+    <div class="modal-body-enhanced">
+      <!-- Training data form will be populated here -->
+    </div>
+  </div>
+</div>
+
+<div id="playerDetailsModal" class="modal-enhanced">
+  <div class="modal-content-enhanced">
+    <div class="modal-header-enhanced">
+      <h3 class="modal-title-enhanced">Player Details</h3>
+      <button class="modal-close-enhanced" onclick="closeModal('playerDetailsModal')">&times;</button>
+    </div>
+    <div class="modal-body-enhanced">
+      <!-- Player details will be populated here -->
+    </div>
+  </div>
+</div>
+
+<div id="actionDetailsModal" class="modal-enhanced">
+  <div class="modal-content-enhanced">
+    <div class="modal-header-enhanced">
+      <h3 class="modal-title-enhanced">Action Details</h3>
+      <button class="modal-close-enhanced" onclick="closeModal('actionDetailsModal')">&times;</button>
+    </div>
+    <div class="modal-body-enhanced">
+      <!-- Action details will be populated here -->
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="frontend/enhanced.js"></script>
+<script>
+// Global functions for modal interactions
+function showQuickAnalysis() {
+  document.getElementById('quickAnalysisModal').classList.add('active');
+}
+
+function showPostMatchModal() {
+  document.getElementById('postMatchModal').classList.add('active');
+}
+
+function showTrainingModal() {
+  document.getElementById('trainingModal').classList.add('active');
+}
+
+function closeModal(modalId) {
+  document.getElementById(modalId).classList.remove('active');
+}
+
+function submitPostMatchAnalysis() {
+  // Implementation for post-match analysis submission
+  console.log('Submitting post-match analysis...');
+  sportsAIEnhanced.showLoading('Submitting post-match analysis...');
+  
+  // Simulate submission
+  setTimeout(() => {
+    sportsAIEnhanced.hideLoading();
+    sportsAIEnhanced.showSuccess('Post-match analysis submitted successfully!');
+    closeModal('postMatchModal');
+  }, 2000);
+}
+
+function generateTrainingData() {
+  // Implementation for training data generation
+  console.log('Generating training data...');
+  sportsAIEnhanced.showLoading('Generating training dataset...');
+  
+  // Simulate generation
+  setTimeout(() => {
+    sportsAIEnhanced.hideLoading();
+    sportsAIEnhanced.showSuccess('Training dataset generated successfully!');
+    closeModal('trainingModal');
+  }, 3000);
+}
+
+function downloadTrainingData() {
+  // Implementation for downloading training data
+  console.log('Downloading training data...');
+  sportsAIEnhanced.showSuccess('Training data download started!');
+}
+
+function downloadFullReport() {
+  // Implementation for downloading full report
+  console.log('Downloading full report...');
+  sportsAIEnhanced.showSuccess('Full report download started!');
+}
+
+function shareResults() {
+  // Implementation for sharing results
+  console.log('Sharing results...');
+  sportsAIEnhanced.showSuccess('Share link copied to clipboard!');
+}
+
+function scheduleFollowUp() {
+  // Implementation for scheduling follow-up
+  console.log('Scheduling follow-up...');
+  sportsAIEnhanced.showSuccess('Follow-up scheduled!');
+}
+
+// Initialize the enhanced system
+document.addEventListener('DOMContentLoaded', function() {
+  // Add smooth scrolling for navigation links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    });
+  });
+  
+  // Update navigation active state on scroll
+  window.addEventListener('scroll', function() {
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-link-enhanced');
+    
+    let current = '';
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop;
+      const sectionHeight = section.clientHeight;
+      if (scrollY >= (sectionTop - 200)) {
+        current = section.getAttribute('id');
+      }
+    });
+    
+    navLinks.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === `#${current}`) {
+        link.classList.add('active');
+      }
+    });
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>API Connection Test</title>
+  <style>
+    body {
+      font-family: monospace;
+      padding: 40px;
+      background: #0d0d1c;
+      color: #ececff;
+    }
+    .test { margin: 20px 0; padding: 20px; background: #121225; border-radius: 10px; }
+    .success { color: #00e676; }
+    .error { color: #ff2d4e; }
+    button { padding: 10px 20px; background: #ff2d4e; color: white; border: none; border-radius: 5px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>SportsAI API Connection Test</h1>
+  
+  <button onclick="testConnection()">Test Connection</button>
+  
+  <div id="results"></div>
+  
+  <script>
+    async function testConnection() {
+      const results = document.getElementById('results');
+      results.innerHTML = '<div class="test">Testing...</div>';
+      
+      const tests = [];
+      
+      // Test 1: Basic fetch to /docs
+      try {
+        const response = await fetch('http://localhost:8001/docs');
+        tests.push({
+          name: 'GET /docs',
+          status: response.ok ? 'success' : 'error',
+          message: `Status: ${response.status}`
+        });
+      } catch (err) {
+        tests.push({
+          name: 'GET /docs',
+          status: 'error',
+          message: `Error: ${err.message}`
+        });
+      }
+      
+      // Test 2: CORS preflight
+      try {
+        const response = await fetch('http://localhost:8001/docs', {
+          method: 'OPTIONS'
+        });
+        tests.push({
+          name: 'OPTIONS /docs (CORS)',
+          status: response.ok ? 'success' : 'error',
+          message: `Status: ${response.status}`
+        });
+      } catch (err) {
+        tests.push({
+          name: 'OPTIONS /docs (CORS)',
+          status: 'error',
+          message: `Error: ${err.message}`
+        });
+      }
+      
+      // Test 3: Check if we can create FormData
+      try {
+        const form = new FormData();
+        form.append('test', 'value');
+        tests.push({
+          name: 'FormData creation',
+          status: 'success',
+          message: 'FormData works'
+        });
+      } catch (err) {
+        tests.push({
+          name: 'FormData creation',
+          status: 'error',
+          message: `Error: ${err.message}`
+        });
+      }
+      
+      // Test 4: Try actual analysis endpoint
+      try {
+        const response = await fetch('http://localhost:8001/analyse/auto?output=json&technique=spike', {
+          method: 'POST',
+          body: new FormData() // Empty form to test endpoint
+        });
+        tests.push({
+          name: 'POST /analyse/auto',
+          status: response.ok ? 'success' : 'error',
+          message: `Status: ${response.status} - ${response.ok ? 'Endpoint accessible' : await response.text()}`
+        });
+      } catch (err) {
+        tests.push({
+          name: 'POST /analyse/auto',
+          status: 'error',
+          message: `Error: ${err.message}`
+        });
+      }
+      
+      // Display results
+      results.innerHTML = tests.map(test => `
+        <div class="test">
+          <strong class="${test.status}">${test.name}</strong>: ${test.message}
+        </div>
+      `).join('');
+    }
+  </script>
+</body>
+</html>

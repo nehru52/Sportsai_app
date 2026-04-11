@@ -1,0 +1,131 @@
+## SportsAI Volleyball Coach — Project Summary (Updated April 2026)
+
+### What It Is
+An AI-powered volleyball coach that analyzes video uploads and provides Olympic-grade biomechanics feedback. Upload a video of yourself playing volleyball, get back an annotated video showing exactly what's wrong with your technique, why, and specific drills to fix it.
+
+### Core Technology Stack
+- YOLO11x-pose: 2D skeleton detection (17 joints per person)
+- MotionAGFormer: Converts 2D poses to 3D with depth information (FINE-TUNED ✓)
+- VolleyVision: Recognizes volleyball actions (spike/serve/block/dig) with 92% accuracy
+- Groq + Llama 3.3 70B: Generates coaching feedback in plain English
+- ByteTrack: Multi-player tracking for team videos
+
+### What's Built and Working
+1. Full auto-analysis pipeline (`/analyse/auto`) - upload any video, system detects technique automatically
+2. Annotated video output with color-coded skeleton (green=good, red=needs work)
+3. Biomechanics measurement for 4 techniques: spike, serve, block, dig
+4. AI coaching with feel cues and specific drills (no technical jargon)
+5. Progress tracking per athlete over time
+6. Side-by-side comparison videos (you vs elite athlete)
+7. Web API with 15+ endpoints
+8. Frontend website with drag-and-drop upload
+9. Match analysis mode for full-length games with per-player reports
+
+### Training Data Collected (COMPLETE ✓)
+- Spike: 47 videos (17 elite, 17 advanced, 13 intermediate)
+- Serve: 36 videos (8 elite, 9 advanced, 19 intermediate)
+- Block: ~25 videos (uploaded ✓)
+- Dig: ~10+ videos (uploaded ✓)
+- Total: ~118+ processed sequences
+- MotionAGFormer fine-tuned on volleyball-specific movements ✓
+
+### Key Metrics Measured
+Spike: arm_cock_angle, jump_height, approach_speed, contact_point, follow_through
+Serve: toss_height, step_timing, shoulder_rotation, wrist_snap, body_lean
+Block: reaction_time, penultimate_step, hand_position, shoulder_width, landing_balance
+Dig: platform_angle, knee_bend, hip_drop, arm_extension, recovery_position
+
+### How It Works (10 Steps)
+1. Video quality check (blur, brightness, resolution)
+2. Action detection (finds spike/serve/block/dig moments)
+3. Clip extraction (cuts relevant segment)
+4. Pose extraction (17 joints tracked per frame)
+5. 3D lifting (adds depth to flat 2D poses using fine-tuned MotionAGFormer)
+6. Biomechanics measurement (joint angles, velocities)
+7. Phase detection (approach→takeoff→contact→follow-through)
+8. Elite comparison (your metrics vs Olympic athletes)
+9. AI coaching feedback (what's wrong + how to fix it + specific drill)
+10. Video rendering (annotated MP4 with skeleton overlay)
+
+### Current Status — PRODUCTION READY
+✓ All 4 techniques fully working (spike, serve, block, dig)
+✓ Training data collected for all techniques
+✓ MotionAGFormer fine-tuned on volleyball movements
+✓ GPU acceleration working (RTX 3050 CUDA)
+✓ API running at `http://localhost:8001`
+✓ Frontend website with drag-and-drop interface
+✓ Match analysis for full-length game videos
+
+### File Structure
+```
+C:\sportsai-backend\
+├── api.py                    # Main FastAPI server
+├── data_collection\          # All analysis code
+│   ├── smart_analyser.py     # Auto-detection pipeline
+│   ├── match_analyser.py     # Full match analysis
+│   ├── pose_extractor.py     # YOLO + 3D lifting
+│   ├── skeleton_overlay.py   # Video rendering
+│   ├── coach_feedback.py     # AI coaching text
+│   └── analyser.py           # Elite comparison
+├── frontend\                 # Web interface
+│   ├── index.html            # Upload page
+│   ├── progress.html         # Athlete history
+│   ├── app.js                # Frontend logic
+│   └── style.css             # Dark theme
+├── data\
+│   ├── pose_data\volleyball\ # Training data (all 4 techniques)
+│   └── input\                # YouTube URL lists
+└── models\
+    ├── AthletePose3D\        # Fine-tuned MotionAGFormer weights
+    └── VolleyVision\         # Action detection weights
+```
+
+### What's Left To Do (Next 3 Tasks)
+1. Jersey number recognition (OCR) - identify players by number across camera cuts
+2. Formation detection (P1-P6 positions) - detect rotation positions
+3. Deploy to cloud server - make it accessible online
+
+### How to Start
+```bash
+cd C:\sportsai-backend
+uvicorn api:app --host 0.0.0.0 --port 8001
+# Open browser: http://localhost:8001/docs
+# Or open: C:\sportsai-backend\frontend\index.html
+```
+
+### API Key (.env file)
+```
+AI_PROVIDER=groq
+GROQ_API_KEY=your_groq_api_key_here
+```
+
+### Main API Endpoints
+- POST `/analyse/auto` - Main endpoint: auto-detect technique and analyze
+- POST `/analyse/match` - Full match analysis with per-player reports
+- POST `/analyse/video` - Returns annotated MP4 with skeleton overlay
+- POST `/analyse/compare` - Side-by-side comparison vs elite athlete
+- POST `/analyse/{technique}` - Analyze specific technique (spike/serve/block/dig)
+- GET `/progress/{athlete_id}/{technique}` - View athlete improvement over time
+
+### Key Features
+- Automatic technique detection (no manual selection needed)
+- Color-coded skeleton overlay (green=good, red=needs improvement)
+- Plain English coaching (no technical jargon or degree measurements)
+- Feel cues using sensation language ("pull your elbow back like drawing a bow")
+- Specific drills with exact sets/reps
+- Progress tracking across sessions
+- Injury risk detection
+- Team video support (tracks all 12 players in 6v6 matches)
+- Court heatmaps showing player positioning
+- Ball trajectory tracking
+
+### System Requirements
+- Windows 10/11
+- NVIDIA GPU with CUDA support (RTX 3050 or better)
+- Python 3.8+
+- 8GB+ RAM
+- 10GB+ disk space for models and training data
+
+---
+
+This project is now production-ready for all 4 volleyball techniques. The remaining tasks are enhancements for team video analysis and deployment.

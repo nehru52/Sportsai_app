@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Side-by-Side Comparison - SportsAI</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .compare-container {
+      max-width: 1400px;
+      margin: 100px auto 60px;
+      padding: 0 20px;
+    }
+    .compare-hero {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    .compare-hero h1 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 3rem;
+      font-weight: 900;
+      margin-bottom: 16px;
+      letter-spacing: -1px;
+    }
+    .compare-hero p {
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+    .upload-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 40px;
+      margin-bottom: 40px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .form-group {
+      margin-bottom: 24px;
+    }
+    .form-label {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+    .video-player {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .video-player video {
+      width: 100%;
+      display: block;
+    }
+    .video-info {
+      background: var(--raised);
+      padding: 20px;
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .info-item {
+      text-align: center;
+    }
+    .info-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 4px;
+    }
+    .info-value {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
+    .loading-state {
+      display: none;
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .loading-state.show {
+      display: block;
+    }
+    .spinner-large {
+      width: 60px;
+      height: 60px;
+      border: 4px solid var(--border);
+      border-top-color: var(--red);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .loading-state h3 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .loading-state p {
+      color: var(--muted);
+      margin-top: 8px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Sports<em>AI</em><sup>BETA</sup></div>
+  <div class="nav-right">
+    <a class="nav-pill" href="home.html">Home</a>
+    <a class="nav-pill" href="index.html">Analysis</a>
+    <a class="nav-pill active" href="compare.html">Compare</a>
+    <a class="nav-pill" href="progress.html">Progress</a>
+    <a class="nav-pill" href="chat.html">AI Coach</a>
+  </div>
+</nav>
+
+<div class="compare-container">
+  <!-- Hero -->
+  <div class="compare-hero">
+    <h1>Side-by-Side Comparison</h1>
+    <p>See your technique next to elite athletes. Visual learning is 10x more effective than numbers alone.</p>
+  </div>
+
+  <!-- Upload Form -->
+  <div class="upload-card" id="uploadCard">
+    <div class="form-group">
+      <label class="form-label">Select Technique</label>
+      <div class="tech-section">
+        <button class="tech-pill active" data-tech="spike">Spike</button>
+        <button class="tech-pill" data-tech="serve">Serve</button>
+        <button class="tech-pill" data-tech="block">Block</button>
+        <button class="tech-pill" data-tech="dig">Dig</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Upload Video</label>
+      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+        <div class="upload-icon-wrap">🏐</div>
+        <h3>Drop your video here</h3>
+        <p>MP4, MOV, or any format · 480p or higher</p>
+        <button class="btn btn-primary" onclick="event.stopPropagation(); document.getElementById('fileInput').click()">
+          Choose Video
+        </button>
+        <input type="file" id="fileInput" accept="video/*" />
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="compareBtn" onclick="startComparison()" style="width:100%;display:none;">
+      ▶ &nbsp; Generate Comparison
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" id="loadingState">
+    <div class="spinner-large"></div>
+    <h3>Generating comparison video...</h3>
+    <p style="color:var(--muted);margin-top:8px;">This takes 30-60 seconds</p>
+  </div>
+
+  <!-- Result -->
+  <div id="resultSection" style="display:none;">
+    <div class="video-player">
+      <video id="resultVideo" controls></video>
+      <div class="video-info">
+        <div class="info-item">
+          <div class="info-label">Technique</div>
+          <div class="info-value" id="infoTech">—</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Score</div>
+          <div class="info-value" id="infoScore">—</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Verdict</div>
+          <div class="info-value" id="infoVerdict">—</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Phases</div>
+          <div class="info-value" id="infoPhases">—</div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:30px;">
+      <button class="btn-outline" onclick="resetComparison()">↩ &nbsp; Compare another video</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:8001';
+let selectedFile = null;
+let selectedTech = 'spike';
+
+// Technique selection
+document.querySelectorAll('.tech-pill').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    document.querySelectorAll('.tech-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedTech = btn.dataset.tech;
+  });
+});
+
+// File handling
+document.getElementById('fileInput').addEventListener('change', e => {
+  if (e.target.files[0]) handleFile(e.target.files[0]);
+});
+
+const zone = document.getElementById('uploadZone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+zone.addEventListener('drop', e => {
+  e.preventDefault();
+  zone.classList.remove('drag-over');
+  if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+});
+
+function handleFile(file) {
+  selectedFile = file;
+  document.getElementById('compareBtn').style.display = 'block';
+}
+
+async function startComparison() {
+  if (!selectedFile) return;
+
+  document.getElementById('uploadCard').style.display = 'none';
+  document.getElementById('loadingState').classList.add('show');
+
+  const form = new FormData();
+  form.append('video', selectedFile);
+
+  try {
+    const res = await fetch(`${API}/analyse/compare?technique=${selectedTech}`, {
+      method: 'POST',
+      body: form
+    });
+
+    if (!res.ok) {
+      alert('Comparison failed. Make sure the API is running.');
+      resetComparison();
+      return;
+    }
+
+    const blob = await res.blob();
+    const videoUrl = URL.createObjectURL(blob);
+
+    document.getElementById('loadingState').classList.remove('show');
+    document.getElementById('resultSection').style.display = 'block';
+    document.getElementById('resultVideo').src = videoUrl;
+
+    document.getElementById('infoTech').textContent = selectedTech.charAt(0).toUpperCase() + selectedTech.slice(1);
+    document.getElementById('infoScore').textContent = res.headers.get('X-Score') || '—';
+    document.getElementById('infoVerdict').textContent = res.headers.get('X-Verdict') || '—';
+    document.getElementById('infoPhases').textContent = res.headers.get('X-Phases') || '—';
+
+  } catch (err) {
+    alert('Could not connect to the analysis server.');
+    resetComparison();
+  }
+}
+
+function resetComparison() {
+  selectedFile = null;
+  document.getElementById('fileInput').value = '';
+  document.getElementById('uploadCard').style.display = 'block';
+  document.getElementById('loadingState').classList.remove('show');
+  document.getElementById('resultSection').style.display = 'none';
+  document.getElementById('compareBtn').style.display = 'none';
+  document.getElementById('resultVideo').src = '';
+}
+</script>
+
+</body>
+</html>

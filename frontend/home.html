@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SportsAI — Home</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="home.css" />
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Sports<em>AI</em><sup>BETA</sup></div>
+  <div class="nav-right">
+    <a class="nav-pill active" href="home.html">Home</a>
+    <a class="nav-pill" href="index.html">Analysis</a>
+    <a class="nav-pill" href="compare.html">Compare</a>
+    <a class="nav-pill" href="progress.html">Progress</a>
+    <a class="nav-pill" href="chat.html">AI Coach</a>
+  </div>
+</nav>
+
+<!-- HOME DASHBOARD -->
+<div class="home-container">
+  
+  <!-- ZONE 1: Athlete Card -->
+  <div class="athlete-card" onclick="openProfile()">
+    <div class="athlete-avatar">
+      <div class="avatar-ring"></div>
+      <div class="avatar-img">🏐</div>
+      <div class="belt-badge">Blue Belt</div>
+    </div>
+    <div class="athlete-info">
+      <h2 class="athlete-name">Athlete</h2>
+      <div class="xp-container">
+        <div class="xp-label">
+          <span>8,420 XP</span>
+          <span class="xp-target">12,000 to Purple Belt</span>
+        </div>
+        <div class="xp-bar-track">
+          <div class="xp-bar-fill" style="width: 70%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ZONE 2: Streak & Challenge -->
+  <div class="streak-challenge-row">
+    <div class="streak-card">
+      <div class="streak-flame">🔥</div>
+      <div class="streak-info">
+        <div class="streak-count">8 week streak</div>
+        <div class="streak-timer">Ends in 2 days</div>
+      </div>
+    </div>
+    
+    <div class="challenge-card">
+      <div class="challenge-header">
+        <span class="challenge-label">ACTIVE CHALLENGE</span>
+        <span class="challenge-time">18h left</span>
+      </div>
+      <div class="challenge-title">Score 70+ on Spike</div>
+      <div class="challenge-progress">
+        <div class="challenge-bar-track">
+          <div class="challenge-bar-fill" style="width: 66%"></div>
+        </div>
+        <span class="challenge-count">2 of 3 complete</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ZONE 3: Technique Score Ring -->
+  <div class="score-ring-card">
+    <div class="ring-container">
+      <svg class="technique-ring" width="180" height="180" viewBox="0 0 180 180">
+        <circle class="ring-bg" cx="90" cy="90" r="70" />
+        <circle class="ring-elite" cx="90" cy="90" r="70" stroke-dasharray="440" stroke-dashoffset="110" />
+        <circle class="ring-best" cx="90" cy="90" r="70" stroke-dasharray="440" stroke-dashoffset="176" />
+        <circle class="ring-current" cx="90" cy="90" r="70" stroke-dasharray="440" stroke-dashoffset="220" />
+      </svg>
+      <div class="ring-center">
+        <div class="ring-score">72</div>
+        <div class="ring-label">Current</div>
+      </div>
+    </div>
+    <div class="ring-legend">
+      <div class="legend-item">
+        <div class="legend-dot" style="background: var(--red)"></div>
+        <span>Your Score: 72</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background: var(--gold)"></div>
+        <span>Personal Best: 78</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background: var(--green)"></div>
+        <span>Elite Avg: 87</span>
+      </div>
+      <div class="percentile">62nd percentile</div>
+    </div>
+  </div>
+
+  <!-- ZONE 4: Today's AI Drill -->
+  <div class="drill-card">
+    <div class="drill-header">
+      <span class="drill-label">TODAY'S AI DRILL</span>
+      <span class="drill-badge">Based on your entry phase weakness</span>
+    </div>
+    <h3 class="drill-name">Hip Drive Penetration Step</h3>
+    <div class="drill-specs">
+      <span class="drill-spec">50 reps</span>
+      <span class="drill-dot">•</span>
+      <span class="drill-spec">Upload after for tracking</span>
+    </div>
+    <div class="drill-actions">
+      <button class="btn-drill-start" onclick="startDrill()">
+        <span>▶</span>
+        Start Drill
+      </button>
+      <button class="btn-drill-demo" onclick="showDemo()">
+        Watch Demo
+      </button>
+    </div>
+  </div>
+
+  <!-- ZONE 5: Social Feed -->
+  <div class="social-feed">
+    <div class="feed-header">
+      <h3>Activity Feed</h3>
+      <button class="btn-filter">All</button>
+    </div>
+    <div class="feed-items">
+      <div class="feed-item">
+        <div class="feed-avatar">⚔️</div>
+        <div class="feed-content">
+          <div class="feed-text"><strong>@rival</strong> improved their entry phase by <span class="highlight-red">12 points</span></div>
+          <div class="feed-time">2 hours ago</div>
+        </div>
+        <button class="btn-feed-action" onclick="viewRivalry()">View</button>
+      </div>
+      
+      <div class="feed-item">
+        <div class="feed-avatar">🔥</div>
+        <div class="feed-content">
+          <div class="feed-text"><strong>JakeWrestle</strong> completed <span class="highlight-gold">10-week streak</span></div>
+          <div class="feed-time">5 hours ago</div>
+        </div>
+      </div>
+      
+      <div class="feed-item">
+        <div class="feed-avatar">🏆</div>
+        <div class="feed-content">
+          <div class="feed-text">New challenge from <strong>@kylefighter</strong></div>
+          <div class="feed-time">1 day ago</div>
+        </div>
+        <button class="btn-feed-action accept" onclick="acceptChallenge()">Accept</button>
+      </div>
+
+      <div class="feed-item">
+        <div class="feed-avatar">📈</div>
+        <div class="feed-content">
+          <div class="feed-text">You unlocked <strong>Advanced Spike</strong> technique</div>
+          <div class="feed-time">2 days ago</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ZONE 6: Quick Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-card" onclick="location.href='progress.html'">
+      <div class="stat-icon">📊</div>
+      <div class="stat-value">24</div>
+      <div class="stat-label">Sessions</div>
+    </div>
+    <div class="stat-card" onclick="location.href='progress.html'">
+      <div class="stat-icon">⭐</div>
+      <div class="stat-value">+18%</div>
+      <div class="stat-label">Improvement</div>
+    </div>
+    <div class="stat-card" onclick="location.href='chat.html'">
+      <div class="stat-icon">💬</div>
+      <div class="stat-value">3</div>
+      <div class="stat-label">AI Questions Left</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🎯</div>
+      <div class="stat-value">12</div>
+      <div class="stat-label">Techniques</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FLOATING RECORD BUTTON -->
+<button class="fab-record" onclick="location.href='index.html#uploadSection'">
+  <div class="fab-icon">📹</div>
+  <div class="fab-pulse"></div>
+</button>
+
+<script src="home.js"></script>
+</body>
+</html>

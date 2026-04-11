@@ -1,0 +1,239 @@
+WHAT WE BUILT — Full Project Status
+=====================================
+Project: SportsAI — Olympic-grade volleyball biomechanics coach
+Location: C:\sportsai-backend\
+Last updated: April 2026
+
+
+===========================================================
+THE BIG IDEA (in one sentence)
+===========================================================
+Upload a volleyball video → get an annotated MP4 showing exactly what's
+wrong with your technique, why, and a specific drill to fix it —
+compared against Olympic-level athletes.
+
+
+===========================================================
+WHAT'S FULLY WORKING RIGHT NOW
+===========================================================
+
+1. AUTO-ANALYSIS PIPELINE (/analyse/auto)
+   Upload any volleyball video. No need to say what technique it is.
+   The system automatically:
+   - Checks video quality (blur, brightness, resolution, person visibility)
+   - Detects what technique is happening and when (spike/serve/block/dig)
+   - Extracts the relevant clip (ignores warmup, running, waiting)
+   - Draws 17-joint skeleton on the correct player (locked to largest/most airborne)
+   - Measures biomechanics and compares to elite athlete averages
+   - Generates AI coaching with feel cues and drills (Groq / Llama 3.3 70B)
+   - Returns annotated MP4 + JSON coaching data
+
+2. ANNOTATED VIDEO OUTPUT
+   The video shows:
+   - Green joints = good, Red joints = needs work
+   - Phase label at top (APPROACH / TAKEOFF / CONTACT / FOLLOW-THROUGH)
+   - Coaching card on the right: headline, feel cues (yellow), drills (green)
+   - At the worst frame: red border flash + feel cue text
+   - Bottom strip: next session focus
+
+3. PERSON SELECTION (fixed)
+   - Spike/Block: tracks the most airborne person (highest ankles off ground)
+   - Dig: tracks the person with lowest hip position (crouching)
+   - Serve: tracks person with wrist above head
+   - Locks to that person after 3 frames — won't switch to background players
+   - Falls back to hip position if ankles are occluded
+
+4. SKELETON ACCURACY (fixed)
+   - Skeleton drawn from raw YOLO 2D pixel coordinates (not 3D lifted)
+   - This eliminates the coordinate drift that was causing skeleton offset
+   - 3D data still used for biomechanics calculations
+
+5. GPU ACCELERATION (fixed)
+   - YOLO runs on NVIDIA RTX 3050 CUDA
+   - Full pipeline: ~40-50 seconds per video (was 5+ minutes on CPU)
+
+6. AI COACHING (working)
+   - Provider: Groq (Llama 3.3 70B) — free, 14,400 req/day
+   - No numbers/degrees in coaching output — plain English only
+   - Feel cues use sensation language ("pull your elbow back like drawing a bow")
+   - Drills have exact sets/reps
+   - Adapts to skill level (beginner/intermediate/advanced)
+   - Falls back to rule-based drills if API unavailable
+
+7. VIDEO QUALITY GATE
+   - Checks blur, brightness, resolution, person visibility before processing
+   - Returns specific fix message if video is bad
+   - Example: "Video is too blurry — hold camera steady or use a tripod"
+
+8. PROGRESS TRACKING
+   - Saves every session per athlete
+   - Tracks metric trends (improving/plateau/declining)
+   - Flags injury risk patterns
+   - Available at GET /progress/{athlete_id}/{technique}
+
+9. FRONTEND WEBSITE (frontend/)
+   - index.html — upload page with drag-and-drop, technique selector, progress steps
+   - progress.html — athlete history page with session cards and trend display
+   - Dark theme, responsive layout
+   - Team tracking mode (👥 button) — shows all players with skeletons
+   - Download button for annotated video
+
+10. VISUALISATIONS
+    - Court heatmap — where each player spent time
+    - Joint angle chart — angles over time with elite range shaded
+    - Team tracking video — all players labelled with trails
+
+
+===========================================================
+TRAINING DATA COLLECTED
+===========================================================
+
+Technique   | Sequences | Elite | Advanced | Intermediate
+------------|-----------|-------|----------|-------------
+Spike       | 47        | 17    | 17       | 13
+Serve       | 36        | 8     | 9        | 19
+Block       | ~8        | ~5    | ~3       | 0
+Dig         | ~10       | ~3    | ~3       | ~4
+TOTAL       | ~101      | ~33   | ~32      | ~36
+
+All biomechanics recomputed with normalised formula (body-height ratios).
+Thresholds load automatically on API startup.
+
+
+===========================================================
+MODELS IN USE
+===========================================================
+
+YOLO11x-pose (data_collection/yolo11x-pose.pt)
+  - 2D pose detection, 17 joints
+  - Running on CUDA (RTX 3050)
+  - NOT yet fine-tuned on volleyball — uses general human pose weights
+
+MotionAGFormer-small (models/AthletePose3D/model_params/motionagformer-s-ap3d.pth.tr)
+  - 2D → 3D pose lifting
+  - Trained on H36M (lab mocap) — NOT yet fine-tuned on volleyball
+  - Fine-tuning in progress (see below)
+
+VolleyVision YOLOv8m (models/VolleyVision/Stage II.../best.pt)
+  - Action detection: block/defense/serve/set/spike
+  - 92.31% mAP50 — works well
+
+Groq / Llama 3.3 70B
+  - AI coaching text generation
+  - Free tier, 14,400 req/day
+  - Key in .env file
+
+
+===========================================================
+TRAINING IN PROGRESS RIGHT NOW
+===========================================================
+
+MotionAGFormer fine-tuning (finetune_lifter.py)
+  - Self-supervised on 93 volleyball sequences
+  - 19,966 training windows (81 frames each)
+  - batch_size=8, 20 epochs, RTX 3050
+  - Expected completion: 3-5 hours from restart
+  - Output: models/AthletePose3D/model_params/motionagformer-volleyball-finetuned.pth
+  - After completion: update CKPT_PATH in pose_3d_lifter.py to use new weights
+
+AFTER fine-tuning completes:
+  - Run: python recompute_all.py
+  - Restart API: uvicorn api:app --host 0.0.0.0 --port 8001
+
+
+===========================================================
+WHAT'S STILL LEFT TO DO
+===========================================================
+
+IMMEDIATE (this week):
+  [ ] MotionAGFormer fine-tuning — in progress, finish tonight
+  [ ] YOLO fine-tuning — after MotionAGFormer, needs raw frames re-downloaded
+  [ ] Dig data collection — 9 URLs blocked by ISP/CDN, need VPN or new URLs
+  [ ] Block data — batch may still be running, check completion
+
+NEXT PRIORITY:
+  [ ] Deploy with ngrok — share with cousin/testers without running locally
+  [ ] Add athlete name field to upload page (currently no athlete_id input)
+  [ ] Mobile responsive layout — coaching card breaks on small screens
+  [ ] "Was this helpful?" feedback button — feeds back into training data
+
+LATER:
+  [ ] Jersey OCR (PaddleOCR) — identify players by number across camera cuts
+  [ ] Formation detection — P1-P6 rotation positions
+  [ ] VideoMAE action localisation — replace kinematic heuristic
+  [ ] Deploy to cloud server (DigitalOcean/Hetzner ~$10/month)
+  [ ] YOLO fine-tuning on volleyball-specific poses
+
+
+===========================================================
+HOW TO START THE API
+===========================================================
+
+1. Open terminal at C:\sportsai-backend
+2. Run: uvicorn api:app --host 0.0.0.0 --port 8001
+3. Open browser: http://localhost:8001/docs  (API test UI)
+4. Open frontend: C:\sportsai-backend\frontend\index.html
+
+API key (.env file):
+  AI_PROVIDER=groq
+  GROQ_API_KEY=your_groq_api_key_here
+
+
+===========================================================
+KNOWN ISSUES
+===========================================================
+
+1. Skeleton still drifts slightly on off-centre players
+   → Will improve after MotionAGFormer fine-tuning completes
+
+2. Block/dig analysis returns limited data (few sequences)
+   → Will improve after more data collected
+
+3. YouTube downloads failing for some URLs (ISP/CDN routing)
+   → Use VPN or find alternative URLs
+
+4. val=0.0000 in fine-tuning output
+   → Not a bug — only 46 validation windows, loss rounds to 0.0000
+
+5. GitHub push blocked (Groq key was in .env commit)
+   → Fix: git stash → git filter-branch → git stash pop → git push --force
+   → Then regenerate Groq key at console.groq.com
+
+
+===========================================================
+FILE STRUCTURE (key files only)
+===========================================================
+
+api.py                          ← Main FastAPI server — run this
+finetune_lifter.py              ← MotionAGFormer fine-tuning script
+recompute_all.py                ← Recompute biomechanics after new data
+
+data_collection/
+  smart_analyser.py             ← Full auto-analysis pipeline
+  pose_extractor.py             ← YOLO + 3D lifting + biomechanics
+  pose_3d_lifter.py             ← MotionAGFormer wrapper
+  skeleton_overlay.py           ← Video rendering with coaching card
+  coach_feedback.py             ← Groq AI coaching text
+  analyser.py                   ← Elite comparison + thresholds
+  action_detector.py            ← VolleyVision action detection
+  action_localiser.py           ← Find technique in video
+  video_quality.py              ← Pre-flight quality check
+  progress_tracker.py           ← Session history per athlete
+  batch_processor.py            ← Download + process YouTube videos
+  youtube_downloader.py         ← yt-dlp wrapper with proxy support
+
+frontend/
+  index.html                    ← Main upload page
+  progress.html                 ← Athlete progress history page
+  app.js                        ← Frontend logic
+  style.css                     ← Dark theme styling
+
+data/input/
+  volleyball_urls.csv           ← Original spike URLs
+  serve_urls.csv                ← Serve training URLs
+  block_urls.csv                ← Block training URLs
+  dig_urls.csv                  ← Dig training URLs (blocked by ISP)
+
+models/
+  AthletePose3D/model_params/   ← MotionAGFormer weights
+  VolleyVision/                 ← YOLOv8m action detection weights

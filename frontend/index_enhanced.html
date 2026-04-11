@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SportsAI Elite — Olympic-Grade Volleyball Analysis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="enhanced.css" />
+</head>
+<body>
+
+<!-- Enhanced Navigation -->
+<nav class="enhanced-nav">
+  <div class="nav-logo">
+    Sports<em>AI</em><sup>ELITE</sup>
+  </div>
+  <div class="nav-links">
+    <a href="#analysis" class="nav-link active">Analysis</a>
+    <a href="#post-match" class="nav-link">Post-Match</a>
+    <a href="#tracking" class="nav-link">Team Tracking</a>
+    <a href="#benchmarks" class="nav-link">Elite Data</a>
+    <a href="#training" class="nav-link">Training</a>
+  </div>
+  <div class="nav-actions">
+    <button class="btn-ghost" onclick="showComparisonMode()">Compare</button>
+    <button class="btn-primary" onclick="showUploadModal()">Upload Video</button>
+  </div>
+</nav>
+
+<!-- Hero Section with Three-Layer Architecture -->
+<section class="hero-enhanced">
+  <div class="hero-content">
+    <div class="hero-badge">🏆 Olympic-Grade Analysis</div>
+    <h1 class="hero-title">
+      Three-Layer AI Analysis
+      <span class="hero-subtitle">for Olympic Champions</span>
+    </h1>
+    <p class="hero-description">
+      Temporal Action Localization • Multi-Player Tracking • Tactical Integration • 
+      FIVB Elite Benchmarks • LLM Coaching Insights • Competition Readiness Assessment
+    </p>
+    
+    <!-- Three-Layer Architecture Visualization -->
+    <div class="architecture-preview">
+      <div class="layer-card layer-1">
+        <div class="layer-icon">🎯</div>
+        <h3>Layer 1: Tactical</h3>
+        <p>Data Volley integration with rally construction and tactical pattern analysis</p>
+      </div>
+      <div class="layer-card layer-2">
+        <div class="layer-icon">🦴</div>
+        <h3>Layer 2: Biomechanical</h3>
+        <p>SAM2 + ViTPose with FIVB elite benchmarks and 3D joint analysis</p>
+      </div>
+      <div class="layer-card layer-3">
+        <div class="layer-icon">🧠</div>
+        <h3>Layer 3: LLM Insights</h3>
+        <p>Contextual coaching with 8-week training programs and readiness assessment</p>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <button class="btn-primary-large" onclick="startQuickAnalysis()">
+        ⚡ Quick Analysis (60s)
+      </button>
+      <button class="btn-ghost-large" onclick="startPostMatchAnalysis()">
+        🌙 Post-Match Analysis (6-8h)
+      </button>
+    </div>
+  </div>
+  
+  <div class="hero-visual">
+    <div class="court-diagram">
+      <div class="court-lines"></div>
+      <div class="player-positions">
+        <div class="position pos-1">S</div>
+        <div class="position pos-2">MB</div>
+        <div class="position pos-3">OH</div>
+        <div class="position pos-4">OP</div>
+        <div class="position pos-5">L</div>
+        <div class="position pos-6">OH</div>
+      </div>
+      <div class="action-zones">
+        <div class="zone zone-1">Zone 1</div>
+        <div class="zone zone-2">Zone 2</div>
+        <div class="zone zone-3">Zone 3</div>
+        <div class="zone zone-4">Zone 4</div>
+        <div class="zone zone-5">Zone 5</div>
+        <div class="zone zone-6">Zone 6</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Quick Analysis Section -->
+<section id="analysis" class="section-analysis">
+  <div class="section-header">
+    <h2>Quick Video Analysis</h2>
+    <p>Get instant biomechanical feedback in under 60 seconds</p>
+  </div>
+
+  <div class="analysis-workflow">
+    <div class="workflow-step active" data-step="1">
+      <div class="step-number">1</div>
+      <div class="step-content">
+        <h3>Upload Video</h3>
+        <p>Single action clip (spike, serve, block, dig)</p>
+      </div>
+    </div>
+    <div class="workflow-arrow">→</div>
+    <div class="workflow-step" data-step="2">
+      <div class="step-number">2</div>
+      <div class="step-content">
+        <h3>Temporal Detection</h3>
+        <p>VideoMAE/ActionFormer identifies action boundaries</p>
+      </div>
+    </div>
+    <div class="workflow-arrow">→</div>
+    <div class="workflow-step" data-step="3">
+      <div class="step-number">3</div>
+      <div class="step-content">
+        <h3>Biomechanical Analysis</h3>
+        <p>SAM2 + ViTPose extracts 3D joint coordinates</p>
+      </div>
+    </div>
+    <div class="workflow-arrow">→</div>
+    <div class="workflow-step" data-step="4">
+      <div class="step-number">4</div>
+      <div class="step-content">
+        <h3>Elite Comparison</h3>
+        <p>FIVB benchmarks with deviation analysis</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="upload-interface">
+    <div class="upload-zone-enhanced" onclick="document.getElementById('quickFileInput').click()">
+      <div class="upload-icon">🏐</div>
+      <h3>Drop your action video here</h3>
+      <p>Single technique (spike/serve/block/dig) • 5-30 seconds • 480p+ recommended</p>
+      <button class="btn-primary" onclick="event.stopPropagation()">Choose Video</button>
+      <input type="file" id="quickFileInput" accept="video/*" style="display:none" />
+    </div>
+
+    <div class="technique-selector">
+      <div class="tech-grid">
+        <button class="tech-card active" data-tech="spike">
+          <div class="tech-icon">🏐</div>
+          <h4>Spike</h4>
+          <p>Approach, arm swing, contact</p>
+        </button>
+        <button class="tech-card" data-tech="serve">
+          <div class="tech-icon">🎯</div>
+          <h4>Serve</h4>
+          <p>Toss, contact, follow-through</p>
+        </button>
+        <button class="tech-card" data-tech="block">
+          <div class="tech-icon">🛡️</div>
+          <h4>Block</h4>
+          <p>Penetration, timing, hands</p>
+        </button>
+        <button class="tech-card" data-tech="dig">
+          <div class="tech-icon">🛡️</div>
+          <h4>Dig</h4>
+          <p>Platform, angle, control</p>
+        </button>
+      </div>
+    </div>
+
+    <div class="analysis-options">
+      <div class="option-group">
+        <label>Player Position</label>
+        <select id="playerPosition">
+          <option value="">Auto-detect</option>
+          <option value="outside">Outside Hitter</option>
+          <option value="opposite">Opposite</option>
+          <option value="middle">Middle Blocker</option>
+          <option value="setter">Setter</option>
+          <option value="libero">Libero</option>
+        </select>
+      </div>
+      <div class="option-group">
+        <label>Competition Level</label>
+        <select id="competitionLevel">
+          <option value="training">Training</option>
+          <option value="national">National</option>
+          <option value="international">International</option>
+          <option value="olympic">Olympic</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn-primary-large analyse-btn" onclick="startQuickAnalysis()">
+      ⚡ Start Analysis
+    </button>
+  </div>
+</section>
+
+<!-- Post-Match Analysis Section -->
+<section id="post-match" class="section-post-match">
+  <div class="section-header">
+    <h2>Post-Match Analysis</h2>
+    <p>Comprehensive overnight analysis for full matches with three-layer integration</p>
+  </div>
+
+  <div class="post-match-features">
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <h3>Temporal Action Localization</h3>
+      <p>VideoMAE/ActionFormer automatically detects 400-500 actions per 90-minute match</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">👥</div>
+      <h3>Multi-Player Tracking</h3>
+      <p>ByteTrack + TrOCR tracks 12 players with 85% jersey recognition accuracy</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎯</div>
+      <h3>Tactical Integration</h3>
+      <p>Data Volley .dvw file parsing with rally construction and tactical patterns</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🏆</div>
+      <h3>Elite Benchmarks</h3>
+      <p>FIVB Level II standards with position-specific biomechanical comparisons</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🧠</div>
+      <h3>LLM Coaching Insights</h3>
+      <p>Contextual feedback with 8-week training programs and readiness assessment</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📈</div>
+      <h3>Competition Readiness</h3>
+      <p>Olympic-level assessment with four-tier readiness scoring system</p>
+    </div>
+  </div>
+
+  <div class="post-match-upload">
+    <div class="upload-section">
+      <h3>Match Video</h3>
+      <div class="file-upload-zone" id="matchVideoZone">
+        <div class="upload-placeholder">
+          <div class="upload-icon">🎬</div>
+          <p>Full match video (90+ minutes)</p>
+          <button class="btn-secondary">Choose Video</button>
+        </div>
+        <input type="file" id="matchVideoInput" accept="video/*" style="display:none" />
+      </div>
+    </div>
+
+    <div class="upload-section">
+      <h3>Data Volley File (Optional)</h3>
+      <div class="file-upload-zone" id="dvwFileZone">
+        <div class="upload-placeholder">
+          <div class="upload-icon">📊</div>
+          <p>.dvw tactical data file</p>
+          <button class="btn-secondary">Choose File</button>
+        </div>
+        <input type="file" id="dvwFileInput" accept=".dvw" style="display:none" />
+      </div>
+    </div>
+
+    <div class="match-metadata">
+      <div class="metadata-row">
+        <div class="metadata-field">
+          <label>Tournament Name</label>
+          <input type="text" id="tournamentName" placeholder="e.g., VNL 2024, Olympic Games" />
+        </div>
+        <div class="metadata-field">
+          <label>Match Date</label>
+          <input type="date" id="matchDate" />
+        </div>
+      </div>
+      <div class="metadata-row">
+        <div class="metadata-field">
+          <label>Team A</label>
+          <input type="text" id="teamA" placeholder="e.g., USA" />
+        </div>
+        <div class="metadata-field">
+          <label>Team B</label>
+          <input type="text" id="teamB" placeholder="e.g., BRA" />
+        </div>
+      </div>
+      <div class="metadata-row">
+        <div class="metadata-field">
+          <label>Priority</label>
+          <select id="analysisPriority">
+            <option value="low">Low (12-24 hours)</option>
+            <option value="normal" selected>Normal (6-8 hours)</option>
+            <option value="high">High (2-4 hours)</option>
+          </select>
+        </div>
+        <div class="metadata-field">
+          <label>Notification Email</label>
+          <input type="email" id="notificationEmail" placeholder="Optional: Get notified when complete" />
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-primary-large" onclick="submitPostMatchAnalysis()">
+      🌙 Submit for Overnight Analysis
+    </button>
+  </div>
+</section>
+
+<!-- Team Tracking Section -->
+<section id="tracking" class="section-tracking">
+  <div class="section-header">
+    <h2>Multi-Player Team Tracking</h2>
+    <p>ByteTrack + TrOCR for comprehensive player identification and tracking</p>
+  </div>
+
+  <div class="tracking-demo">
+    <div class="demo-visualization">
+      <div class="court-view">
+        <div class="court-outline"></div>
+        <div class="player-track player-1" data-jersey="7" data-position="OH">
+          <div class="player-marker"></div>
+          <div class="player-label">#7 OH</div>
+        </div>
+        <div class="player-track player-2" data-jersey="11" data-position="MB">
+          <div class="player-marker"></div>
+          <div class="player-label">#11 MB</div>
+        </div>
+        <div class="player-track player-3" data-jersey="2" data-position="S">
+          <div class="player-marker"></div>
+          <div class="player-label">#2 S</div>
+        </div>
+        <div class="player-track player-4" data-jersey="14" data-position="OP">
+          <div class="player-marker"></div>
+          <div class="player-label">#14 OP</div>
+        </div>
+        <div class="player-track player-5" data-jersey="1" data-position="L">
+          <div class="player-marker"></div>
+          <div class="player-label">#1 L</div>
+        </div>
+        <div class="player-track player-6" data-jersey="9" data-position="OH">
+          <div class="player-marker"></div>
+          <div class="player-label">#9 OH</div>
+        </div>
+      </div>
+      
+      <div class="tracking-stats">
+        <div class="stat-item">
+          <div class="stat-value">12</div>
+          <div class="stat-label">Players Tracked</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">85%</div>
+          <div class="stat-label">Jersey Recognition</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">92%</div>
+          <div class="stat-label">Tracking Accuracy</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">15</div>
+          <div class="stat-label">Occlusions Handled</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tracking-features">
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-icon">👁️</div>
+          <div class="feature-content">
+            <h4>ByteTrack Multi-Object Tracking</h4>
+            <p>Advanced tracking with YOLOv8 backbone for robust player identification</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🔢</div>
+          <div class="feature-content">
+            <h4>TrOCR Jersey Recognition</h4>
+            <p>Optical character recognition for persistent player identification</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🏃</div>
+          <div class="feature-content">
+            <h4>Position Classification</h4>
+            <p>AI-powered detection of player roles based on movement patterns</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🔄</div>
+          <div class="feature-content">
+            <h4>Occlusion Handling</h4>
+            <p>Sophisticated algorithms for blocking situations and overlapping players</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Elite Benchmarks Section -->
+<section id="benchmarks" class="section-benchmarks">
+  <div class="section-header">
+    <h2>FIVB Elite Biomechanical Benchmarks</h2>
+    <p>Compare against Olympic-level standards from the 2014 FIVB World Championship</p>
+  </div>
+
+  <div class="benchmarks-dashboard">
+    <div class="benchmark-categories">
+      <button class="benchmark-tab active" data-technique="spike">Spike</button>
+      <button class="benchmark-tab" data-technique="serve">Serve</button>
+      <button class="benchmark-tab" data-technique="block">Block</button>
+      <button class="benchmark-tab" data-technique="dig">Dig</button>
+    </div>
+
+    <div class="benchmark-content" id="spikeBenchmarks">
+      <div class="benchmark-grid">
+        <div class="benchmark-card">
+          <div class="benchmark-header">
+            <h4>Elbow Flexion</h4>
+            <div class="benchmark-value">166.4° ± 8.2°</div>
+          </div>
+          <div class="benchmark-chart">
+            <div class="chart-bar elite" style="height: 80%">Elite</div>
+            <div class="chart-bar good" style="height: 60%">Good</div>
+            <div class="chart-bar needs-work" style="height: 40%">Needs Work</div>
+          </div>
+          <div class="benchmark-description">
+            Optimal "bow and arrow" position during approach phase
+          </div>
+        </div>
+
+        <div class="benchmark-card">
+          <div class="benchmark-header">
+            <h4>Torso Extension</h4>
+            <div class="benchmark-value">159.8° ± 12.4°</div>
+          </div>
+          <div class="benchmark-chart">
+            <div class="chart-bar elite" style="height: 75%">Elite</div>
+            <div class="chart-bar good" style="height: 55%">Good</div>
+            <div class="chart-bar needs-work" style="height: 35%">Needs Work</div>
+          </div>
+          <div class="benchmark-description">
+            Full body extension during jump and arm swing
+          </div>
+        </div>
+
+        <div class="benchmark-card">
+          <div class="benchmark-header">
+            <h4>Approach Angle</h4>
+            <div class="benchmark-value">45.2° ± 3.1°</div>
+          </div>
+          <div class="benchmark-chart">
+            <div class="chart-bar elite" style="height: 70%">Elite</div>
+            <div class="chart-bar good" style="height: 50%">Good</div>
+            <div class="chart-bar needs-work" style="height: 30%">Needs Work</div>
+          </div>
+          <div class="benchmark-description">
+            Optimal angle for momentum transfer and power generation
+          </div>
+        </div>
+
+        <div class="benchmark-card">
+          <div class="benchmark-header">
+            <h4>Jump Height</h4>
+            <div class="benchmark-value">0.67m ± 0.08m</div>
+          </div>
+          <div class="benchmark-chart">
+            <div class="chart-bar elite" style="height: 85%">Elite</div>
+            <div class="chart-bar good" style="height: 65%">Good</div>
+            <div class="chart-bar needs-work" style="height: 45%">Needs Work</div>
+          </div>
+          <div class="benchmark-description">
+            Vertical leap for optimal contact height
+          </div>
+        </div>
+      </div>
+
+      <div class="position-variations">
+        <h4>Position-Specific Variations</h4>
+        <div class="variation-grid">
+          <div class="variation-item">
+            <div class="variation-position">Outside Hitter</div>
+            <div class="variation-details">
+              <span>+2.1° approach angle</span>
+              <span>+0.15 m/s approach velocity</span>
+            </div>
+          </div>
+          <div class="variation-item">
+            <div class="variation-position">Opposite</div>
+            <div class="variation-details">
+              <span>-1.8° approach angle</span>
+              <span>+3.2° torso extension</span>
+            </div>
+          </div>
+          <div class="variation-item">
+            <div class="variation-position">Middle Blocker</div>
+            <div class="variation-details">
+              <span>+2.1° approach angle</span>
+              <span>+0.03m jump height</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Training & LLM Section -->
+<section id="training" class="section-training">
+  <div class="section-header">
+    <h2>AI Training Programs & LLM Insights</h2>
+    <p>Personalized 8-week programs with contextual coaching feedback</p>
+  </div>
+
+  <div class="training-interface">
+    <div class="llm-demo">
+      <div class="demo-input">
+        <h4>Sample Analysis Input</h4>
+        <div class="input-card">
+          <div class="input-header">
+            <span class="tech-badge">Spike</span>
+            <span class="position-badge">Outside Hitter</span>
+            <span class="tempo-badge">High Ball</span>
+          </div>
+          <div class="input-data">
+            <div class="joint-angles">
+              <div class="angle-item">
+                <span class="angle-label">Elbow Flexion</span>
+                <span class="angle-value">143.2°</span>
+                <span class="angle-deviation">-23.2°</span>
+              </div>
+              <div class="angle-item">
+                <span class="angle-label">Torso Extension</span>
+                <span class="angle-value">142.1°</span>
+                <span class="angle-deviation">-17.7°</span>
+              </div>
+              <div class="angle-item">
+                <span class="angle-label">Approach Angle</span>
+                <span class="angle-value">43.2°</span>
+                <span class="angle-deviation">-2.0°</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-output">
+        <h4>LLM Coaching Output</h4>
+        <div class="output-card">
+          <div class="assessment-header">
+            <div class="assessment-grade">B+</div>
+            <div class="assessment-text">
+              <strong>Good technique with specific improvements needed</strong>
+              <p>Assessment based on FIVB Level II benchmarks</p>
+            </div>
+          </div>
+          
+          <div class="coaching-insights">
+            <div class="insight-section">
+              <h5>🎯 Key Findings</h5>
+              <ul>
+                <li>Elbow flexion 23.2° below elite standard (166.4°)</li>
+                <li>Torso extension insufficient for optimal power generation</li>
+                <li>Approach angle close to ideal but could be wider</li>
+              </ul>
+            </div>
+            
+            <div class="insight-section">
+              <h5>💡 Tactical Context</h5>
+              <p>Given the high ball set tempo, you have adequate time to achieve proper mechanics. 
+              Focus on maintaining the 'bow and arrow' position longer during your approach.</p>
+            </div>
+            
+            <div class="insight-section">
+              <h5>🏋️ Specific Corrections</h5>
+              <div class="correction-item">
+                <strong>Immediate:</strong> Delay arm swing by 0.2s, maintain 90° elbow flexion until contact
+              </div>
+              <div class="correction-item">
+                <strong>Short-term:</strong> Wall blocks with delayed arm swing - 3 sets of 15 reps
+              </div>
+              <div class="correction-item">
+                <strong>Long-term:</strong> Medicine ball throws emphasizing elbow loading phase
+              </div>
+            </div>
+          </div>
+          
+          <div class="training-program">
+            <h5>📅 8-Week Training Program</h5>
+            <div class="program-timeline">
+              <div class="week-item">
+                <div class="week-number">Week 1-2</div>
+                <div class="week-focus">Assessment & Fundamentals</div>
+                <div class="week-intensity moderate">Moderate</div>
+              </div>
+              <div class="week-item">
+                <div class="week-number">Week 3-4</div>
+                <div class="week-focus">Technique Refinement</div>
+                <div class="week-intensity high">High</div>
+              </div>
+              <div class="week-item">
+                <div class="week-number">Week 5-6</div>
+                <div class="week-focus">Integration & Speed</div>
+                <div class="week-intensity very-high">Very High</div>
+              </div>
+              <div class="week-item">
+                <div class="week-number">Week 7-8</div>
+                <div class="week-focus">Competition Prep</div>
+                <div class="week-intensity peak">Peak</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="llm-training-interface">
+      <h4>LLM Training Data Generation</h4>
+      <div class="training-controls">
+        <div class="control-group">
+          <label>Techniques to Include</label>
+          <div class="technique-checkboxes">
+            <label><input type="checkbox" checked> Spike</label>
+            <label><input type="checkbox" checked> Serve</label>
+            <label><input type="checkbox" checked> Block</label>
+            <label><input type="checkbox" checked> Dig</label>
+          </div>
+        </div>
+        <div class="control-group">
+          <label>Samples per Technique</label>
+          <input type="range" min="500" max="5000" value="1000" class="slider" id="sampleRange">
+          <span class="range-value">1000</span>
+        </div>
+        <div class="control-group">
+          <label>Quality Threshold</label>
+          <input type="range" min="0.5" max="0.9" step="0.1" value="0.7" class="slider" id="qualityRange">
+          <span class="range-value">0.7</span>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="generateTrainingData()">
+        🧠 Generate Training Dataset
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Competition Readiness Dashboard -->
+<section class="section-readiness">
+  <div class="section-header">
+    <h2>Competition Readiness Assessment</h2>
+    <p>Four-tier readiness system for Olympic-level performance evaluation</p>
+  </div>
+
+  <div class="readiness-dashboard">
+    <div class="readiness-overview">
+      <div class="readiness-score">
+        <div class="score-circle">
+          <div class="score-value">74%</div>
+          <div class="score-label">Overall Readiness</div>
+        </div>
+        <div class="readiness-level near-ready">Near Ready</div>
+      </div>
+      
+      <div class="readiness-breakdown">
+        <div class="readiness-component">
+          <div class="component-name">Tactical Readiness</div>
+          <div class="component-score">78%</div>
+          <div class="component-bar">
+            <div class="component-fill" style="width: 78%"></div>
+          </div>
+        </div>
+        <div class="readiness-component">
+          <div class="component-name">Biomechanical Readiness</div>
+          <div class="component-score">68%</div>
+          <div class="component-bar">
+            <div class="component-fill" style="width: 68%"></div>
+          </div>
+        </div>
+        <div class="readiness-component">
+          <div class="component-name">Consistency Score</div>
+          <div class="component-score">79%</div>
+          <div class="component-bar">
+            <div class="component-fill" style="width: 79%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="readiness-levels">
+      <div class="level-card competition-ready">
+        <div class="level-header">
+          <div class="level-icon">🏆</div>
+          <h3>Competition Ready</h3>
+          <div class="level-range">≥85%</div>
+        </div>
+        <p>Elite performance standards met across all metrics</p>
+      </div>
+      
+      <div class="level-card near-ready active">
+        <div class="level-header">
+          <div class="level-icon">⚡</div>
+          <h3>Near Ready</h3>
+          <div class="level-range">70-84%</div>
+        </div>
+        <p>Minor adjustments needed for optimal performance</p>
+      </div>
+      
+      <div class="level-card development-needed">
+        <div class="level-header">
+          <div class="level-icon">📈</div>
+          <h3>Development Needed</h3>
+          <div class="level-range">55-69%</div>
+        </div>
+        <p>Significant improvements required for competition level</p>
+      </div>
+      
+      <div class="level-card significant-work">
+        <div class="level-header">
+          <div class="level-icon">🔧</div>
+          <h3>Significant Work</h3>
+          <div class="level-range">&lt;55%</div>
+        </div>
+        <p>Comprehensive development program recommended</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Results Modal -->
+<div id="resultsModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="modalTitle">Analysis Results</h2>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <!-- Results will be populated here -->
+    </div>
+  </div>
+</div>
+
+<!-- Upload Modal -->
+<div id="uploadModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Choose Analysis Type</h2>
+      <button class="modal-close" onclick="closeUploadModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="analysis-options">
+        <div class="option-card" onclick="startQuickAnalysisFromModal()">
+          <div class="option-icon">⚡</div>
+          <h3>Quick Analysis</h3>
+          <p>Single action clip • Under 60 seconds • Immediate results</p>
+        </div>
+        <div class="option-card" onclick="startPostMatchAnalysisFromModal()">
+          <div class="option-icon">🌙</div>
+          <h3>Post-Match Analysis</h3>
+          <p>Full match video • 6-8 hours • Comprehensive report</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="loading-content">
+    <div class="loading-spinner"></div>
+    <h3 id="loadingTitle">Processing your video...</h3>
+    <p id="loadingMessage">This may take a few moments</p>
+    <div class="loading-progress">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-text" id="progressText">0%</div>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script src="enhanced.js"></script>
+</body>
+</html>

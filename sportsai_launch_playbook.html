@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SportsAI — Zero Budget Launch Playbook</title>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#05050a;--bg2:#09090f;--bg3:#0e0e18;--bg4:#131320;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);
+  --text:#ebebff;--muted:#6868a0;--dim:#252545;
+  --g:#00ff88;--b:#3d8bff;--r:#ff3d6e;
+  --y:#ffc800;--p:#c084fc;--o:#ff7b00;--c:#00d4ff;
+  --sans:'Familjen Grotesk',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.7;}
+
+nav{position:fixed;top:0;left:0;width:215px;height:100vh;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;padding:18px 0;z-index:100;}
+.logo{padding:0 16px 16px;border-bottom:1px solid var(--border);}
+.logo h1{font-family:var(--mono);font-size:12px;color:var(--g);letter-spacing:1px;}
+.logo p{font-size:9px;color:var(--muted);margin-top:2px;font-family:var(--mono);}
+.ns{font-size:8px;letter-spacing:2.5px;text-transform:uppercase;color:var(--dim);padding:10px 16px 2px;font-family:var(--mono);}
+nav a{display:block;padding:5px 16px;color:var(--muted);text-decoration:none;font-size:10px;font-family:var(--mono);border-left:2px solid transparent;transition:all .1s;}
+nav a:hover,nav a.on{color:var(--g);border-left-color:var(--g);background:rgba(0,255,136,.04);}
+main{margin-left:215px;}
+section{padding:60px 48px;border-bottom:1px solid var(--border);max-width:960px;}
+section.wide{max-width:none;}
+
+/* HERO */
+#hero{padding:80px 48px 64px;max-width:none;
+  background:radial-gradient(ellipse at 70% 30%,rgba(0,255,136,.06) 0%,transparent 55%);}
+.kicker{font-family:var(--mono);font-size:10px;color:var(--g);letter-spacing:3px;text-transform:uppercase;margin-bottom:18px;display:block;}
+h1{font-family:var(--sans);font-size:52px;font-weight:700;letter-spacing:-2px;line-height:1.05;max-width:800px;margin-bottom:16px;}
+h1 .g{color:var(--g);}h1 .b{color:var(--b);}h1 .r{color:var(--r);}
+.sub{font-size:16px;color:var(--muted);max-width:580px;line-height:1.7;margin-bottom:32px;}
+.budget-pill{display:inline-flex;align-items:center;gap:10px;background:rgba(0,255,136,.07);border:1px solid rgba(0,255,136,.2);border-radius:8px;padding:10px 18px;font-family:var(--mono);font-size:12px;color:var(--g);}
+
+/* HEADERS */
+.sl{font-family:var(--mono);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--g);display:block;margin-bottom:8px;}
+h2{font-size:34px;font-weight:700;letter-spacing:-1.5px;line-height:1.05;margin-bottom:10px;}
+.lead{font-size:14px;color:var(--muted);border-left:2px solid var(--g);padding-left:14px;margin-bottom:28px;line-height:1.7;max-width:680px;}
+
+/* WEEK TIMELINE */
+.timeline{position:relative;margin:20px 0;}
+.timeline::before{content:'';position:absolute;left:18px;top:8px;bottom:8px;width:1px;background:linear-gradient(to bottom,var(--g),var(--b),var(--r),transparent);}
+.tw{position:relative;display:grid;grid-template-columns:52px 1fr;gap:16px;margin-bottom:24px;align-items:start;}
+.tw-num{width:38px;height:38px;border-radius:50%;background:var(--bg3);border:1px solid var(--g);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;color:var(--g);flex-shrink:0;}
+.tw-body{}
+.tw-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.tw-when{font-family:var(--mono);font-size:9px;color:var(--g);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;}
+.tw-desc{font-size:12px;color:var(--muted);line-height:1.6;}
+.tw-desc strong{color:var(--text);}
+.tw-tasks{margin-top:8px;list-style:none;}
+.tw-tasks li{font-size:11px;color:var(--muted);padding:3px 0;display:flex;align-items:flex-start;gap:6px;}
+.tw-tasks li::before{content:'›';color:var(--g);flex-shrink:0;font-weight:700;}
+
+/* TOOL CARDS */
+.tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin:16px 0;}
+.tool{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.tool-name{font-family:var(--mono);font-size:12px;color:var(--b);margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.tool-price{font-size:10px;padding:1px 7px;border-radius:4px;margin-left:auto;}
+.tp-free{background:rgba(0,255,136,.12);border:1px solid rgba(0,255,136,.25);color:var(--g);}
+.tp-cheap{background:rgba(255,200,0,.12);border:1px solid rgba(255,200,0,.25);color:var(--y);}
+.tool-desc{font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:6px;}
+.tool-use{font-family:var(--mono);font-size:10px;color:var(--g);}
+
+/* REDDIT STRATEGY */
+.reddit-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin:14px 0;}
+.rc{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px;}
+.rc-name{font-family:var(--mono);font-size:11px;color:var(--o);margin-bottom:3px;}
+.rc-subs{font-size:10px;color:var(--muted);}
+.rc-why{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.4;}
+
+/* DATA FARMING */
+.farm-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:14px 0;}
+@media(max-width:680px){.farm-row{grid-template-columns:1fr;}}
+.farm{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.farm .f-icon{font-size:22px;margin-bottom:8px;display:block;}
+.farm h3{font-size:13px;font-weight:600;color:var(--text);margin-bottom:5px;}
+.farm p{font-size:11px;color:var(--muted);line-height:1.5;margin:0;}
+.farm .f-reward{font-family:var(--mono);font-size:10px;color:var(--y);margin-top:6px;display:block;}
+
+/* NOTE */
+.note{border-radius:8px;padding:12px 14px;margin:14px 0;font-size:12px;line-height:1.6;}
+.ng{background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.18);color:rgba(0,255,136,.85);}
+.nb{background:rgba(61,139,255,.06);border:1px solid rgba(61,139,255,.18);color:rgba(130,175,255,.9);}
+.ny{background:rgba(255,200,0,.06);border:1px solid rgba(255,200,0,.18);color:rgba(255,220,80,.9);}
+.nr{background:rgba(255,61,110,.06);border:1px solid rgba(255,61,110,.18);color:rgba(255,130,150,.9);}
+.note strong{font-weight:600;}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:12px;margin:14px 0;}
+th{font-family:var(--mono);font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:var(--dim);padding:7px 12px;text-align:left;border-bottom:1px solid var(--border);}
+td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--muted);vertical-align:top;}
+td:first-child{color:var(--text);font-weight:500;}
+tr:last-child td{border-bottom:none;}
+
+/* OS ALTERNATIVES */
+.os-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0;}
+@media(max-width:640px){.os-grid{grid-template-columns:1fr;}}
+.os{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.os h3{font-family:var(--mono);font-size:12px;color:var(--p);margin-bottom:4px;}
+.os .paid{font-size:11px;color:var(--muted);margin-bottom:6px;}
+.os .free{font-size:12px;color:var(--text);font-weight:600;margin-bottom:4px;}
+.os p{font-size:11px;color:var(--muted);line-height:1.5;margin:0;}
+.os .save{font-family:var(--mono);font-size:10px;color:var(--g);margin-top:5px;display:block;}
+
+/* CODE */
+pre{background:#020208;border:1px solid var(--border2);border-radius:6px;padding:14px 16px;margin:10px 0;overflow-x:auto;font-family:var(--mono);font-size:11px;line-height:1.8;color:#8888cc;}
+.cg{color:var(--g);}
+.cb{color:var(--b);}
+.cy{color:var(--y);}
+.cl{color:var(--muted);}
+
+/* CONTENT CALENDAR */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:14px 0;}
+.cal-day{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px;text-align:center;min-height:70px;}
+.cal-day .d-name{font-family:var(--mono);font-size:8px;color:var(--dim);margin-bottom:4px;text-transform:uppercase;}
+.cal-day .d-task{font-size:9px;color:var(--muted);line-height:1.4;}
+.cal-day.active{background:rgba(0,255,136,.06);border-color:rgba(0,255,136,.2);}
+.cal-day.active .d-task{color:var(--text);}
+
+/* CRYPTO GIFT SECTION */
+.gift{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin:10px 0;}
+.gift h3{font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;}
+.gift p{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:8px;}
+.gift .amount{font-family:var(--mono);font-size:20px;color:var(--y);}
+.gift .note-small{font-family:var(--mono);font-size:10px;color:var(--muted);}
+
+/* UGC PROMPTS */
+.ugc{background:var(--bg3);border-left:3px solid var(--b);border-radius:0 8px 8px 0;padding:12px 14px;margin:8px 0;font-size:12px;color:var(--muted);font-family:var(--mono);}
+.ugc .platform{font-size:9px;color:var(--b);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;}
+
+h4.ss{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--c);margin:20px 0 10px;}
+p.t{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:10px;}
+ul{padding-left:18px;margin-bottom:10px;}
+li{font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:3px;}
+li strong{color:var(--text);}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo"><h1>// LAUNCH PLAYBOOK</h1><p>zero budget. maximum impact.</p></div>
+  <ul>
+    <div class="ns">The plan</div>
+    <li><a href="#truth">Honest truth first</a></li>
+    <li><a href="#sequence">Exact sequence</a></li>
+    <li><a href="#week1">Week 1–2: website + waitlist</a></li>
+
+    <div class="ns">Content engine</div>
+    <li><a href="#ugc">AI UGC videos</a></li>
+    <li><a href="#reddit">Reddit strategy</a></li>
+    <li><a href="#tiktok">TikTok + Reels</a></li>
+    <li><a href="#calendar">Content calendar</a></li>
+
+    <div class="ns">Data farming</div>
+    <li><a href="#farming">Farm pro/noob videos</a></li>
+    <li><a href="#crypto">Crypto + gift rewards</a></li>
+    <li><a href="#legal">Legal structure</a></li>
+
+    <div class="ns">Zero budget stack</div>
+    <li><a href="#opensource">Open-source everything</a></li>
+    <li><a href="#tools">Free tools only</a></li>
+    <li><a href="#website">Website for free</a></li>
+
+    <div class="ns">Execution</div>
+    <li><a href="#daily">Daily schedule</a></li>
+    <li><a href="#milestones">Milestones to hit</a></li>
+    <li><a href="#mistakes">Mistakes to avoid</a></li>
+  </ul>
+</nav>
+
+<main>
+
+<!-- HERO -->
+<section id="hero" class="wide">
+  <span class="kicker">// Build in Public · Zero Budget · Maximum Traction</span>
+  <h1>What to actually<br>do while you<br>build <span class="g">SportsAI.</span></h1>
+  <p class="sub">The exact sequence, every free tool, every Reddit post, every piece of content, the data farming strategy with crypto rewards, and how to run the entire operation with as close to £0 as possible while keeping Olympic-grade quality.</p>
+  <div class="budget-pill">
+    Total pre-launch budget target → <strong style="font-size:16px;">£0–200</strong> for the first 3 months
+  </div>
+</section>
+
+<!-- HONEST TRUTH -->
+<section id="truth">
+  <span class="sl">// 00 — Read this first</span>
+  <h2>The honest truth about what works</h2>
+  <p class="lead">Most founders do these things in the wrong order. Here is what actually works and what wastes your time.</p>
+
+  <div class="note nr"><strong>What does NOT work:</strong> Building a perfect website before you have users. Posting AI UGC videos before you have real footage. Paying for ads before you have product-market fit. Creating a Discord server nobody joins. Announcing "we're building something big" with no specifics. All of these are displacement activities — they feel productive but produce zero paying users.</div>
+
+  <div class="note ng"><strong>What actually works:</strong> Talking to real athletes about their real pain. Posting your founder journey raw and unpolished. Showing a real person's real technique being analyzed — even if the product is rough. Posting in the exact places where your target athletes already are. Giving something genuinely valuable (free analysis, free coaching feedback) before asking for anything in return. These five things, done consistently for 8 weeks, produce your first 50 users. Everything else is secondary.</div>
+
+  <table>
+    <thead><tr><th>Action</th><th>Time cost</th><th>Real impact</th><th>Do when</th></tr></thead>
+    <tbody>
+      <tr><td>Post in r/wrestling offering free analysis</td><td>30 min</td><td><span style="color:var(--g)">Very high — direct users</span></td><td>Week 1</td></tr>
+      <tr><td>Film real athlete using your prototype</td><td>2 hours</td><td><span style="color:var(--g)">Very high — social proof</span></td><td>Week 3</td></tr>
+      <tr><td>Build a waitlist landing page</td><td>4 hours</td><td><span style="color:var(--g)">High — captures interest</span></td><td>Week 1</td></tr>
+      <tr><td>TikTok before/after technique video</td><td>3 hours</td><td><span style="color:var(--g)">High if real footage</span></td><td>Week 4+</td></tr>
+      <tr><td>AI UGC with no real footage</td><td>5 hours</td><td><span style="color:var(--y)">Medium — only works after real content</span></td><td>Month 2</td></tr>
+      <tr><td>Perfect website with animations</td><td>2 weeks</td><td><span style="color:var(--r)">Low — nobody comes to it yet</span></td><td>Month 3+</td></tr>
+      <tr><td>Discord / Slack community</td><td>Ongoing</td><td><span style="color:var(--r)">Low until you have 100+ users</span></td><td>Month 4+</td></tr>
+      <tr><td>Product Hunt launch</td><td>1 week prep</td><td><span style="color:var(--y)">Medium — mostly tech audience</span></td><td>Month 6 with product live</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- EXACT SEQUENCE -->
+<section id="sequence">
+  <span class="sl">// 01 — Master sequence</span>
+  <h2>Exact sequence — week by week</h2>
+  <p class="lead">Everything runs in parallel with the app build. Person 3 owns this entirely. Person 1 and Person 2 focus on building. Person 3 builds the audience the product will launch into.</p>
+
+  <div class="timeline">
+    <div class="tw">
+      <div class="tw-num">W1</div>
+      <div class="tw-body">
+        <div class="tw-when">Week 1 — Day you start building</div>
+        <div class="tw-title">Set up your presence and start talking</div>
+        <div class="tw-desc">Before writing one line of app code: create the waitlist page, post in 3 Reddit communities, and DM 20 coaches.</div>
+        <ul class="tw-tasks">
+          <li>Build waitlist page on Carrd or Framer (free) — takes 2 hours</li>
+          <li>Create accounts: Reddit (aged), TikTok, Instagram, X/Twitter</li>
+          <li>Post in r/wrestling: <em>"Building an AI wrestling coach. Looking for 10 beta testers who want free technique analysis. No app yet — just upload a video, I'll analyze it manually and with AI."</em></li>
+          <li>Post in r/MMA and r/bjj with same offer, different wording</li>
+          <li>DM 20 wrestling/MMA coaches on Instagram: offer free analysis for their athletes in exchange for feedback</li>
+          <li>Start a personal build log on X/Twitter: "Day 1 of building the AI wrestling coach I wish I had at 16."</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="tw">
+      <div class="tw-num">W2</div>
+      <div class="tw-body">
+        <div class="tw-when">Week 2 — Still no product</div>
+        <div class="tw-title">Do manual analysis. Build real relationships. Collect real footage.</div>
+        <div class="tw-desc">Run your first 10 "fake it till you make it" analyses. Athlete sends video → you run skeleton extractor script → you write feedback manually + with Claude → they get a real analysis report. This is your product without the app.</div>
+        <ul class="tw-tasks">
+          <li>Set up a Google Form: "Submit your technique video for free AI analysis" — link it from Reddit posts</li>
+          <li>Process every submission within 24 hours — manually using your pose extractor + Claude API</li>
+          <li>Film the skeleton overlay on their video with a screen recording → this is your first real content</li>
+          <li>Ask every person: "Can I post this anonymously as a before/after?" — get consent</li>
+          <li>Set up a simple Notion page documenting the build — "SportsAI Build Log" — link from your bio</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="tw">
+      <div class="tw-num">W3</div>
+      <div class="tw-body">
+        <div class="tw-when">Week 3 — First real content</div>
+        <div class="tw-title">Post your first real before/after video. This is the moment everything changes.</div>
+        <div class="tw-desc"><strong>The video that works:</strong> Real wrestler uploads video → skeleton overlay appears → 3 errors highlighted → score shown → same wrestler 2 weeks later after using the drills → score improved. Film it as a TikTok. No voiceover needed. Text overlays only. Post everywhere.</div>
+        <ul class="tw-tasks">
+          <li>Film the before/after on your phone — raw, unpolished is fine. Authenticity beats production quality at this stage.</li>
+          <li>Add text overlays in CapCut (free): "Uploaded technique → AI found 3 errors → 2 weeks of drills → result"</li>
+          <li>Post on TikTok, Instagram Reels, YouTube Shorts, Reddit (r/wrestling, r/MMA) simultaneously</li>
+          <li>Pin this video to your profile. It is your proof of concept.</li>
+          <li>Reply to every comment within 1 hour for the first 24 hours — Reddit and TikTok algorithms reward early engagement</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="tw">
+      <div class="tw-num">W4</div>
+      <div class="tw-body">
+        <div class="tw-when">Week 4</div>
+        <div class="tw-title">Double down on what worked. Start building the data farming program.</div>
+        <ul class="tw-tasks">
+          <li>Post 3 more before/after videos from your first manual analyses</li>
+          <li>Announce the Data Contributor program (see farming section) — offer rewards for uploading technique videos</li>
+          <li>Add a "Join the waitlist" CTA to every video: "App launching in 8 weeks — get free first month"</li>
+          <li>Start your weekly Reddit "technique breakdown" posts — pick a famous wrestler's clip, break it down with your AI tool. Provide genuine value. Never mention your product in the post — only in your bio.</li>
+          <li>Apply to BetaList.com — free listing, drives 200–500 signups for legitimate products</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="tw">
+      <div class="tw-num">W6</div>
+      <div class="tw-body">
+        <div class="tw-when">Week 6 — App prototype ready</div>
+        <div class="tw-title">First TestFlight/APK to your waitlist. The app doesn't need to be good — it needs to work.</div>
+        <ul class="tw-tasks">
+          <li>Email your waitlist: "You're in the first 100. Here's the beta. We want brutal feedback." — use Loops.so (free)</li>
+          <li>Set up a 15-minute feedback call with every beta user who uploads a video — Calendly free tier</li>
+          <li>Record every feedback call with permission — this content becomes your testimonial library</li>
+          <li>Post a "Beta is live — here's what early users said" video. Raw reactions convert better than polished testimonials.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="tw">
+      <div class="tw-num">W10</div>
+      <div class="tw-body">
+        <div class="tw-when">Week 10 — Target: 50 paying users</div>
+        <div class="tw-title">Turn on payments. First revenue. Apply to accelerators.</div>
+        <ul class="tw-tasks">
+          <li>Stripe payment goes live — £9.99/month Competitor tier only. No free tier yet — beta users get 30 days free as their reward for feedback.</li>
+          <li>Post "We made our first £100 in revenue" publicly — build-in-public posts about revenue milestones get 10× engagement of regular posts</li>
+          <li>Apply: Entrepreneur First (London), Stadia Ventures, Techstars London</li>
+          <li>Email every beta user who gave feedback: "You helped us build this. Here's 3 months free." — converts 40% of beta users to paid</li>
+          <li>Product Hunt launch — schedule for Tuesday 00:01 PST, prepare all assets, ask your network to upvote at launch time</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WEEK 1 WEBSITE -->
+<section id="week1">
+  <span class="sl">// 02 — Day 1 deliverable</span>
+  <h2>Build the waitlist page in 2 hours for free</h2>
+  <p class="lead">Not a full website. One page. One job: convert visitors into waitlist signups. Everything else is a distraction.</p>
+
+  <h4 class="ss">// Free tools to build it — pick one</h4>
+  <div class="tools">
+    <div class="tool">
+      <div class="tool-name">Carrd.co <span class="tool-price tp-free">Free</span></div>
+      <div class="tool-desc">Single-page websites in 30 minutes. Beautiful templates. Custom domain for $19/year. The fastest path to a live page. Used by hundreds of successful pre-launch products.</div>
+      <div class="tool-use">→ carrd.co — pick "Landing Page" template</div>
+    </div>
+    <div class="tool">
+      <div class="tool-name">Framer <span class="tool-price tp-free">Free</span></div>
+      <div class="tool-desc">More powerful than Carrd. Animations, CMS, better design control. Free tier includes 1 page with framer.website domain. Worth learning if you have 4 hours instead of 2.</div>
+      <div class="tool-use">→ framer.com — "Landing page" starter</div>
+    </div>
+    <div class="tool">
+      <div class="tool-name">Tally.so forms <span class="tool-price tp-free">Free</span></div>
+      <div class="tool-desc">The simplest waitlist form on earth. Embed in Carrd/Framer. Collects name + email + sport + skill level. Connects to Loops.so for email automation. Zero code.</div>
+      <div class="tool-use">→ tally.so → embed in your Carrd page</div>
+    </div>
+    <div class="tool">
+      <div class="tool-name">Loops.so <span class="tool-price tp-free">Free to 1K</span></div>
+      <div class="tool-desc">Email automation for your waitlist. Free up to 1,000 contacts. Sends welcome email, weekly build updates, beta invite — all automated once set up. Much better than Mailchimp for startups.</div>
+      <div class="tool-use">→ loops.so → connect to Tally form</div>
+    </div>
+  </div>
+
+  <h4 class="ss">// Your landing page must contain exactly these 5 elements</h4>
+  <pre><span class="cg">HEADLINE (1 line, under 8 words):</span>
+<span class="cy">"The AI wrestling coach that films your mistakes"</span>
+
+<span class="cg">SUBHEADLINE (2 lines max):</span>
+<span class="cy">"Upload a 30-second technique video. Get an Olympic-grade breakdown</span>
+<span class="cy">in 20 seconds. Free for the first 100 athletes."</span>
+
+<span class="cg">SINGLE VIDEO (autoplay, no sound, looping):</span>
+<span class="cy">Your best before/after footage. 15 seconds max. No intro card.</span>
+<span class="cy">Skeleton overlay visible. Score visible. Error highlighted.</span>
+<span class="cy">This video IS the product demo. Nothing else needed.</span>
+
+<span class="cg">EMAIL FORM (one field only):</span>
+<span class="cy">Email address. Nothing else. Friction kills conversion.</span>
+<span class="cy">Button text: "Get free early access" — not "Submit"</span>
+
+<span class="cg">SOCIAL PROOF (3 quotes from your beta users):</span>
+<span class="cy">"I've trained for 4 years and never had feedback this specific." — Jake, wrestler</span>
+<span class="cy">"Showed me exactly what I'm doing wrong at the moment it happens." — Priya, MMA</span>
+<span class="cy">"My coach agreed with everything the AI flagged." — Marcus, BJJ</span></pre>
+
+  <div class="note ny"><strong>Robinhood converted their landing page at over 50%</strong> because it was laser-focused and low-friction. <strong>Your goal: 30% conversion rate</strong> (3 out of 10 visitors sign up). If you're below 20%, the headline or video is wrong — not the traffic source.</div>
+</section>
+
+<!-- AI UGC VIDEOS -->
+<section id="ugc">
+  <span class="sl">// 03 — Content engine</span>
+  <h2>AI UGC videos — what works and what doesn't</h2>
+  <p class="lead">AI-generated content works only as a volume multiplier on top of real content. It cannot replace authentic footage. Here is the exact formula.</p>
+
+  <div class="note nr"><strong>Critical warning:</strong> AI UGC with no real footage is obvious, performs poorly, and damages credibility with the sports community. Athletes can spot fake training content instantly. Use AI UGC only to scale content you've already proven works with real footage. The sequence is always: real footage first → AI-enhanced version second.</div>
+
+  <h4 class="ss">// The 4 video formats that actually work for sports AI</h4>
+
+  <div class="ugc">
+    <div class="platform">Format 1 — TikTok / Reels · Highest reach</div>
+    <strong>The "Real Analysis" format</strong> — Real athlete's skeleton overlay. AI error markers visible. Score counting up. Technique name card. Caption: "I analyzed 500 wrestling shots. Here are the 3 mistakes 90% of beginners make." Hook within 2 seconds. No voiceover — text overlays only. Duration: 15–30 seconds. This format gets 10× more views than anything else because it's genuinely useful content, not an ad.
+  </div>
+
+  <div class="ugc">
+    <div class="platform">Format 2 — YouTube Shorts · Best for trust building</div>
+    <strong>The "Founder explains" format</strong> — You (or one of your team) on camera, talking directly to the athlete. "Here's why your wrestling shot keeps getting stuffed — and the exact drill to fix it in 2 weeks." Show the AI analysis at the 20-second mark. End with "we're building an app that does this automatically — link in bio." Authenticity of a real person builds trust. 60 seconds maximum.
+  </div>
+
+  <div class="ugc">
+    <div class="platform">Format 3 — Reddit posts · Highest conversion to signups</div>
+    <strong>The "Breakdown post" format</strong> — Text post with images. "I analyzed [Famous Fighter]'s technique using AI pose estimation. Here's what I found [5 specific biomechanical observations with images]." Never mention your product in the post. Put your link in your bio. Redditors will find it if the content is good. Redditors are 27% more likely to purchase a product they discover on the platform compared to other social networks.
+  </div>
+
+  <div class="ugc">
+    <div class="platform">Format 4 — AI UGC (volume play, Month 2+)</div>
+    <strong>The "AI-voiced breakdown" format</strong> — Use HeyGen or Synthesia free tier to create AI presenter videos explaining technique concepts. Use your real analysis data as the script. "Here's why 73% of wrestlers fail the double-leg finish — based on 200 analyzed sessions." AI presenter + real skeleton overlay data + real stats. Produces 5× the content volume at zero incremental time cost. Only works after you have real data to cite.
+  </div>
+
+  <h4 class="ss">// Free AI video tools</h4>
+  <div class="tools">
+    <div class="tool">
+      <div class="tool-name">CapCut <span class="tool-price tp-free">Free</span></div>
+      <div class="tool-desc">Best free video editor for TikTok/Reels. Auto-captions, text overlays, before/after templates, speed effects. The skeleton overlay + error highlight videos are built here. Mobile and desktop.</div>
+      <div class="tool-use">→ capcut.com — use "Analysis" template</div>
+    </div>
+    <div class="tool">
+      <div class="tool-name">HeyGen <span class="tool-price tp-free">Free tier</span></div>
+      <div class="tool-desc">AI avatar video creator. Free tier: 1 minute of video per month. Use it for the "AI expert explains" format. Upload your script, pick an avatar, get a professional-looking presenter video.</div>
+      <div class="tool-use">→ heygen.com — "Digital Human" feature</div>
+    </div>
+    <div class="tool">
+      <div class="tool-name">ElevenLabs <span class="tool-price tp-free">Free tier</span></div>
+      <div class="tool-desc">AI voiceover. Free tier: 10,000 characters/month. Use for narrated technique breakdown videos. Sounds completely human. Much better than text-to-speech alternatives.</div>
+      <div class="tool-use">→ elevenlabs.io → "Instant voice cloning"</div>
+    </div>
+    <div class="tool">
+      <div class="tool-name">Canva <span class="tool-price tp-free">Free</span></div>
+      <div class="tool-desc">All static content: Reddit post images, Instagram carousels, technique breakdown diagrams, before/after comparison graphics. The free tier is genuinely sufficient for pre-launch.</div>
+      <div class="tool-use">→ canva.com — "Sports" template category</div>
+    </div>
+  </div>
+</section>
+
+<!-- REDDIT STRATEGY -->
+<section id="reddit">
+  <span class="sl">// 04 — Reddit</span>
+  <h2>Reddit strategy — the honest playbook</h2>
+  <p class="lead">Reddit is your highest-converting channel. Sports subreddits are growing 26% year-over-year. But Reddit bans you instantly if you spam. The strategy requires patience and genuine contribution.</p>
+
+  <div class="note nb"><strong>The 10:1 rule:</strong> For every 1 post that mentions your product, contribute 10 posts of genuine value with no promotion. This is not optional. Moderators check post history. New accounts that only promote get banned in hours. Build 4–6 weeks of genuine contributions before your first product mention.</div>
+
+  <h4 class="ss">// Target subreddits — post in this exact order</h4>
+  <div class="reddit-cards">
+    <div class="rc">
+      <div class="rc-name">r/wrestling</div>
+      <div class="rc-subs">250K members</div>
+      <div class="rc-why">Your primary community. Post technique breakdowns, training questions, analysis of pro fights. Build karma here first before anything else.</div>
+    </div>
+    <div class="rc">
+      <div class="rc-name">r/MMA</div>
+      <div class="rc-subs">3.8M members</div>
+      <div class="rc-why">Largest combat sports community on Reddit. High-intent users. Strict moderation — only post genuinely useful content. A viral post here = 10,000 visitors.</div>
+    </div>
+    <div class="rc">
+      <div class="rc-name">r/bjj</div>
+      <div class="rc-subs">500K members</div>
+      <div class="rc-why">Brazilian jiu-jitsu. Highly technical community. They love data and analysis. Your AI breakdown posts will perform extremely well here.</div>
+    </div>
+    <div class="rc">
+      <div class="rc-name">r/volleyball</div>
+      <div class="rc-subs">150K members</div>
+      <div class="rc-why">Second sport after wrestling. Engage here while building wrestling features. Volleyball players are underserved for technique analysis tools.</div>
+    </div>
+    <div class="rc">
+      <div class="rc-name">r/WeightLifting</div>
+      <div class="rc-subs">400K members</div>
+      <div class="rc-why">Enormous form-correction culture. Athletes constantly film themselves and post asking "what's wrong with my form?" — that is exactly what you solve.</div>
+    </div>
+    <div class="rc">
+      <div class="rc-name">r/Entrepreneur</div>
+      <div class="rc-subs">3M members</div>
+      <div class="rc-why">Build-in-public posts go here. "I'm building an AI sports coach — here's what I learned after analyzing 200 wrestling videos." Drives waitlist signups from founder community.</div>
+    </div>
+    <div class="rc">
+      <div class="rc-name">r/startups</div>
+      <div class="rc-subs">1.5M members</div>
+      <div class="rc-why">Post your revenue milestones and learnings. "Our first £100 in revenue from an AI sports app — what we learned." Converts to B2B investors and advisor relationships.</div>
+    </div>
+    <div class="rc">
+      <div class="rc-name">r/india + Sports</div>
+      <div class="rc-subs">Varies</div>
+      <div class="rc-why">Your India team covers Indian wrestling and MMA communities. r/Kushti (traditional wrestling), r/ProWrestlingIndia. Huge untapped market.</div>
+    </div>
+  </div>
+
+  <h4 class="ss">// The 3 Reddit post templates that work every time</h4>
+  <pre><span class="cg">TEMPLATE 1 — Free analysis offer (Week 1, genuine value)</span>
+Title: <span class="cy">"Free AI technique analysis for wrestlers — looking for 10 beta testers"</span>
+Body: <span class="cy">"I'm building an AI tool that analyzes wrestling technique using pose estimation.</span>
+<span class="cy">I need real footage to test it. Drop your technique video in the comments or DM me.</span>
+<span class="cy">I'll analyze it and send you a detailed breakdown within 24 hours, completely free.</span>
+<span class="cy">No strings, no signup — just genuine feedback in exchange for testing my tool."</span>
+<span class="cl">— Do not mention the app name. Do not link to your waitlist. First response only.</span>
+
+<span class="cg">TEMPLATE 2 — Technique breakdown post (Weekly, pure value)</span>
+Title: <span class="cy">"I analyzed [Athlete Name]'s single-leg shot using AI pose estimation. Here's what the data shows."</span>
+Body: <span class="cy">[5 specific biomechanical observations with images from your skeleton extractor]</span>
+<span class="cy">"Hip height at entry: 0.68 (elite average: 0.63). His left shoulder dip telegraphs</span>
+<span class="cy">the shot 0.4 seconds before contact — opponents who know what to look for can sprawl early."</span>
+<span class="cl">— Mention product ONLY if someone asks in comments: "what tool did you use for this?"</span>
+
+<span class="cg">TEMPLATE 3 — Build-in-public post (Monthly, drives waitlist)</span>
+Title: <span class="cy">"6 weeks building an AI wrestling coach — 3 things I got completely wrong"</span>
+Body: <span class="cy">Honest reflection on what failed. What athletes actually wanted vs what you built.</span>
+<span class="cy">Specific numbers: X videos analyzed, Y coaches interviewed, Z beta users.</span>
+<span class="cy">Link to waitlist at the bottom: "If you're interested in following along or getting early access:"</span>
+<span class="cl">— This post style gets crossposted to r/Entrepreneur and r/startups organically.</span></pre>
+</section>
+
+<!-- TIKTOK -->
+<section id="tiktok">
+  <span class="sl">// 05 — TikTok + Reels</span>
+  <h2>TikTok and Instagram Reels strategy</h2>
+  <p class="lead">This is your fastest growth channel once you have real footage. One viral video in r/MMA or on TikTok is worth 6 months of paid advertising.</p>
+
+  <h4 class="ss">// The viral format — skeleton overlay comparison</h4>
+  <p class="t">Film this video exactly: 3 seconds — "Analyzed a wrestler's technique with AI." Cut to 5 seconds — skeleton overlay appears on their video. 3 seconds — 3 errors highlighted in red. 3 seconds — score counter: 58/100. Cut to same wrestler 3 weeks later. 5 seconds — new skeleton. 2 errors. Score: 74/100. Text card: "Same drills. 3 weeks." End card: "App coming soon — link in bio." No music needed. No voiceover. Pure content.</p>
+
+  <h4 class="ss">// Posting schedule that works without spending anything</h4>
+  <div class="cal">
+    <div class="cal-day">
+      <div class="d-name">Mon</div>
+      <div class="d-task">Technique breakdown post on Reddit</div>
+    </div>
+    <div class="cal-day active">
+      <div class="d-name">Tue</div>
+      <div class="d-task" style="color:var(--g)">Before/after skeleton video — TikTok + Reels + Shorts</div>
+    </div>
+    <div class="cal-day">
+      <div class="d-name">Wed</div>
+      <div class="d-task">Engage all comments from Tuesday's video</div>
+    </div>
+    <div class="cal-day active">
+      <div class="d-name">Thu</div>
+      <div class="d-task" style="color:var(--g)">Build-in-public update on X/Twitter</div>
+    </div>
+    <div class="cal-day">
+      <div class="d-name">Fri</div>
+      <div class="d-task">Reply to all Reddit DMs from free analysis offer</div>
+    </div>
+    <div class="cal-day active">
+      <div class="d-name">Sat</div>
+      <div class="d-task" style="color:var(--g)">Film new analysis content at a local gym</div>
+    </div>
+    <div class="cal-day">
+      <div class="d-name">Sun</div>
+      <div class="d-task">Waitlist email update — 200 word build update</div>
+    </div>
+  </div>
+
+  <div class="note ng"><strong>The one thing that determines if TikTok works for you:</strong> The first 2 seconds of the video. If the first frame isn't visually striking or immediately answers "what is happening?", the algorithm buries it. The skeleton overlay appearing on a real wrestling video is inherently striking. Lead with that frame. Never lead with a title card or your logo.</div>
+</section>
+
+<!-- CONTENT CALENDAR -->
+<section id="calendar">
+  <span class="sl">// 06 — Content calendar</span>
+  <h2>8-week content calendar — exact posts</h2>
+  <p class="lead">This is what Person 3 posts, on what day, in what format. Nothing is improvised. Everything is planned 2 weeks ahead.</p>
+
+  <table>
+    <thead><tr><th>Week</th><th>Reddit (Monday)</th><th>TikTok/Reels (Tuesday)</th><th>X/Twitter (Thursday)</th><th>Email (Sunday)</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Free analysis offer — r/wrestling</td><td>No video yet — share a breakdown image instead</td><td>"Day 1 of building an AI wrestling coach. Why I'm doing this."</td><td>Welcome email to first 50 signups</td></tr>
+      <tr><td>2</td><td>Free analysis offer — r/MMA</td><td>No video yet — share skeleton extractor demo screenshot</td><td>"Analyzed 10 wrestling videos this week. The most common mistake is..."</td><td>"You're in the first wave. Here's what we're building."</td></tr>
+      <tr><td>3</td><td>Technique breakdown — popular fighter</td><td><strong>First before/after video</strong> — post on all platforms simultaneously</td><td>"Our first before/after posted. Here's what happened."</td><td>"First real content. Watch this."</td></tr>
+      <tr><td>4</td><td>Technique breakdown — common beginner error</td><td>Before/after video #2 — different sport (MMA)</td><td>"We've now analyzed 30 videos. The data is surprising."</td><td>"30 videos analyzed. 3 patterns we didn't expect."</td></tr>
+      <tr><td>5</td><td>Post in r/bjj — first time</td><td>Founder on camera — "why I'm building this"</td><td>"4 weeks in. Here's the honest progress report."</td><td>"Beta starts in 3 weeks. Are you in?"</td></tr>
+      <tr><td>6</td><td>Build-in-public: "What I got wrong about AI sports coaching"</td><td>Beta testers' reaction compilation</td><td>"Beta is live. First 50 users are in. Here's what they said."</td><td>Beta invite email — existing waitlist only</td></tr>
+      <tr><td>7</td><td>Ask for feedback: "What feature would make you pay for this?"</td><td>Product demo video — the app working</td><td>"Users are finding things I didn't expect. Thread:"</td><td>"Beta feedback summary. Here's what we're fixing."</td></tr>
+      <tr><td>8</td><td>Launch announcement post</td><td>Launch day video — "It's live"</td><td>"We launched. Here's the link. Here's our first paying customer's story."</td><td>Launch email — "You made this happen."</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- DATA FARMING -->
+<section id="farming">
+  <span class="sl">// 07 — Data farming</span>
+  <h2>Farming pro and beginner videos — the exact program</h2>
+  <p class="lead">Your AI gets better with every labeled video. The most valuable thing early users can give you is their footage. Here is how to get it ethically, legally, and at scale.</p>
+
+  <div class="note nb"><strong>The core exchange:</strong> Athlete uploads a technique video and lets you use the anonymized skeleton data for AI training. In return: they get free premium access, XP bonuses, or token rewards. This is a legitimate value exchange — you're giving real value, they're giving real data. The legal structure matters enormously — see the Legal section below.</div>
+
+  <h4 class="ss">// The Data Contributor Program — three tiers</h4>
+
+  <div class="farm-row">
+    <div class="farm">
+      <span class="f-icon">🎬</span>
+      <h3>Contributor — Any athlete</h3>
+      <p>Upload any technique video and consent to anonymized skeleton data being used for AI training. 5 videos minimum to join. Available to all users — free and paid. The skeleton data (not the video) is what you keep.</p>
+      <span class="f-reward">Reward: 3 months free Competitor tier + 500 XP bonus</span>
+    </div>
+    <div class="farm">
+      <span class="f-icon">🥋</span>
+      <h3>Expert Contributor — Coaches + advanced athletes</h3>
+      <p>Upload labeled videos with quality annotations: which technique, what errors are present, severity rating. Your coaching knowledge becomes training data. Minimum: competition-level experience. 20 labeled videos required.</p>
+      <span class="f-reward">Reward: 6 months free Elite tier + £50 Amazon voucher per 20 videos + revenue share 0.5% for first year</span>
+    </div>
+    <div class="farm">
+      <span class="f-icon">🏆</span>
+      <h3>Pro Contributor — Olympians + elite athletes</h3>
+      <p>Your technique sessions filmed and labeled with full biomechanical annotation. This is your ground truth data. Approached directly, not through a form. Offer: custom dashboards + career progression tracking + meaningful compensation.</p>
+      <span class="f-reward">Reward: Negotiated directly — £500–2,000 per session package</span>
+    </div>
+  </div>
+
+  <h4 class="ss">// Where to find video data — legal sources ranked</h4>
+  <table>
+    <thead><tr><th>Source</th><th>How to access</th><th>Legal status</th><th>Quality</th></tr></thead>
+    <tbody>
+      <tr><td>User-uploaded (consent form)</td><td>In-app upload flow with explicit consent checkbox</td><td style="color:var(--g)">Fully legal — consent given</td><td>High — real training footage</td></tr>
+      <tr><td>YouTube competition footage (skeleton extraction only)</td><td>pytube library → extract pose coordinates → delete video frames</td><td style="color:var(--g)">Legal — skeleton coordinates not copyrightable</td><td>Very high — elite level</td></tr>
+      <tr><td>AthletePose3D dataset (CVPR 2025)</td><td>github.com/calvinyeungck/AthletePose3D — direct download</td><td style="color:var(--g)">Fully legal — academic license</td><td>Very high — 1.3M frames</td></tr>
+      <tr><td>MADS dataset (martial arts)</td><td>Academic download — request form</td><td style="color:var(--g)">Fully legal — research license</td><td>High</td></tr>
+      <tr><td>DM athletes for recorded sparring</td><td>Instagram DMs → offer free analysis in exchange</td><td style="color:var(--g)">Legal with written consent</td><td>Very high — real sparring</td></tr>
+      <tr><td>Scraping social media video frames</td><td>Technically possible</td><td style="color:var(--r)">ILLEGAL — terms of service violation, GDPR breach. Do not do this.</td><td>—</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- CRYPTO + GIFTS -->
+<section id="crypto">
+  <span class="sl">// 08 — Incentive program</span>
+  <h2>Crypto rewards and gift strategy — honest assessment</h2>
+  <p class="lead">You asked about crypto rewards for data contributors. Here is the completely honest answer about what works, what's legally complex, and the simpler alternative that achieves the same result.</p>
+
+  <div class="note nr"><strong>Crypto rewards — the real problems:</strong> Paying users with cryptocurrency tokens for data creates potential securities law issues (you may be issuing unregistered securities), tax reporting obligations for users in UK/EU/India, wallet friction (most athletes don't have crypto wallets), and regulatory scrutiny from the FCA (UK), SEBI (India), and SEC (US) if your "token" appreciates in value. For a pre-seed startup trying to stay under the radar and focus on building — this is the wrong complexity to introduce at this stage.</div>
+
+  <div class="note ng"><strong>The simpler alternative that works better:</strong> Amazon gift cards, app credits, and free subscription tiers. These have zero regulatory complexity, zero friction (everyone has Amazon), and convert data contributors at higher rates than crypto. The research is clear: crypto rewards attract crypto-oriented users, not necessarily your target athletes. Gift cards attract athletes.</div>
+
+  <h4 class="ss">// The reward structure that works without crypto complexity</h4>
+
+  <div class="gift">
+    <h3>Tier 1: Data Contributor (5+ videos)</h3>
+    <p>Automatic: 3 months free Competitor subscription (worth £30). Costs you: £0 (it's your own product). Impact: athlete gets £30 value, you get 5 labeled training videos worth £200+ in data collection cost.</p>
+    <div class="amount">£0 cash cost → £200 data value</div>
+  </div>
+
+  <div class="gift">
+    <h3>Tier 2: Expert Contributor (20+ labeled videos)</h3>
+    <p>Amazon gift card £50 per 20 videos + 6 months Elite free. Costs you: £50 cash + £180 in foregone subscription revenue. You get: 20 expert-labeled videos worth £500–1,000 in professional data annotation cost.</p>
+    <div class="amount">£50 cash → £500+ data value = 10× ROI</div>
+  </div>
+
+  <div class="gift">
+    <h3>Tier 3: Founding Athletes program (top 20 contributors)</h3>
+    <p>Revenue share: 0.5% of first year revenue when the product monetizes, up to £2,000 per founding athlete. This creates genuine long-term alignment. They tell everyone. They recruit other athletes. They stay for years. Similar to Robinhood's "invite friends, both get free stock" — the revenue share makes them evangelists, not just contributors.</p>
+    <div class="amount">0.5% capped at £2,000 — 20 athletes = max £40,000 total</div>
+    <div class="note-small">Legal: structure as a "data contributor bonus" not equity. Use a simple written agreement. Have a lawyer review for £200.</div>
+  </div>
+
+  <div class="gift">
+    <h3>If you still want crypto — do it this way (Phase 2 only)</h3>
+    <p>Wait until you have a legal entity, revenue, and a lawyer. Use an established token (USDC on Solana — stablecoin, zero volatility risk, no securities issue since it's not your token). Pay contributors in USDC via a simple smart contract. Coinbase Commerce makes this straightforward. Cost to implement: £500 in developer time. Only do this when your contributor program is proven with gift cards first.</p>
+    <div class="amount">USDC: $0.01–0.10 per labeled video frame</div>
+    <div class="note-small">Never create your own token at this stage. The regulatory risk is not worth it.</div>
+  </div>
+</section>
+
+<!-- LEGAL -->
+<section id="legal">
+  <span class="sl">// 09 — Legal structure</span>
+  <h2>Legal structure for the data program</h2>
+  <p class="lead">Three documents you need before collecting a single video from anyone. All three can be drafted with AI and reviewed by a lawyer for £200–500 total.</p>
+
+  <pre><span class="cg">DOCUMENT 1: Data Contributor Agreement (athletes)</span>
+<span class="cy">Key clauses needed:</span>
+<span class="cl">- Athlete grants SportsAI license to use anonymized skeleton data for AI training</span>
+<span class="cl">- Athlete confirms they own the footage or have rights to upload it</span>
+<span class="cl">- SportsAI NEVER shares identifiable video with third parties</span>
+<span class="cl">- Athlete can request data deletion at any time (GDPR right to erasure)</span>
+<span class="cl">- Skeleton coordinate data is NOT identifiable and therefore not personal data under GDPR</span>
+<span class="cl">- If athlete is under 18: parental consent required (COPPA/GDPR)</span>
+
+<span class="cg">DOCUMENT 2: Privacy Policy (on your website)</span>
+<span class="cy">Must state:</span>
+<span class="cl">- What data you collect (email, sport, skill level, skeleton coordinates)</span>
+<span class="cl">- What you do NOT collect (biometric data, identifiable video frames)</span>
+<span class="cl">- Where data is stored (UK/EU servers for GDPR compliance)</span>
+<span class="cl">- How to delete your account and all data</span>
+<span class="cl">Use iubenda.com — generates GDPR-compliant privacy policy free</span>
+
+<span class="cg">DOCUMENT 3: Coach Partnership Agreement</span>
+<span class="cy">Key clauses:</span>
+<span class="cl">- Coach's IP (coaching knowledge, threshold values) belongs to coach</span>
+<span class="cl">- SportsAI licenses coach's knowledge for AI training</span>
+<span class="cl">- Revenue share percentage and payment schedule</span>
+<span class="cl">- Non-compete limited to 6 months post-termination</span>
+
+<span class="cy">Cheap legal resources:</span>
+<span class="cl">- Docracy.com — free legal template library</span>
+<span class="cl">- Clerky.com — startup legal docs at fixed price</span>
+<span class="cl">- Rocket Lawyer UK — £30/month, review any document</span>
+<span class="cl">- AI-draft with Claude → have a UK solicitor review once: £200-400</span></pre>
+</section>
+
+<!-- OPEN SOURCE EVERYTHING -->
+<section id="opensource">
+  <span class="sl">// 10 — Zero budget stack</span>
+  <h2>Replace every paid tool with open source</h2>
+  <p class="lead">The full SportsAI tech stack rebuilt with open source and free tiers only. Same quality. Zero monthly cost until you have revenue.</p>
+
+  <div class="os-grid">
+    <div class="os">
+      <h3>Paid: Modal GPU ($0.30/video)</h3>
+      <div class="paid">Cost at 1,000 videos: $300/month</div>
+      <div class="free">Free: Google Colab Pro</div>
+      <p>Run your YOLO11 pose service on Google Colab Pro ($10/month) for the first 3 months. Write a FastAPI server on Colab that accepts video URLs, processes them, returns pose JSON. Ngrok tunnels the localhost to a public URL. Not production-grade but works for 500 users.</p>
+      <span class="save">Save: $290/month → upgrade to Modal when revenue covers it</span>
+    </div>
+    <div class="os">
+      <h3>Paid: Cloudflare R2 + Stream ($50+/month)</h3>
+      <div class="paid">Cost at 1,000 users: $50-200/month</div>
+      <div class="free">Free: Supabase Storage + bunny.net</div>
+      <p>Supabase Storage free tier: 1GB. Bunny.net video CDN: $10/month for 1TB traffic. Use bunny.net instead of Cloudflare Stream for video delivery at early scale. Switch to Cloudflare when you hit 10,000 videos.</p>
+      <span class="save">Save: $40-190/month at early stage</span>
+    </div>
+    <div class="os">
+      <h3>Paid: Railway API hosting ($20/month)</h3>
+      <div class="paid">Cost: $20/month</div>
+      <div class="free">Free: Render.com free tier</div>
+      <p>Render.com free tier: 1 web service, 512MB RAM, free PostgreSQL. Sleeps after 15 minutes of inactivity (spins up in ~30 seconds). Acceptable for beta with under 100 users. Upgrade to Railway when you have 50+ daily active users.</p>
+      <span class="save">Save: $20/month → $0 until real traffic</span>
+    </div>
+    <div class="os">
+      <h3>Paid: DomoAI anime API ($0.20/clip)</h3>
+      <div class="paid">Cost at 500 anime clips: $100/month</div>
+      <div class="free">Free: AnimeGANv2 self-hosted</div>
+      <p>AnimeGANv2 is open source and runs on Google Colab. Quality is lower than DomoAI but free. Run it on Colab, process clips in batch (not real-time). Ships the anime feature at zero cost. Upgrade to DomoAI API when you have paying users who specifically want the premium quality.</p>
+      <span class="save">Save: $100/month — Phase 1 only</span>
+    </div>
+    <div class="os">
+      <h3>Paid: Ready Player Me ($0-99/month)</h3>
+      <div class="paid">Cost: free up to 1,000 avatars/month</div>
+      <div class="free">Free: Ready Player Me free tier</div>
+      <p>Ready Player Me's free tier covers 1,000 avatar creations per month — more than enough for Phase 1 with under 200 users. No open-source alternative matches it for quality and React Native integration. This one, keep as-is.</p>
+      <span class="save">Actually already free for Phase 1</span>
+    </div>
+    <div class="os">
+      <h3>Paid: Sentry error monitoring ($26/month)</h3>
+      <div class="paid">Cost: $26/month</div>
+      <div class="free">Free: GlitchTip (self-hosted Sentry)</div>
+      <p>GlitchTip is an open-source Sentry alternative. Deploy on Railway free tier or Render free tier. Full error monitoring, stack traces, user context. Identical to Sentry for your scale. Switch to Sentry when you have investors who want enterprise monitoring.</p>
+      <span class="save">Save: $26/month until Series A</span>
+    </div>
+  </div>
+
+  <h4 class="ss">// Total monthly cost with zero-budget stack</h4>
+  <table>
+    <thead><tr><th>Service</th><th>Zero-budget version</th><th>Monthly cost</th></tr></thead>
+    <tbody>
+      <tr><td>Database + Auth + Storage</td><td>Supabase free tier</td><td style="color:var(--g)">£0</td></tr>
+      <tr><td>API hosting</td><td>Render.com free tier</td><td style="color:var(--g)">£0</td></tr>
+      <tr><td>GPU inference</td><td>Google Colab Pro</td><td style="color:var(--y)">£8</td></tr>
+      <tr><td>Video storage</td><td>Supabase Storage (1GB) + Bunny.net</td><td style="color:var(--y)">£8</td></tr>
+      <tr><td>Email</td><td>Loops.so free tier (under 1K)</td><td style="color:var(--g)">£0</td></tr>
+      <tr><td>Waitlist</td><td>Tally.so free</td><td style="color:var(--g)">£0</td></tr>
+      <tr><td>Landing page</td><td>Carrd.co free</td><td style="color:var(--g)">£0</td></tr>
+      <tr><td>Claude API</td><td>Claude API (usage-based, ~£2 at low volume)</td><td style="color:var(--y)">£2</td></tr>
+      <tr><td>Error monitoring</td><td>GlitchTip self-hosted on Render</td><td style="color:var(--g)">£0</td></tr>
+      <tr><td>Analytics</td><td>Plausible open-source or Umami</td><td style="color:var(--g)">£0</td></tr>
+      <tr><td>Content creation</td><td>CapCut free, Canva free</td><td style="color:var(--g)">£0</td></tr>
+      <tr><td><strong>TOTAL — Phase 1 (under 100 users)</strong></td><td></td><td style="color:var(--g)"><strong>£18/month</strong></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- FREE TOOLS -->
+<section id="tools">
+  <span class="sl">// 11 — Every free tool</span>
+  <h2>Complete free tool stack</h2>
+
+  <div class="tools">
+    <div class="tool"><div class="tool-name">Figma <span class="tool-price tp-free">Free</span></div><div class="tool-desc">UI design for the app. Free tier: 3 projects. Design all screens here before building. Share with Person 2 via link — no export needed.</div><div class="tool-use">→ figma.com</div></div>
+    <div class="tool"><div class="tool-name">Notion <span class="tool-price tp-free">Free</span></div><div class="tool-desc">Product roadmap, build log, coach knowledge sessions documentation, content calendar, team tasks. Free tier handles everything for a 3-person team.</div><div class="tool-use">→ notion.so</div></div>
+    <div class="tool"><div class="tool-name">Linear <span class="tool-price tp-free">Free</span></div><div class="tool-desc">Issue tracking for the 3-person dev team. Better than Jira for small teams. Free tier: unlimited issues, 3 members. Integrates with GitHub.</div><div class="tool-use">→ linear.app</div></div>
+    <div class="tool"><div class="tool-name">Discord <span class="tool-price tp-free">Free</span></div><div class="tool-desc">Internal team communication. Also: set up a #beta-testers channel for your first 50 users — best feedback channel you'll ever have.</div><div class="tool-use">→ discord.com</div></div>
+    <div class="tool"><div class="tool-name">Calendly <span class="tool-price tp-free">Free</span></div><div class="tool-desc">Schedule feedback calls with beta users. Free tier: 1 event type, unlimited bookings. Use for "15-minute feedback call" bookings.</div><div class="tool-use">→ calendly.com</div></div>
+    <div class="tool"><div class="tool-name">Loom <span class="tool-price tp-free">Free</span></div><div class="tool-desc">Screen + camera recording for async communication between distributed team. Free tier: 25 videos. Also use for coach review recordings in the marketplace MVP.</div><div class="tool-use">→ loom.com</div></div>
+    <div class="tool"><div class="tool-name">Plausible Analytics <span class="tool-price tp-free">Open-source</span></div><div class="tool-desc">Privacy-friendly website analytics. Self-host on Render free tier. GDPR compliant without cookie banners. Better than Google Analytics for your EU users.</div><div class="tool-use">→ github.com/plausible/analytics</div></div>
+    <div class="tool"><div class="tool-name">Excalidraw <span class="tool-price tp-free">Free</span></div><div class="tool-desc">Whiteboard for architecture diagrams, user flows, team planning sessions. Free, browser-based, no account needed. Share links work without login.</div><div class="tool-use">→ excalidraw.com</div></div>
+    <div class="tool"><div class="tool-name">iubenda <span class="tool-price tp-free">Free</span></div><div class="tool-desc">GDPR-compliant privacy policy and terms of service generator. Free tier generates basic documents. Essential before collecting any user data.</div><div class="tool-use">→ iubenda.com</div></div>
+    <div class="tool"><div class="tool-name">PostHog <span class="tool-price tp-free">Free to 1M events</span></div><div class="tool-desc">Product analytics: session recordings, funnels, feature flags, A/B testing. Free up to 1 million events/month. The best product analytics tool for mobile apps at this stage.</div><div class="tool-use">→ posthog.com</div></div>
+  </div>
+</section>
+
+<!-- DAILY SCHEDULE -->
+<section id="daily">
+  <span class="sl">// 12 — Daily execution</span>
+  <h2>Daily schedule — how all three people spend their time</h2>
+  <p class="lead">While the app is being built (weeks 1–10). Everyone has a parallel track. Nothing waits for anything else.</p>
+
+  <table>
+    <thead><tr><th>Time</th><th style="color:var(--p)">Person 1 — AI/Backend</th><th style="color:var(--b)">Person 2 — Mobile</th><th style="color:var(--y)">Person 3 — Game/Data/Growth</th></tr></thead>
+    <tbody>
+      <tr><td>Morning (3 hrs)</td><td>Build: pose service, rules engine, API routes. Use Claude Code for complex multi-file tasks.</td><td>Build: screens, components, UI. Use Cursor for TypeScript/RN work.</td><td>Respond to all Reddit DMs from free analysis offers. Process any submitted videos manually.</td></tr>
+      <tr><td>Midday (1 hr)</td><td>Review PRs from last day. Async standup in Discord: 3 bullets.</td><td>Review designs in Figma vs. what was built. Flag mismatches.</td><td>Film or source content for this week's TikTok/Reels video. Coach knowledge session if scheduled.</td></tr>
+      <tr><td>Afternoon (3 hrs)</td><td>Continue building. Write tests. Document API endpoints in Postman.</td><td>Continue building. Wire screens to API mocks.</td><td>Post on Reddit (value post — no promotion). Reply to all comments within 1 hour.</td></tr>
+      <tr><td>Evening (1 hr)</td><td>Review Person 3's content requests: "can you generate skeleton overlay for this video?" — 15 minutes of work.</td><td>Test on physical device. Screenshot bugs. Update Linear.</td><td>Edit video content in CapCut. Schedule for next day posting. Update content calendar in Notion.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note ng"><strong>Person 3's most important daily habit:</strong> Spend 30 minutes every morning replying to sports community posts on Reddit where someone asks about technique improvement — NOT mentioning your product, just being genuinely helpful. After 4 weeks of this, your karma and credibility is high enough that your launch post gets upvoted instead of downvoted. The founders who succeed on Reddit invest 4–6 weeks building genuine community presence before asking for anything in return.</div>
+</section>
+
+<!-- MILESTONES -->
+<section id="milestones">
+  <span class="sl">// 13 — Milestones</span>
+  <h2>The exact numbers to hit — and what unlocks at each</h2>
+
+  <table>
+    <thead><tr><th>Milestone</th><th>Target timing</th><th>What it unlocks</th><th>How to measure</th></tr></thead>
+    <tbody>
+      <tr><td>100 waitlist signups</td><td>Week 2</td><td>Proof of interest. Add social proof to landing page: "100 athletes waiting."</td><td>Tally.so dashboard</td></tr>
+      <tr><td>10 videos manually analyzed</td><td>Week 2</td><td>Real testimonials. Real data. Content for 3 TikTok videos.</td><td>Google Form responses</td></tr>
+      <tr><td>First viral post (1,000+ upvotes)</td><td>Week 3–4</td><td>Credibility signal. Repost everywhere. Screenshot for pitch deck.</td><td>Reddit notification</td></tr>
+      <tr><td>500 waitlist signups</td><td>Week 5</td><td>Enough to send meaningful beta invite. Credible for accelerator applications.</td><td>Loops.so contact count</td></tr>
+      <tr><td>50 beta users active</td><td>Week 7</td><td>Real retention data. Real AI/coach agreement rate. Real testimonials with names.</td><td>Supabase active users query</td></tr>
+      <tr><td>First paying user</td><td>Week 10</td><td>The most important milestone. Post it publicly. Thank them by name (with permission).</td><td>Stripe first payment</td></tr>
+      <tr><td>£1,000 MRR</td><td>Month 4</td><td>Apply to Entrepreneur First. Apply to Stadia Ventures. This number makes you fundable at pre-seed.</td><td>Stripe MRR dashboard</td></tr>
+      <tr><td>50 paying users</td><td>Month 4–5</td><td>Seed round conversations. The number investors ask about first.</td><td>Stripe active subscriptions</td></tr>
+      <tr><td>75% AI/coach agreement rate</td><td>Month 5</td><td>Your technical validation. Publishable. Pitchable. The proof the AI actually works.</td><td>coach_ai_divergence table query</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- MISTAKES TO AVOID -->
+<section id="mistakes">
+  <span class="sl">// 14 — What not to do</span>
+  <h2>The mistakes that kill pre-launch momentum</h2>
+
+  <div class="note nr"><strong>Mistake 1 — Stealth mode.</strong> Keeping your idea secret until the product is "ready" means you arrive at launch with zero audience, zero data, and zero social proof. Every week you build in secret is a week your competitors (if any exist) are building an audience. Build in public from Day 1.</div>
+
+  <div class="note nr"><strong>Mistake 2 — Posting promotional content in Reddit sports communities before building karma.</strong> You will be banned. The account will be flagged as spam. You lose the best acquisition channel before you ever used it. Build karma first. 20–30 genuine contributions across your target communities before any product mention.</div>
+
+  <div class="note nr"><strong>Mistake 3 — Building the full website instead of the waitlist page.</strong> A full website with 10 pages, animations, pricing tables, and a blog takes 3 weeks. A waitlist page on Carrd takes 2 hours. You need the waitlist page in Week 1. The full website happens in Month 3 when you know what your product actually is based on user feedback.</div>
+
+  <div class="note nr"><strong>Mistake 4 — Creating your own crypto token for data rewards.</strong> Regulatory nightmare, engineering distraction, wrong user motivation, and most athletes don't have crypto wallets. Use Amazon gift cards and app credits. Same incentive effect, zero complexity.</div>
+
+  <div class="note nr"><strong>Mistake 5 — Waiting until the app is "good enough" to talk to athletes.</strong> Every athlete you talk to before the app is built saves you 2 weeks of building the wrong thing. The manual analysis workflow (Google Form → Claude API → email report) IS the product at Week 1. Start talking to athletes on Day 1.</div>
+
+  <div class="note ng"><strong>The one thing that actually matters:</strong> Get 10 real athletes using your analysis — even if it's completely manual — within the first 2 weeks. If they find it valuable enough to tell a friend, you have product-market fit. If they don't, you need to change something before you build the app. This 2-week test costs you nothing and saves you 6 months of building the wrong product.</div>
+</section>
+
+</main>
+
+<script>
+const links=document.querySelectorAll('nav a');
+const secs=document.querySelectorAll('section[id]');
+window.addEventListener('scroll',()=>{
+  let cur='';
+  secs.forEach(s=>{if(window.scrollY>=s.offsetTop-120)cur=s.id;});
+  links.forEach(l=>{l.classList.remove('on');if(l.getAttribute('href')==='#'+cur)l.classList.add('on');});
+});
+links.forEach(l=>l.addEventListener('click',e=>{
+  e.preventDefault();
+  document.querySelector(l.getAttribute('href'))?.scrollIntoView({behavior:'smooth',block:'start'});
+}));
+</script>
+</body>
+</html>
