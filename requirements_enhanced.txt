@@ -39,7 +39,6 @@ python-multipart>=0.0.5
 pydantic>=1.10.0
 
 # Database & Storage
-sqlite3             # Built-in SQLite support
 sqlalchemy>=1.4.0   # ORM for database operations
 redis>=4.3.0        # Caching and job queue
 
