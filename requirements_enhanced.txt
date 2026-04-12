@@ -10,7 +10,7 @@ accelerate>=0.12.0
 # Computer Vision & Tracking
 opencv-python>=4.6.0
 ultralytics>=8.0.0  # YOLO for ByteTrack
-bytetrack>=0.1.0    # Multi-object tracking
+bytetrack>=0.0.1    # Multi-object tracking
 mediapipe>=0.9.0    # Pose estimation
 scipy>=1.8.0        # Signal processing for motion analysis
 
