@@ -21,7 +21,6 @@ segment-anything>=1.0  # SAM2 integration
 
 # OCR for Jersey Recognition
 easyocr>=1.6.0      # Alternative OCR solution
-tesseract>=0.1.3     # Tesseract OCR
 pytesseract>=0.3.8  # Python wrapper for Tesseract
 
 # Data Processing & Analysis
@@ -48,8 +47,6 @@ aioredis>=2.0.0     # Async Redis support
 asyncio             # Built-in async support
 
 # Email & Notifications
-smtplib2>=0.2.0     # Email notifications
-email-validator>=1.2.0  # Email validation
 
 # Configuration & Environment
 python-dotenv>=0.20.0
