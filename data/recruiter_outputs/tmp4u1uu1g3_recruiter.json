@@ -1,0 +1,334 @@
+{
+  "video_id": "tmp4u1uu1g3",
+  "players": {
+    "1": {
+      "role": "unknown",
+      "frames_analysed": 4,
+      "biomechanics": {
+        "avg_jump_height_px": 0,
+        "vy": 11.363677978515625,
+        "arm_cock_angle": 275.0411682128906
+      },
+      "fivb_score": 40,
+      "recruiter_flags": [
+        "limited_jump_data",
+        "insufficient_data"
+      ],
+      "scoring_notes": [
+        "insufficient spike events for elbow scoring",
+        "insufficient jump events for height scoring"
+      ],
+      "jump_event_count": 1,
+      "spike_event_count": 0,
+      "normalised_scoring": false,
+      "performance_drift": {
+        "sets_analysed": 1,
+        "jump_trend": "stable",
+        "arm_trend": "stable",
+        "fatigue_flag": false,
+        "per_set_data": [
+          {
+            "set_idx": 0,
+            "jump_height_mean": 0,
+            "arm_cock_mean": 275.0411682128906,
+            "vy_peak": 11.363677978515625
+          }
+        ]
+      },
+      "heatmap": {
+        "grid_rows": 6,
+        "grid_cols": 10,
+        "data": [
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        ],
+        "peak_zone": "front-left"
+      }
+    },
+    "4": {
+      "role": "hitter",
+      "frames_analysed": 17,
+      "biomechanics": {
+        "avg_jump_height_px": 0.0,
+        "vy": -0.13811534643173218,
+        "arm_cock_angle": 437.3096008300781
+      },
+      "fivb_score": 45,
+      "recruiter_flags": [
+        "limited_spike_data",
+        "limited_jump_data",
+        "insufficient_data"
+      ],
+      "scoring_notes": [
+        "insufficient spike events for elbow scoring",
+        "insufficient jump events for height scoring"
+      ],
+      "jump_event_count": 0,
+      "spike_event_count": 0,
+      "normalised_scoring": false,
+      "performance_drift": {
+        "sets_analysed": 1,
+        "jump_trend": "stable",
+        "arm_trend": "stable",
+        "fatigue_flag": false,
+        "per_set_data": [
+          {
+            "set_idx": 0,
+            "jump_height_mean": 0,
+            "arm_cock_mean": 388.302734375,
+            "vy_peak": 1.1785244941711426
+          }
+        ]
+      },
+      "heatmap": {
+        "grid_rows": 6,
+        "grid_cols": 10,
+        "data": [
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.75,
+            0.25
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        ],
+        "peak_zone": "front-right"
+      }
+    },
+    "5": {
+      "role": "unknown",
+      "frames_analysed": 1,
+      "biomechanics": {},
+      "fivb_score": 40,
+      "recruiter_flags": [
+        "limited_jump_data",
+        "insufficient_data"
+      ],
+      "scoring_notes": [
+        "insufficient spike events for elbow scoring",
+        "insufficient jump events for height scoring"
+      ],
+      "jump_event_count": 0,
+      "spike_event_count": 0,
+      "normalised_scoring": false,
+      "performance_drift": {
+        "sets_analysed": 0,
+        "error": "No data for track_id"
+      },
+      "heatmap": {
+        "grid_rows": 6,
+        "grid_cols": 10,
+        "data": [
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        ],
+        "peak_zone": "front-left"
+      }
+    }
+  }
+}

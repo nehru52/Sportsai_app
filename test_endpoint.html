@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test SportsAI Endpoint</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .container {
+            background: #2a2a2a;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        h1 {
+            color: #4CAF50;
+        }
+        input[type="file"] {
+            margin: 20px 0;
+            padding: 10px;
+            background: #3a3a3a;
+            border: 2px solid #4CAF50;
+            border-radius: 5px;
+            color: #fff;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        #status {
+            margin-top: 20px;
+            padding: 15px;
+            background: #3a3a3a;
+            border-radius: 5px;
+            min-height: 50px;
+        }
+        .success {
+            color: #4CAF50;
+        }
+        .error {
+            color: #f44336;
+        }
+        .info {
+            color: #2196F3;
+        }
+        pre {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test SportsAI Analysis Endpoint</h1>
+        <p>This page tests the <code>/api/analyse/auto</code> endpoint directly.</p>
+        
+        <div>
+            <label>Select Technique:</label><br>
+            <select id="technique" style="padding: 10px; margin: 10px 0; background: #3a3a3a; color: #fff; border: 2px solid #4CAF50; border-radius: 5px;">
+                <option value="spike">Spike</option>
+                <option value="serve">Serve</option>
+                <option value="block">Block</option>
+                <option value="dig">Dig</option>
+            </select>
+        </div>
+        
+        <div>
+            <label>Upload Video:</label><br>
+            <input type="file" id="videoFile" accept="video/*">
+        </div>
+        
+        <button onclick="testAnalysis()" id="testBtn">🚀 Test Analysis</button>
+        
+        <div id="status">
+            <p class="info">Ready to test. Select a video and click the button.</p>
+        </div>
+        
+        <div id="result" style="display: none;">
+            <h3>Response:</h3>
+            <pre id="resultData"></pre>
+        </div>
+    </div>
+    
+    <script>
+        async function testAnalysis() {
+            const videoFile = document.getElementById('videoFile').files[0];
+            const technique = document.getElementById('technique').value;
+            const statusDiv = document.getElementById('status');
+            const resultDiv = document.getElementById('result');
+            const resultData = document.getElementById('resultData');
+            const testBtn = document.getElementById('testBtn');
+            
+            if (!videoFile) {
+                statusDiv.innerHTML = '<p class="error">❌ Please select a video file first!</p>';
+                return;
+            }
+            
+            testBtn.disabled = true;
+            statusDiv.innerHTML = '<p class="info">⏳ Uploading and analyzing video...</p>';
+            resultDiv.style.display = 'none';
+            
+            try {
+                const formData = new FormData();
+                formData.append('video', videoFile);
+                
+                console.log('Calling: /api/analyse/auto?output=json');
+                console.log('Technique:', technique);
+                
+                const response = await fetch('/api/analyse/auto?output=json', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Server returned ${response.status}: ${errorText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Success! Data:', data);
+                
+                statusDiv.innerHTML = '<p class="success">✅ Analysis completed successfully!</p>';
+                resultDiv.style.display = 'block';
+                resultData.textContent = JSON.stringify(data, null, 2);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                statusDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+                resultDiv.style.display = 'block';
+                resultData.textContent = error.stack || error.message;
+            } finally {
+                testBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

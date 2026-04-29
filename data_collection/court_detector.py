@@ -83,6 +83,72 @@ def detect_court_in_frame(frame: np.ndarray) -> dict:
             os.remove(tmp_path)
 
 
+def get_homography_matrix(video_corners: list) -> np.ndarray:
+    """
+    Compute homography matrix from video coordinates to standard 18m x 9m court.
+    
+    video_corners: list of [x, y] coordinates of the 4 court corners.
+    Order: Top-Left, Top-Right, Bottom-Right, Bottom-Left.
+    
+    Returns 3x3 homography matrix.
+    """
+    # Standard volleyball court dimensions (meters)
+    # We use a 2D top-down view where length is 18m and width is 9m (horizontal).
+    # We'll map to a coordinate system where (0,0) is top-left of the court.
+    dst_pts = np.array([
+        [0, 0],   # Top-Left
+        [18, 0],  # Top-Right
+        [18, 9],  # Bottom-Right
+        [0, 9]    # Bottom-Left
+    ], dtype=np.float32)
+    
+    src_pts = np.array(video_corners, dtype=np.float32)
+    
+    H, _ = cv2.findHomography(src_pts, dst_pts)
+    return H
+
+
+def transform_points(points: np.ndarray, H: np.ndarray) -> np.ndarray:
+    """
+    Apply homography transformation to a set of points.
+    
+    points: np.ndarray of shape (N, 2)
+    H: 3x3 homography matrix
+    
+    Returns transformed points of shape (N, 2) in meters.
+    """
+    if points.size == 0:
+        return points
+    
+    # Reshape to (N, 1, 2) for cv2.perspectiveTransform
+    pts_reshaped = points.reshape(-1, 1, 2).astype(np.float32)
+    transformed = cv2.perspectiveTransform(pts_reshaped, H)
+    
+    return transformed.reshape(-1, 2)
+
+
+def order_corners(polygon: list) -> list:
+    """
+    Order polygon points into Top-Left, Top-Right, Bottom-Right, Bottom-Left.
+    """
+    pts = np.array(polygon)
+    
+    # Sum of coordinates: TL will have min sum, BR will have max sum
+    s = pts.sum(axis=1)
+    tl = pts[np.argmin(s)]
+    br = pts[np.argmax(s)]
+    
+    # Difference of coordinates: TR will have max diff (x-y), BL will have min diff (x-y)
+    diff = np.diff(pts, axis=1) # y-x
+    # Actually diff = y-x. 
+    # TR: (w, 0) -> y-x = -w (min)
+    # BL: (0, h) -> y-x = h (max)
+    tr = pts[np.argmin(diff)]
+    bl = pts[np.argmax(diff)]
+    
+    return [tl.tolist(), tr.tolist(), br.tolist(), bl.tolist()]
+
+
 def detect_court_in_video(video_path: str, sample_every_n: int = 30) -> dict:
     """
     Sample frames from a video and return the most stable court polygon.

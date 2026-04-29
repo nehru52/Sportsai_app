@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Match Analysis — SportsAI</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .match-container { max-width: 1200px; margin: 0 auto; padding: 120px 20px 60px; }
+    .search-row { display: flex; gap: 12px; margin-bottom: 40px; }
+    
+    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
+    .summary-card { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 12px; text-align: center; }
+    .summary-val { font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 800; color: var(--text); }
+    .summary-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+    .match-layout { display: grid; grid-template-columns: 1fr 400px; gap: 32px; }
+    @media (max-width: 900px) { .match-layout { grid-template-columns: 1fr; } }
+
+    .timeline-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; max-height: 600px; }
+    .timeline-header { padding: 20px; border-bottom: 1px solid var(--border); font-weight: 700; background: var(--raised); }
+    .timeline-list { overflow-y: auto; padding: 10px; }
+    .event-item { display: flex; align-items: center; gap: 15px; padding: 12px; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .event-time { font-family: 'JetBrains Mono', monospace; color: var(--muted); width: 50px; flex-shrink: 0; }
+    .event-badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; min-width: 80px; text-align: center; }
+    .ev-rally_start { background: rgba(77,140,255,0.1); color: var(--blue); }
+    .ev-spike { background: rgba(255,45,78,0.1); color: var(--red); }
+    .ev-set_change { background: rgba(255,194,45,0.1); color: var(--gold); }
+    .event-meta { color: var(--muted); font-size: 11px; }
+
+    .drift-section { margin-top: 40px; }
+    .drift-table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; }
+    .drift-table th { background: var(--surface); padding: 15px; text-align: left; font-size: 11px; color: var(--muted); text-transform: uppercase; }
+    .drift-table td { padding: 15px; border-bottom: 1px solid var(--border); }
+    .trend-up { color: var(--green); }
+    .trend-down { color: var(--red); }
+    .fatigue-badge { background: var(--red); color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; animation: pulse 1s infinite; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Sports<em>AI</em><sup>BETA</sup></div>
+  <div class="nav-right">
+    <a class="nav-pill" href="index.html">Dashboard</a>
+    <a class="nav-pill" href="players.html">Players</a>
+    <a class="nav-pill active" href="match.html">Match Analysis</a>
+    <a class="nav-pill" href="progress.html">Progress</a>
+  </div>
+</nav>
+
+<div class="match-container">
+  <div class="hero-eyebrow">🏆 Tactical Insights</div>
+  <h1 style="font-family: 'Barlow Condensed', sans-serif; font-size: 3rem; margin-bottom: 8px;">Match Dashboard</h1>
+  <p style="color: var(--muted); margin-bottom: 40px;">Deep temporal and spatial analysis of full volleyball matches.</p>
+
+  <div class="search-row">
+    <input type="text" class="search-input" id="matchIdInput" placeholder="Enter Video ID (e.g. game_01)..." style="flex:1">
+    <button class="btn btn-primary" onclick="loadMatch()">Load Match</button>
+  </div>
+
+  <div id="matchContent" style="display:none">
+    <div class="summary-grid" id="summaryGrid">
+      <div class="summary-card"><div class="summary-val" id="sDuration">0:00</div><div class="summary-label">Duration</div></div>
+      <div class="summary-card"><div class="summary-val" id="sRallies">0</div><div class="summary-label">Total Rallies</div></div>
+      <div class="summary-card"><div class="summary-val" id="sSpikes">0</div><div class="summary-label">Total Spikes</div></div>
+      <div class="summary-card"><div class="summary-val" id="sHomeAway">0 / 0</div><div class="summary-label">Home vs Away Spikes</div></div>
+    </div>
+
+    <div class="match-layout">
+      <div class="drift-section">
+        <h3 style="margin-bottom:20px; font-family: 'Barlow Condensed', sans-serif;">Player Performance Drift</h3>
+        <div id="driftContainer"></div>
+      </div>
+
+      <div class="timeline-card">
+        <div class="timeline-header">Match Timeline</div>
+        <div class="timeline-list" id="timelineList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="noMatch" style="display:none; text-align: center; padding: 60px 0;">
+    <h3 style="color: var(--muted);">Match data not found</h3>
+    <p>Ensure you have processed the full match using <code>pose_extractor.py</code>.</p>
+  </div>
+</div>
+
+<script>
+    async function loadMatch() {
+        const id = document.getElementById('matchIdInput').value;
+        if (!id) return;
+
+        try {
+            const resp = await fetch(`http://localhost:8000/api/match/${id}`);
+            if (!resp.ok) throw new Error('Not found');
+            const data = await resp.json();
+            renderMatch(data);
+            document.getElementById('matchContent').style.display = 'block';
+            document.getElementById('noMatch').style.display = 'none';
+        } catch (e) {
+            document.getElementById('matchContent').style.display = 'none';
+            document.getElementById('noMatch').style.display = 'block';
+        }
+    }
+
+    function formatTime(sec) {
+        const m = Math.floor(sec / 60);
+        const s = Math.floor(sec % 60);
+        return `${m}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function renderMatch(data) {
+        document.getElementById('sDuration').innerText = formatTime(data.total_duration_seconds);
+        document.getElementById('sRallies').innerText = data.total_rallies;
+        document.getElementById('sSpikes').innerText = data.total_spikes;
+        document.getElementById('sHomeAway').innerText = `${data.team_summary.home.spike_count} / ${data.team_summary.away.spike_count}`;
+
+        const timeline = document.getElementById('timelineList');
+        timeline.innerHTML = data.timeline.map(e => `
+            <div class="event-item">
+                <div class="event-time">${formatTime(e.time_seconds)}</div>
+                <div class="event-badge ev-${e.event_type}">${e.event_type.replace('_', ' ')}</div>
+                <div class="event-meta">${JSON.stringify(e.metadata).replace(/{|}|"/g, '')}</div>
+            </div>
+        `).join('');
+
+        const drift = document.getElementById('driftContainer');
+        drift.innerHTML = Object.entries(data.player_drift_reports).map(([tid, report]) => `
+            <div class="card" style="margin-bottom:15px; padding:15px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <strong>Player ${tid}</strong>
+                    ${report.fatigue_flag ? '<span class="fatigue-badge">FATIGUE DETECTED</span>' : ''}
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:12px;">
+                    <div>Jump Trend: <span class="trend-${report.jump_trend === 'declining' ? 'down' : (report.jump_trend === 'improving' ? 'up' : '')}">${report.jump_trend}</span></div>
+                    <div>Arm Trend: <span class="trend-${report.arm_trend === 'declining' ? 'down' : (report.arm_trend === 'improving' ? 'up' : '')}">${report.arm_trend}</span></div>
+                </div>
+            </div>
+        `).join('');
+    }
+</script>
+</body>
+</html>

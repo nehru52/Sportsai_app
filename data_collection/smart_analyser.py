@@ -9,16 +9,13 @@ This module figures out everything:
 3. For each detected technique segment — run full biomechanics
 4. Generate coaching feedback per segment
 5. Return a timeline of everything that happened + improvement advice
-
-No need to tell the system "this is a spike video."
-It watches the video and tells YOU what's in it.
 """
 import os
 import numpy as np
 import tempfile
 import cv2
 
-BASE_DIR = "C:/sportsai-backend"
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Minimum frames a detected action must last to be worth analysing
 MIN_SEGMENT_FRAMES = 15
@@ -34,22 +31,12 @@ def analyse_video_auto(
 ) -> dict:
     """
     Full automatic analysis. No technique hint needed.
-
-    Returns:
-        {
-            "quality": {...},           # video quality report
-            "timeline": [...],          # what happened and when
-            "segments": [...],          # per-technique analysis
-            "summary": {...},           # overall session summary
-            "bad_video_advice": str,    # if video is bad, specific fix
-        }
     """
     from video_quality import check_video_quality
     from action_detector import detect_actions
     from action_localiser import extract_clip
-    from pose_extractor import extract_pose, _extract_biomechanics
-    from analyser import analyse_biomechanics, load_thresholds, TECHNIQUE_CONFIG
-    from coach_feedback import generate_feedback
+    from pose_extractor import extract_pose
+    from elite_analyser import analyze_elite_biomechanics, POSITION_ELITE_STANDARDS
     from progress_tracker import save_session
 
     result = {
@@ -75,7 +62,7 @@ def analyse_video_auto(
     duration_sec = total_frames / fps
     cap.release()
 
-    # Try VolleyVision action detector first, fall back to kinematic scan
+    # Try VolleyVision action detector first
     try:
         action_scan = detect_actions(video_path)
         events      = action_scan.get("events", [])
@@ -83,15 +70,15 @@ def analyse_video_auto(
         events = []
         action_scan = {"events": [], "action_counts": {}, "total_frames": total_frames}
 
-    # If action detector found nothing, use kinematic scan as fallback
+    # If action detector found nothing, use kinematic scan + physics fallback
     if not events:
         action_scan, events = _kinematic_scan(video_path, fps, total_frames)
 
+    # If EVERYTHING fails, return the error
     if not events:
         result["bad_video_advice"] = (
-            "No volleyball actions were detected in this video. "
-            "Make sure the athlete is clearly visible and performing a technique. "
-            "The camera should be side-on at net height, 10-15m back."
+            "No techniques detected or insufficient data.\n"
+            "Make sure the athlete is clearly visible performing a volleyball technique."
         )
         return result
 
@@ -100,7 +87,6 @@ def analyse_video_auto(
     result["timeline"] = timeline
 
     # ── Step 4: Extract and analyse each technique segment ───────────────────
-    thresholds_cache = {}
     segments = []
 
     for seg in timeline:
@@ -110,49 +96,43 @@ def analyse_video_auto(
                              "skip_reason": f"'{technique}' not yet supported for biomechanics"})
             continue
 
-        # Extract the clip for this segment
         tmp_clip = tempfile.mktemp(suffix=".mp4")
         try:
             extract_clip(video_path, seg["start_frame"], seg["end_frame"], tmp_clip)
 
-            # Load thresholds (cached)
-            if technique not in thresholds_cache:
-                thresholds_cache[technique] = load_thresholds(technique)
-
-            # Run pose extraction + biomechanics on the clip
+            # Run pose extraction
             pose_result = extract_pose(tmp_clip, technique, skip_quality_check=True)
-            report      = analyse_biomechanics(
-                pose_result["biomechanics"],
-                thresholds_cache[technique],
+            
+            # ELITE ANALYSIS INTEGRATION
+            position = POSITION_ELITE_STANDARDS.get("receiver") # Default
+            
+            elite_report = analyze_elite_biomechanics(
+                pose_result["pose_sequence_3d"], 
                 technique,
+                session_context={"athlete_id": athlete_id}
             )
-            good    = sum(1 for r in report.values() if r["status"] == "GOOD")
-            total_m = len(report)
-            verdict = _verdict(report)
-
-            # AI coaching feedback
-            feedback = generate_feedback(technique, report, verdict)
 
             seg_result = {
                 **seg,
                 "analysis": {
-                    "verdict":    verdict,
-                    "score":      f"{good}/{total_m}",
-                    "metrics":    report,
+                    "verdict":    elite_report["elite_comparisons"]["olympic_readiness"],
+                    "score":      f"{int(elite_report['performance_percentile'])}%",
+                    "metrics":    elite_report["elite_comparisons"]["metric_comparisons"],
                     "confidence": pose_result["average_confidence"],
-                    "coaching":   feedback,
+                    "coaching":   {
+                        "headline": elite_report["coaching_insights"][0] if elite_report["coaching_insights"] else "Focus on form",
+                        "next_session_focus": elite_report["coaching_insights"][1] if len(elite_report["coaching_insights"]) > 1 else "Consistency",
+                        "detailed_advice": elite_report["coaching_insights"]
+                    },
+                    "elite_data": elite_report
                 },
             }
 
-            # Save to progress history
             if athlete_id:
-                save_session(athlete_id, technique, {
-                    "verdict": verdict,
-                    "score":   f"{good}/{total_m}",
-                    "metrics": report,
-                })
+                save_session(athlete_id, technique, seg_result["analysis"])
 
         except Exception as e:
+            print(f"Analysis failed for segment: {e}")
             seg_result = {**seg, "analysis": None, "skip_reason": str(e)}
         finally:
             if os.path.exists(tmp_clip):
@@ -168,14 +148,7 @@ def analyse_video_auto(
     return result
 
 
-# ── Timeline builder ──────────────────────────────────────────────────────────
-
 def _build_timeline(events: list, fps: float, total_frames: int) -> list:
-    """
-    Convert raw action events into a clean timeline of segments.
-    Merges consecutive same-action events into one segment.
-    Adds human-readable timestamps.
-    """
     if not events:
         return []
 
@@ -184,17 +157,16 @@ def _build_timeline(events: list, fps: float, total_frames: int) -> list:
     while i < len(events):
         ev = events[i]
         action = ev["action"]
-        start_frame = max(0, ev["frame"] - SEGMENT_PADDING * 3)  # grab more before
-
-        # Find end: next different action or end of video
-        end_frame = total_frames - 1
-        if i + 1 < len(events):
-            end_frame = min(events[i + 1]["frame"] + SEGMENT_PADDING, total_frames - 1)
-
-        # Skip tiny segments
-        if end_frame - start_frame < MIN_SEGMENT_FRAMES:
-            i += 1
-            continue
+        
+        # For short clips, ensure we grab the whole context
+        if total_frames / fps < 15.0:
+            start_frame = 0
+            end_frame = total_frames - 1
+        else:
+            start_frame = max(0, ev["frame"] - SEGMENT_PADDING * 3)  
+            end_frame = total_frames - 1
+            if i + 1 < len(events):
+                end_frame = min(events[i + 1]["frame"] + SEGMENT_PADDING, total_frames - 1)
 
         start_sec = start_frame / fps
         end_sec   = end_frame / fps
@@ -219,10 +191,7 @@ def _fmt_time(sec: float) -> str:
     return f"{m}:{s:05.2f}"
 
 
-# ── Summary builder ───────────────────────────────────────────────────────────
-
 def _build_summary(segments: list, duration_sec: float, action_scan: dict) -> dict:
-    """Build an overall session summary across all detected techniques."""
     analysed = [s for s in segments if s.get("analysis")]
     if not analysed:
         return {
@@ -234,37 +203,28 @@ def _build_summary(segments: list, duration_sec: float, action_scan: dict) -> di
             "session_duration_sec": round(duration_sec, 1),
         }
 
-    # Collect all metrics across all segments
     all_good, all_bad = [], []
     for seg in analysed:
         report = seg["analysis"]["metrics"]
         for metric, val in report.items():
-            if val["status"] == "GOOD":
-                all_good.append((metric, val["value"], val["elite_mean"]))
+            # NEW: Using the updated Olympic biomechanics dictionary keys
+            measured_val = val.get("measured", 0)
+            target_val = val.get("target", 0)
+            
+            if val.get("is_elite", False):
+                all_good.append((metric, measured_val, target_val))
             else:
-                all_bad.append((metric, val["value"], val["elite_mean"]))
+                all_bad.append((metric, measured_val, target_val))
 
-    # Top strength = metric furthest above elite mean (proportionally)
-    top_strength = None
-    if all_good:
-        top_strength = max(all_good, key=lambda x: abs(x[1] - x[2]))[0]
+    top_strength = max(all_good, key=lambda x: abs(x[1] - x[2]))[0] if all_good else None
+    top_priority = max(all_bad, key=lambda x: abs(x[1] - x[2]))[0] if all_bad else None
 
-    # Top priority = metric furthest below elite mean
-    top_priority = None
-    if all_bad:
-        top_priority = max(all_bad, key=lambda x: abs(x[1] - x[2]))[0]
-
-    # Overall verdict
     good_count  = len(all_good)
     total_count = len(all_good) + len(all_bad)
     ratio = good_count / max(total_count, 1)
     overall = "ELITE" if ratio == 1.0 else "GOOD" if ratio >= 0.6 else "NEEDS WORK"
 
-    # Per-technique verdicts
-    per_technique = {}
-    for seg in analysed:
-        t = seg["technique"]
-        per_technique[t] = seg["analysis"]["verdict"]
+    per_technique = {seg["technique"]: seg["analysis"]["verdict"] for seg in analysed}
 
     return {
         "techniques_detected":  list(action_scan.get("action_counts", {}).keys()),
@@ -279,29 +239,19 @@ def _build_summary(segments: list, duration_sec: float, action_scan: dict) -> di
         "segments_analysed":    len(analysed),
     }
 
-
-# ── Bad video advice ──────────────────────────────────────────────────────────
-
 def _build_bad_video_advice(quality) -> str:
-    """
-    Turn quality issues into a single clear message the user can act on.
-    Prioritises the most impactful fix.
-    """
     issues = quality.issues
     recs   = quality.recommendations
+    if not issues: return None
 
-    if not issues:
-        return None
-
-    # Map issue keywords to plain advice
     advice_map = [
-        ("blurry",      "Your video is too blurry. Hold your phone steady or prop it against something. A tripod costs £10 and makes a huge difference."),
-        ("dark",        "Your video is too dark. Record in daylight or turn on the gym lights. The athlete's full body must be clearly lit."),
-        ("overexposed", "Your video is too bright/washed out. Don't record with bright light or sun directly behind the athlete."),
-        ("resolution",  "Your video resolution is too low. Record at 720p or higher — most phones do this by default in camera settings."),
-        ("short",       "Your video is too short. Record the full movement including the run-up and follow-through, not just the contact moment."),
-        ("visible",     "The athlete isn't clearly visible. Frame the full body from head to feet. Don't zoom in on just the upper body."),
-        ("moving",      "The camera is moving too much. Fix the camera in one position before recording. Don't follow the athlete with the camera."),
+        ("blurry",      "Your video is too blurry. Hold your phone steady or use a tripod."),
+        ("dark",        "Your video is too dark. Record in better lighting."),
+        ("overexposed", "Your video is washed out. Don't record with bright light behind the athlete."),
+        ("resolution",  "Resolution is too low. Record at 720p or higher."),
+        ("short",       "Video is too short. Include full run-up and follow-through."),
+        ("visible",     "Athlete isn't fully visible. Frame the full body from head to feet."),
+        ("moving",      "Camera is moving too much. Keep the camera stationary."),
     ]
 
     for keyword, advice in advice_map:
@@ -309,49 +259,40 @@ def _build_bad_video_advice(quality) -> str:
             if keyword in issue.lower():
                 return advice
 
-    # Generic fallback
     return f"Video issue: {issues[0]}. {recs[0] if recs else ''}"
-
-
-def _verdict(report: dict) -> str:
-    good  = sum(1 for r in report.values() if r["status"] == "GOOD")
-    total = len(report)
-    if good == total:        return "ELITE"
-    if good >= total * 0.6:  return "GOOD"
-    return "NEEDS WORK"
 
 
 def _kinematic_scan(video_path: str, fps: float, total_frames: int) -> tuple:
     """
-    Fallback scanner when VolleyVision action detector fails or finds nothing.
-    Uses YOLO pose + kinematic signatures to detect technique windows.
-    Much faster than running the full action detector on every frame.
+    Fallback scanner. Uses YOLO pose + kinematic signatures to detect technique windows.
+    INCLUDES ULTIMATE PHYSICS FALLBACK for short videos if standard detectors fail.
     """
     import sys
     sys.path.insert(0, os.path.dirname(__file__))
     from action_localiser import (
         _get_yolo, _joint_velocity_signal,
         _detect_spike_window, _detect_serve_window,
-        _detect_block_window, _detect_dig_window,
-        SAMPLE_RATE, PADDING_FRAMES
+        _detect_block_window, _detect_dig_window
     )
 
     yolo = _get_yolo()
     cap  = cv2.VideoCapture(video_path)
     keypoints_by_frame = {}
     frame_idx = 0
-
+    
+    # Dense scan (every frame) for maximum accuracy on short clips
     while True:
         ret, frame = cap.read()
-        if not ret:
-            break
-        if frame_idx % SAMPLE_RATE == 0:
+        if not ret: break
+        
+        # We only need every 2nd frame to save processing time
+        if frame_idx % 2 == 0:
             results = yolo(frame, verbose=False)
             if results and results[0].keypoints is not None:
-                kps = results[0].keypoints
+                kps   = results[0].keypoints
                 if kps.conf is not None and len(kps.conf) > 0:
-                    best = int(kps.conf.mean(dim=1).argmax())
-                    xy = kps.xy[best].cpu().numpy()
+                    best_idx = int(kps.conf.mean(dim=1).argmax())
+                    xy = kps.xy[best_idx].cpu().numpy()
                     keypoints_by_frame[frame_idx] = xy
         frame_idx += 1
     cap.release()
@@ -366,7 +307,6 @@ def _kinematic_scan(video_path: str, fps: float, total_frames: int) -> tuple:
     events = []
     action_counts = {}
 
-    # Try each technique detector and take the best match
     detectors = {
         "spike": _detect_spike_window,
         "serve": _detect_serve_window,
@@ -374,31 +314,67 @@ def _kinematic_scan(video_path: str, fps: float, total_frames: int) -> tuple:
         "dig":   _detect_dig_window,
     }
 
-    best_conf = 0
-    best_result = None
-    best_technique = None
-
+    # Standard Detection Loop
     for technique, detector in detectors.items():
         result = detector(kp_array, velocity, frames_with_kp, fps)
-        if result and result[2] > best_conf:
-            best_conf = result[2]
-            best_result = result
-            best_technique = technique
+        if result:
+            start_f, end_f, conf, method = result
+            if conf >= 0.35:  
+                events.append({
+                    "frame": int(start_f + (end_f - start_f)//2),
+                    "action": technique,
+                    "confidence": round(conf, 3),
+                })
+                action_counts[technique] = action_counts.get(technique, 0) + 1
 
-    if best_result and best_conf >= 0.55:
-        start_f, end_f, conf, method = best_result
+    # ═══════════════════════════════════════════════════════════════════════
+    # ULTIMATE PHYSICS-BASED FALLBACK
+    # If the video is a short clip and standard detectors failed, FORCE a guess
+    # ═══════════════════════════════════════════════════════════════════════
+    if not events and (total_frames / fps) < 15.0:
+        print("[smart_analyser] Standard detectors failed. Forcing Physics-Based Fallback.")
+        
+        # Calculate posture metrics across the whole video
+        head_y = kp_array[:, 0, 1]
+        wrist_y = np.minimum(kp_array[:, 9, 1], kp_array[:, 10, 1])
+        hip_y = (kp_array[:, 11, 1] + kp_array[:, 12, 1]) / 2
+        
+        max_hip_drop = hip_y.max() - hip_y.min()
+        hands_above_head = np.any(wrist_y < head_y)
+        
+        wrist_dist = np.linalg.norm(kp_array[:, 9, :2] - kp_array[:, 10, :2], axis=1)
+        max_wrist_dist = wrist_dist.max()
+        
+        # Estimate player height in pixels for dynamic thresholds
+        person_h = (kp_array[:, 15, 1] - kp_array[:, 0, 1]).max()
+        
+        guessed_action = "spike" # Default fallback
+        
+        if hands_above_head:
+            if max_wrist_dist < (person_h * 0.3):
+                guessed_action = "block"  # Hands held tight together high up
+            else:
+                guessed_action = "spike"  # Hands apart / swinging
+        else:
+            if max_hip_drop > (person_h * 0.15):
+                guessed_action = "dig"    # Crouching down significantly
+            else:
+                guessed_action = "serve"  # Standing upright
+                
         events.append({
-            "frame":      int(start_f + PADDING_FRAMES),
-            "action":     best_technique,
-            "confidence": round(conf, 3),
+            "frame": total_frames // 2,
+            "action": guessed_action,
+            "confidence": 0.45
         })
-        action_counts[best_technique] = 1
+        action_counts[guessed_action] = 1
+
+    events.sort(key=lambda x: x["frame"])
+    dominant = max(action_counts, key=action_counts.get) if action_counts else None
 
     action_scan = {
         "events":         events,
         "action_counts":  action_counts,
         "total_frames":   total_frames,
-        "dominant_action": best_technique,
-        "source":         "kinematic_fallback",
+        "dominant_action": dominant,
     }
     return action_scan, events

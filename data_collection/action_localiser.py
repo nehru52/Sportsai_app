@@ -26,7 +26,9 @@ import os
 from typing import Optional
 
 import torch as _torch
-_DEVICE = "cuda" if _torch.cuda.is_available() else "cpu"          # analyse every Nth frame for speed
+_DEVICE = "cuda" if _torch.cuda.is_available() else "cpu"
+YOLO_MODEL_PATH = os.path.join(os.path.dirname(__file__), "yolo11x-pose.pt")
+SAMPLE_RATE     = 1      # analyse every Nth frame for speed
 MIN_CLIP_FRAMES = 20     # minimum frames for a valid technique clip
 MAX_CLIP_FRAMES = 300    # maximum — anything longer is probably not a single technique
 PADDING_FRAMES  = 25     # extra frames before/after detected window — more context

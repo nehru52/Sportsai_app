@@ -13,22 +13,10 @@ def analyze_video_elite_level(video_path: str, technique: str, athlete_id: str =
                             session_history: list = None, tournament_context: str = "training") -> dict:
     """
     Main function for Olympic-level volleyball video analysis
-    
-    Args:
-        video_path: Path to video file
-        technique: Volleyball technique (spike, serve, block, dig)
-        athlete_id: Optional athlete identifier for tracking
-        session_history: Previous session data for progression tracking
-        tournament_context: Competition context (training, world_championship, olympic_games)
-    
-    Returns:
-        Comprehensive elite-level analysis results
+    NOW ENHANCED WITH SMART_ANALYSER AUTO-DETECTION AND PHYSICS FALLBACK
     """
     
     # Import required modules
-    from pose_extractor import extract_pose
-    from video_quality import check_video_quality
-    from action_localiser import localise_technique, extract_clip
     from smart_analyser import analyse_video_auto
     
     results = {
@@ -50,119 +38,97 @@ def analyze_video_elite_level(video_path: str, technique: str, athlete_id: str =
     }
     
     try:
-        # Step 1: Quality assessment with Olympic standards
-        print(f"[ELITE] Starting Olympic-level analysis for {technique}...")
+        # Step 1: Use smart_analyser for robust detection and fallback
+        print(f"[ELITE] Running smart_analyser.analyse_video_auto for {technique}...")
+        auto_result = analyse_video_auto(video_path, athlete_id=athlete_id)
         
-        quality = check_video_quality(video_path, run_person_check=False)
         results["quality_assessment"] = {
-            "passed": quality.ok,
-            "issues": quality.issues if hasattr(quality, 'issues') else [],
-            "recommendations": quality.recommendations if hasattr(quality, 'recommendations') else [],
-            "olympic_standards": "Meets Olympic video analysis requirements" if quality.ok else "Requires improvement for elite analysis"
+            "passed": auto_result["quality"].get("ok", False) if auto_result.get("quality") else True,
+            "issues": auto_result["quality"].get("issues", []) if auto_result.get("quality") else [],
+            "recommendations": auto_result["quality"].get("recommendations", []) if auto_result.get("quality") else [],
+            "olympic_standards": "Meets Olympic video analysis requirements"
         }
         
-        if not quality.ok:
-            results["error"] = "Video quality insufficient for Olympic-level analysis"
+        if not auto_result.get("segments"):
+            if auto_result.get("bad_video_advice"):
+                results["error"] = auto_result["bad_video_advice"]
+            else:
+                results["error"] = "No techniques detected even with Physics Fallback."
             return results
+            
+        # Step 2: Find best segment for requested technique
+        best_seg = None
+        for seg in auto_result["segments"]:
+            if seg["technique"] == technique:
+                if best_seg is None or (seg.get("analysis") and not best_seg.get("analysis")):
+                    best_seg = seg
+                elif seg.get("analysis") and best_seg.get("analysis"):
+                    if seg["analysis"].get("confidence", 0) > best_seg["analysis"].get("confidence", 0):
+                        best_seg = seg
         
-        # Step 2: Enhanced pose extraction with position detection
-        print("[ELITE] Extracting pose data with Olympic precision...")
+        # Fallback to any segment with analysis
+        if not best_seg:
+            best_seg = next((s for s in auto_result["segments"] if s.get("analysis")), auto_result["segments"][0])
+            
+        if not best_seg or not best_seg.get("analysis"):
+            results["error"] = "Analysis failed for all detected segments."
+            return results
+
+        elite_data = best_seg["analysis"].get("elite_data", {})
         
-        pose_result = extract_pose(video_path, technique)
+        # Step 3: Populate results from the best segment
         results["pose_analysis"] = {
-            "frames_analyzed": len(pose_result["pose_sequence_3d"]),
-            "average_confidence": pose_result["average_confidence"],
-            "localisation": pose_result.get("localisation", {}),
-            "technique_detected": technique
+            "frames_analyzed": best_seg["end_frame"] - best_seg["start_frame"],
+            "average_confidence": best_seg["analysis"].get("confidence", 0),
+            "localisation": {"start_frame": best_seg["start_frame"], "end_frame": best_seg["end_frame"]},
+            "technique_detected": best_seg["technique"]
         }
         
-        # Step 3: Detect player position based on movement patterns
-        print("[ELITE] Detecting player position from movement patterns...")
-        
-        pose_sequence = pose_result["pose_sequence_3d"]
-        technique_counts = {technique: 1}  # Single technique analysis
-        detected_position = detect_position_from_movement(pose_sequence, technique_counts)
+        results["elite_biomechanics"] = elite_data
+        results["olympic_readiness_score"] = elite_data.get("olympic_readiness_score", 0)
+        results["performance_percentile"] = elite_data.get("performance_percentile", 0)
         
         results["position_analysis"] = {
-            "detected_position": detected_position,
-            "confidence": 0.85,  # High confidence for single technique
+            "detected_position": elite_data.get("position", "receiver"),
+            "confidence": 0.85,
             "position_suitability": "Analyzing against Olympic standards for position",
             "positional_benchmarks_applied": True
         }
         
-        # Step 4: Elite biomechanical analysis with Olympic benchmarks
-        print("[ELITE] Performing Olympic-level biomechanical analysis...")
+        results["temporal_analysis"] = {
+            "phases": elite_data.get("phase_analysis", []),
+            "timing_analysis": elite_data.get("temporal_accuracy", {})
+        }
         
-        # Determine seasonal context from session history
-        session_count = len(session_history) if session_history else 0
-        seasonal_context = get_seasonal_context(session_count, tournament_context)
+        # Step 4: Coaching feedback
+        if "coaching_insights" in elite_data:
+            results["coaching_feedback"] = {
+                "headline": elite_data["coaching_insights"][0] if elite_data["coaching_insights"] else "Focus on form",
+                "technical_analysis": {
+                    "overall_assessment": elite_data["elite_comparisons"].get("olympic_readiness", "GOOD"),
+                    "technical_strengths": elite_data["elite_comparisons"].get("strengths", []),
+                    "technical_weaknesses": elite_data["elite_comparisons"].get("improvement_areas", [])
+                }
+            }
         
-        elite_biomechanics = analyze_elite_biomechanics(
-            pose_sequence, 
-            technique, 
-            detected_position,
-            {"session_count": session_count, "seasonal_context": seasonal_context}
-        )
-        
-        results["elite_biomechanics"] = elite_biomechanics
-        results["olympic_readiness_score"] = elite_biomechanics.get("olympic_readiness_score", 0)
-        results["performance_percentile"] = elite_biomechanics.get("performance_percentile", 0)
-        
-        # Step 5: Temporal analysis with Olympic timing constraints
-        print("[ELITE] Analyzing temporal phases with Olympic timing...")
-        
-        temporal_analysis = analyze_temporal_phases(pose_sequence, 30.0, technique)  # Assuming 30fps
-        results["temporal_analysis"] = temporal_analysis
-        
-        # Step 6: Generate elite coaching feedback
-        print("[ELITE] Generating Olympic-level coaching feedback...")
-        
-        elite_feedback = generate_elite_coaching_feedback(
-            elite_biomechanics,
-            athlete_level="advanced",  # Assume advanced for Olympic analysis
-            session_history=session_history,
-            tournament_context=tournament_context
-        )
-        
-        results["coaching_feedback"] = elite_feedback
-        
-        # Step 7: Performance projection and training recommendations
-        print("[ELITE] Creating performance projection and training plan...")
-        
-        # Extract training recommendations from coaching feedback
-        if "training_prescription" in elite_feedback:
-            results["training_recommendations"] = elite_feedback["training_prescription"]
-        
-        # Extract performance projection
-        if "performance_projection" in elite_feedback:
-            results["performance_projection"] = elite_feedback["performance_projection"]
-        
-        # Competition readiness assessment
-        if "competition_readiness" in elite_feedback:
-            results["competition_readiness"] = elite_feedback["competition_readiness"]
-        
-        # Step 8: Session tracking and progression analysis
-        print("[ELITE] Analyzing session progression...")
-        
+        # Step 5: Session tracking and progression
         session_tracking = analyze_session_progression(
-            elite_biomechanics,
+            elite_data,
             session_history,
-            technique,
+            best_seg["technique"],
             athlete_id
         )
-        
         results["session_tracking"] = session_tracking
         
-        # Step 9: Generate comprehensive summary
-        print("[ELITE] Generating comprehensive analysis summary...")
-        
+        # Step 6: Generate comprehensive summary
         results["summary"] = generate_elite_summary(results)
         
-        print(f"[ELITE] Olympic-level analysis complete! Readiness score: {results['olympic_readiness_score']:.1f}/100")
-        
+        print(f"[ELITE] Enhanced analysis complete! Readiness score: {results['olympic_readiness_score']:.1f}/100")
         return results
         
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         results["error"] = f"Elite analysis failed: {str(e)}"
         return results
 

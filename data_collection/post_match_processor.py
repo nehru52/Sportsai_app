@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 import pandas as pd
 import numpy as np
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 import sqlite3
 import smtplib
 from email.mime.text import MIMEText
@@ -24,6 +24,8 @@ from data_collection.integrated_analyzer import (
     process_volleyball_analysis, create_analysis_request, 
     AnalysisRequest, AnalysisResult
 )
+from data_collection.court_detector import detect_court_in_video, get_homography_matrix, transform_points, order_corners
+from data_collection.visualiser import render_shot_map, render_heatmap
 
 @dataclass
 class MatchProcessingJob:
@@ -85,6 +87,10 @@ class PostMatchReport:
     weekly_training_plan: Dict
     performance_targets: Dict
     progress_tracking_metrics: List[str]
+    
+    # Shot Map Data
+    shot_map_data: List[Dict] = field(default_factory=list)
+    shot_map_image_path: Optional[str] = None
 
 class MatchProcessingQueue:
     """Manages match processing queue with priority and scheduling"""
@@ -384,6 +390,43 @@ class PostMatchAnalyzer:
         
         # Generate training program
         training_program = self.generate_training_program(coaching_recommendations, job.athlete_id)
+
+        # ── 2D SHOT MAP GENERATION ──
+        shot_map_data = []
+        shot_map_path = None
+        
+        try:
+            # 1. Detect court for homography
+            court_result = detect_court_in_video(job.video_path, sample_every_n=60)
+            if court_result["polygon"]:
+                ordered = order_corners(court_result["polygon"])
+                H = get_homography_matrix(ordered)
+                
+                # 2. Convert action coordinates to 2D
+                # Assuming tactical_data has rally_analysis with ball_impact coordinates
+                actions = []
+                for rally in tactical_data.get("rally_analysis", []):
+                    for event in rally.get("events", []):
+                        if event.get("x") and event.get("y"):
+                            # Convert video coords to 2D court meters
+                            vid_pt = np.array([[event["x"], event["y"]]])
+                            court_pt = transform_points(vid_pt, H)[0]
+                            
+                            action_item = {
+                                "2d_coords": court_pt.tolist(),
+                                "action_type": event.get("type", "unknown"),
+                                "player_id": event.get("player_id"),
+                                "frame": event.get("frame")
+                            }
+                            shot_map_data.append(action_item)
+                
+                # 3. Render map image
+                if shot_map_data:
+                    shot_map_filename = f"shot_map_{job.job_id}.jpg"
+                    shot_map_path = self.reports_dir / shot_map_filename
+                    render_shot_map(shot_map_data, str(shot_map_path))
+        except Exception as e:
+            self.logger.error(f"Failed to generate shot map: {e}")
         
         report = PostMatchReport(
             match_id=job.job_id,
@@ -423,7 +466,11 @@ class PostMatchAnalyzer:
             recommended_training_focus=self.determine_training_focus(coaching_recommendations),
             weekly_training_plan=training_program.get('weekly_plan', {}),
             performance_targets=training_program.get('targets', {}),
-            progress_tracking_metrics=training_program.get('metrics', [])
+            progress_tracking_metrics=training_program.get('metrics', []),
+
+            # Shot Map
+            shot_map_data=shot_map_data,
+            shot_map_image_path=str(shot_map_path) if shot_map_path else None
         )
         
         return report

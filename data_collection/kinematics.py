@@ -27,7 +27,7 @@ ANGLE_TRIPLETS = {
 }
 
 _BUTTER_ORDER = 4
-_CUTOFF_HZ = 8.0
+_CUTOFF_HZ = 6.0  # Lowered from 8.0 Hz for stronger smoothing (removes more jitter)
 
 
 def _butter_filter(data: np.ndarray, fps: float) -> np.ndarray:

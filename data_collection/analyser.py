@@ -6,7 +6,7 @@ import os
 import json
 import numpy as np
 
-BASE_DIR = "C:/sportsai-backend"
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 METADATA_PATH = os.path.join(BASE_DIR, "data/pose_data/volleyball/metadata.json")
 
 # Per-technique metric config: metric -> "higher" | "lower"

@@ -5,9 +5,23 @@ flags injury risk patterns from kinematics over time.
 """
 import json
 import os
+import numpy as np
 from datetime import datetime
 
-BASE_DIR      = "C:/sportsai-backend"
+# Custom JSON encoder for numpy types
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, (np.integer, np.int32, np.int64)):
+            return int(obj)
+        elif isinstance(obj, (np.floating, np.float32, np.float64)):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, np.bool_):
+            return bool(obj)
+        return super().default(obj)
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROGRESS_DIR  = os.path.join(BASE_DIR, "data/progress")
 
 # Metrics where a declining trend = injury risk
@@ -33,7 +47,7 @@ def save_session(athlete_id: str, technique: str, session: dict):
         "timestamp": datetime.now().isoformat(),
     })
     with open(path, "w") as f:
-        json.dump(history, f, indent=2)
+        json.dump(history, f, indent=2, cls=NumpyEncoder)
 
 
 def load_history(athlete_id: str, technique: str) -> list:

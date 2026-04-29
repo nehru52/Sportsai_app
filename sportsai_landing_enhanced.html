@@ -6,8 +6,8 @@
 <title>SportsAI Elite — Three-Layer Olympic Analysis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="frontend/enhanced.css">
-<link rel="stylesheet" href="frontend/style.css">
+<link rel="stylesheet" href="/static/enhanced.css">
+<link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 
@@ -741,6 +741,22 @@
         </div>
       </div>
     </div>
+
+    <!-- TACTICAL & VIDEO DISPLAY -->
+    <div class="analysis-display-enhanced" style="margin: 40px 0; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 30px;">
+      <div id="videoContainer" style="width: 100%; border-radius: 12px; overflow: hidden; background: #000; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center;">
+         <video id="resultVideo" controls playsinline style="width:100%; height:100%; object-fit: contain;"></video>
+         
+         <div id="shotMapContainer" style="display:none; width:100%; height:100%; padding:20px; background:#111;">
+            <img id="shotMapImage" src="" alt="Tactical Shot Map" style="width:100%; height:100%; object-fit: contain; border-radius:8px;" />
+         </div>
+      </div>
+
+      <div class="display-controls" style="margin-top: 20px; display: flex; gap: 15px; justify-content: center;">
+        <button class="btn-enhanced btn-primary-enhanced" id="btnShowVideo" onclick="sportsAIEnhanced.setView('video')" style="display:none; min-width: 160px;">🎬 Video View</button>
+        <button class="btn-enhanced btn-primary-enhanced" id="btnShowMap" onclick="sportsAIEnhanced.setView('map')" style="display:none; min-width: 160px;">🗺️ Tactical Map</button>
+      </div>
+    </div>
     
     <div class="results-actions">
       <button class="btn-enhanced btn-primary-enhanced" onclick="downloadFullReport()">
@@ -777,7 +793,29 @@
       <button class="modal-close-enhanced" onclick="closeModal('quickAnalysisModal')">&times;</button>
     </div>
     <div class="modal-body-enhanced">
-      <!-- Quick analysis form will be populated here -->
+      <div class="upload-section-enhanced">
+        <div class="upload-zone-enhanced" id="quickUploadZone" onclick="document.getElementById('quickVideoInput').click()">
+          <div class="upload-icon">⚡</div>
+          <h4>Upload Action Video</h4>
+          <p>Select a video of a single technique (spike, serve, etc.)</p>
+          <input type="file" id="quickVideoInput" accept="video/*" class="file-input-hidden" style="display:none">
+          <div class="file-info" id="quickFileInfo"></div>
+        </div>
+      </div>
+      
+      <div style="margin-top: 20px;">
+        <label style="display:block; margin-bottom:10px; font-weight:700;">Select Technique</label>
+        <div class="tech-section" style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="tech-pill active" onclick="setQuickTech(this, 'spike')">Spike</button>
+          <button class="tech-pill" onclick="setQuickTech(this, 'serve')">Serve</button>
+          <button class="tech-pill" onclick="setQuickTech(this, 'block')">Block</button>
+          <button class="tech-pill" onclick="setQuickTech(this, 'dig')">Dig</button>
+        </div>
+      </div>
+
+      <button class="btn-enhanced btn-primary-enhanced" style="width:100%; margin-top:30px;" onclick="submitQuickAnalysis()">
+        🚀 Start Quick Analysis
+      </button>
     </div>
   </div>
 </div>
@@ -789,7 +827,48 @@
       <button class="modal-close-enhanced" onclick="closeModal('postMatchModal')">&times;</button>
     </div>
     <div class="modal-body-enhanced">
-      <!-- Post-match form will be populated here -->
+      <div class="upload-section-enhanced">
+        <div class="upload-zone-enhanced" onclick="document.getElementById('matchVideoInput').click()">
+          <div class="upload-icon">📹</div>
+          <h4>Upload Match Video</h4>
+          <p>Drag and drop or click to select match video file</p>
+          <input type="file" id="matchVideoInput" accept="video/*" class="file-input-hidden" style="display:none">
+          <div class="file-info" id="matchFileInfo"></div>
+        </div>
+        
+        <div class="upload-zone-enhanced" onclick="document.getElementById('matchDvwInput').click()" style="margin-top:15px;">
+          <div class="upload-icon">📊</div>
+          <h4>Data Volley File (Optional)</h4>
+          <p>Upload .dvw file for enhanced tactical analysis</p>
+          <input type="file" id="matchDvwInput" accept=".dvw" class="file-input-hidden" style="display:none">
+          <div class="file-info" id="matchDvwInfo"></div>
+        </div>
+      </div>
+      
+      <div class="analysis-form-enhanced" style="margin-top:20px;">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Athlete ID</label>
+            <input type="text" placeholder="athlete_001" id="athleteId">
+          </div>
+          <div class="form-group">
+            <label>Tournament Name</label>
+            <input type="text" placeholder="Elite Championship" id="tournamentName">
+          </div>
+          <div class="form-group">
+            <label>Priority</label>
+            <select id="priority">
+              <option value="normal">Normal</option>
+              <option value="high">High Priority</option>
+              <option value="low">Low Priority</option>
+            </select>
+          </div>
+        </div>
+        
+        <button class="btn-enhanced btn-primary-enhanced" style="width:100%; margin-top:20px;" onclick="submitPostMatchAnalysis()">
+          🌙 Submit for Overnight Analysis
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -830,39 +909,122 @@
   </div>
 </div>
 
+<!-- EMERGENCY DEBUG BAR -->
+<div id="debugBar" style="position:fixed; bottom:0; left:0; right:0; background:rgba(0,0,0,0.8); color:#0f0; font-family:monospace; font-size:10px; padding:5px 15px; z-index:10000; border-top:1px solid #333; pointer-events:none;">
+  SportsAI Status: <span id="debugStatus">System Initializing...</span> | Active Tech: <span id="debugTech">spike</span>
+</div>
+
 <!-- Scripts -->
-<script src="frontend/enhanced.js"></script>
+<script src="/static/enhanced.js?v=2"></script>
 <script>
-// Global functions for modal interactions
+// --- ROBUST UI LOGIC ---
+let quickAnalysisTech = 'spike';
+
+function log(msg, type='info') {
+    const el = document.getElementById('debugStatus');
+    if (el) el.textContent = msg;
+    console.log(`[UI ${type}] ${msg}`);
+}
+
+function setQuickTech(btn, tech) {
+  try {
+    quickAnalysisTech = tech;
+    log(`Selected: ${tech}`);
+    document.getElementById('debugTech').textContent = tech;
+    
+    // Update visual state of pills
+    const modal = document.getElementById('quickAnalysisModal');
+    if (modal) {
+        modal.querySelectorAll('.tech-pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+  } catch (e) {
+    log(`Error selecting tech: ${e.message}`, 'error');
+  }
+}
+
 function showQuickAnalysis() {
   document.getElementById('quickAnalysisModal').classList.add('active');
+  log('Quick Analysis Modal Opened');
 }
 
 function showPostMatchModal() {
   document.getElementById('postMatchModal').classList.add('active');
-}
-
-function showTrainingModal() {
-  document.getElementById('trainingModal').classList.add('active');
+  log('Post-Match Modal Opened');
 }
 
 function closeModal(modalId) {
   document.getElementById(modalId).classList.remove('active');
+  log('Modal Closed');
 }
 
-function submitPostMatchAnalysis() {
-  // Implementation for post-match analysis submission
-  console.log('Submitting post-match analysis...');
-  sportsAIEnhanced.showLoading('Submitting post-match analysis...');
+// Global initialization check
+window.addEventListener('load', () => {
+    log('System Ready. Click any button to start.');
+});
+
+async function submitQuickAnalysis() {
+  const videoInput = document.getElementById('quickVideoInput');
+  const ai = window.sportsAIEnhanced;
   
-  // Simulate submission
-  setTimeout(() => {
-    sportsAIEnhanced.hideLoading();
-    sportsAIEnhanced.showSuccess('Post-match analysis submitted successfully!');
-    closeModal('postMatchModal');
-  }, 2000);
+  if (!videoInput.files[0]) {
+    alert('Please select a video file first.');
+    return;
+  }
+
+  log(`Submitting ${quickAnalysisTech} analysis...`);
+  
+  try {
+    if (ai) ai.showLoading(`Analyzing ${quickAnalysisTech}...`);
+    
+    const formData = new FormData();
+    formData.append('video', videoInput.files[0]);
+    formData.append('technique', quickAnalysisTech);
+
+    if (!ai) throw new Error('AI Instance not found');
+    
+    await ai.submitComprehensiveAnalysis(formData);
+    closeModal('quickAnalysisModal');
+    log('Analysis Request Sent!');
+    
+  } catch (err) {
+    log(`SUBMIT ERROR: ${err.message}`, 'error');
+    alert(`Submission Error: ${err.message}`);
+    if (ai) ai.hideLoading();
+  }
 }
 
+// Match submission
+async function submitPostMatchAnalysis() {
+  const videoInput = document.getElementById('matchVideoInput');
+  const ai = window.sportsAIEnhanced;
+  
+  if (!videoInput.files[0]) {
+    alert('Please select a match video first.');
+    return;
+  }
+
+  log('Submitting match analysis...');
+  
+  try {
+    if (ai) ai.showLoading('Uploading match...');
+    const formData = new FormData();
+    formData.append('video', videoInput.files[0]);
+    formData.append('athlete_id', document.getElementById('athleteId').value || 'anon');
+    
+    if (!ai) throw new Error('AI Instance not found');
+    await ai.submitPostMatchAnalysis(formData);
+    closeModal('postMatchModal');
+  } catch (err) {
+    log(`MATCH ERROR: ${err.message}`, 'error');
+    alert(`Match Error: ${err.message}`);
+    if (ai) ai.hideLoading();
+  }
+}
+
+// Prevent default drag and drop
+window.addEventListener("dragover", function(e){ e.preventDefault(); }, false);
+window.addEventListener("drop", function(e){ e.preventDefault(); }, false);
 function generateTrainingData() {
   // Implementation for training data generation
   console.log('Generating training data...');
@@ -885,7 +1047,27 @@ function downloadTrainingData() {
 function downloadFullReport() {
   // Implementation for downloading full report
   console.log('Downloading full report...');
-  sportsAIEnhanced.showSuccess('Full report download started!');
+  
+  const ai = window.sportsAIEnhanced;
+  if (!ai || !ai.currentAnalysis) {
+    alert('No analysis data available to download.');
+    return;
+  }
+  
+  // Create a downloadable JSON file
+  const dataStr = JSON.stringify(ai.currentAnalysis, null, 2);
+  const dataBlob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(dataBlob);
+  
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `sportsai_analysis_${new Date().getTime()}.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+  
+  if (ai) ai.showSuccess('Analysis report downloaded!');
 }
 
 function shareResults() {

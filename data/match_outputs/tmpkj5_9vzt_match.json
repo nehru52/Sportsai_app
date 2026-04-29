@@ -1,0 +1,63 @@
+{
+  "video_id": "tmpkj5_9vzt",
+  "total_duration_seconds": 1.57,
+  "total_rallies": 0,
+  "total_spikes": 0,
+  "timeline": [
+    {
+      "time_seconds": 0.13,
+      "event_type": "set_change",
+      "metadata": {
+        "set_index": 0
+      }
+    }
+  ],
+  "player_drift_reports": {
+    "1": {
+      "sets_analysed": 1,
+      "jump_trend": "stable",
+      "arm_trend": "stable",
+      "fatigue_flag": false,
+      "per_set_data": [
+        {
+          "set_idx": 0,
+          "jump_height_mean": 0,
+          "arm_cock_mean": 275.0411682128906,
+          "vy_peak": 11.363677978515625
+        }
+      ]
+    },
+    "2": {
+      "sets_analysed": 0,
+      "error": "No data for track_id"
+    },
+    "4": {
+      "sets_analysed": 1,
+      "jump_trend": "stable",
+      "arm_trend": "stable",
+      "fatigue_flag": false,
+      "per_set_data": [
+        {
+          "set_idx": 0,
+          "jump_height_mean": 0,
+          "arm_cock_mean": 388.302734375,
+          "vy_peak": 1.1785244941711426
+        }
+      ]
+    },
+    "5": {
+      "sets_analysed": 0,
+      "error": "No data for track_id"
+    }
+  },
+  "team_summary": {
+    "home": {
+      "spike_count": 0,
+      "avg_court_coverage": 0.65
+    },
+    "away": {
+      "spike_count": 0,
+      "avg_court_coverage": 0.58
+    }
+  }
+}

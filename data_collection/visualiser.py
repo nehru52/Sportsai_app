@@ -99,6 +99,80 @@ def render_heatmap(
     return output_path
 
 
+def render_shot_map(
+    actions: list,
+    output_path: str,
+    court_width: int = 800,
+    court_height: int = 400,
+) -> str:
+    """
+    Generate a top-down shot map showing discrete action points (serves, spikes).
+    
+    actions: List of dicts, each with '2d_coords' [x, y] in meters and 'action_type'.
+    """
+    # Canvas with padding
+    pad = 40
+    canvas = np.zeros((court_height + pad * 2, court_width + pad * 2, 3), dtype=np.uint8)
+    canvas[:] = (30, 80, 30)  # slightly lighter green
+    
+    # Draw court lines (scaled)
+    _draw_court_lines_scaled(canvas, court_width, court_height, pad)
+    
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    
+    for act in actions:
+        coords = act.get("2d_coords")
+        if not coords or len(coords) < 2:
+            continue
+        
+        x_m, y_m = coords
+        # Map 18x9 meters to court_width x court_height
+        px = int(pad + (x_m / 18.0) * court_width)
+        py = int(pad + (y_m / 9.0) * court_height)
+        
+        atype = act.get("action_type", "").lower()
+        if "serve" in atype:
+            color = (0, 255, 255)  # yellow
+            label = "S"
+        elif "spike" in atype or "attack" in atype:
+            color = (0, 0, 255)    # red
+            label = "A"
+        else:
+            color = (255, 255, 255)
+            label = "•"
+            
+        cv2.circle(canvas, (px, py), 10, color, -1)
+        cv2.circle(canvas, (px, py), 10, (0, 0, 0), 1)
+        if label != "•":
+            cv2.putText(canvas, label, (px - 5, py + 5), font, 0.4, (0, 0, 0), 1, cv2.LINE_AA)
+
+    # Legend
+    cv2.putText(canvas, "S = Serve (Yellow)", (20, canvas.shape[0] - 15), font, 0.5, (0, 255, 255), 1)
+    cv2.putText(canvas, "A = Attack (Red)", (200, canvas.shape[0] - 15), font, 0.5, (0, 0, 255), 1)
+
+    os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
+    cv2.imwrite(output_path, canvas)
+    return output_path
+
+
+def _draw_court_lines_scaled(img: np.ndarray, w: int, h: int, pad: int):
+    """Draw 2D volleyball court lines to scale."""
+    LINE = (255, 255, 255)
+    thick = 2
+    
+    # Outer boundary
+    cv2.rectangle(img, (pad, pad), (pad + w, pad + h), LINE, thick)
+    
+    # Net (Centre line)
+    cv2.line(img, (pad + w // 2, pad), (pad + w // 2, pad + h), (200, 200, 200), 3)
+    
+    # Attack lines (3m from net)
+    # 3m / 18m = 1/6 of total length
+    atk_dist = w // 6
+    cv2.line(img, (pad + w // 2 - atk_dist, pad), (pad + w // 2 - atk_dist, pad + h), LINE, thick)
+    cv2.line(img, (pad + w // 2 + atk_dist, pad), (pad + w // 2 + atk_dist, pad + h), LINE, thick)
+
+
 def _draw_court_lines(img: np.ndarray, w: int, h: int):
     """Draw basic volleyball court lines."""
     LINE = (100, 160, 100)

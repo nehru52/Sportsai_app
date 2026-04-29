@@ -1,0 +1,41 @@
+# Cloudflare Workers configuration for SportsAI Backend
+
+name = "sportsai-backend"
+main = "worker.py"
+compatibility_date = "2024-01-01"
+
+# Python Workers
+[build]
+command = "pip install -r requirements.txt"
+
+# Environment variables (set these in Cloudflare dashboard)
+[vars]
+ENVIRONMENT = "production"
+
+# R2 Storage bindings
+[[r2_buckets]]
+binding = "VIDEOS"
+bucket_name = "sportsai-videos"
+
+[[r2_buckets]]
+binding = "OUTPUTS"
+bucket_name = "sportsai-outputs"
+
+[[r2_buckets]]
+binding = "MODELS"
+bucket_name = "sportsai-models"
+
+# KV namespace for session storage (optional)
+# [[kv_namespaces]]
+# binding = "SESSIONS"
+# id = "your-kv-namespace-id"
+
+# Durable Objects (for job queue - optional)
+# [[durable_objects.bindings]]
+# name = "JOB_QUEUE"
+# class_name = "JobQueue"
+
+# Routes
+[routes]
+pattern = "api.yourdomain.com/*"
+zone_name = "yourdomain.com"

@@ -3,6 +3,19 @@ import json
 import numpy as np
 from datetime import datetime
 
+# Custom JSON encoder for numpy types
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, (np.integer, np.int32, np.int64)):
+            return int(obj)
+        elif isinstance(obj, (np.floating, np.float32, np.float64)):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, np.bool_):
+            return bool(obj)
+        return super().default(obj)
+
 from url_loader import load_urls
 from youtube_downloader import download_video
 from pose_extractor import extract_pose
@@ -23,7 +36,7 @@ def load_metadata() -> dict:
 def save_metadata(meta: dict):
     meta["last_updated"] = datetime.now().isoformat()
     with open(METADATA_PATH, "w") as f:
-        json.dump(meta, f, indent=2)
+        json.dump(meta, f, indent=2, cls=NumpyEncoder)
 
 
 def process_batch(csv_path: str = CSV_PATH):
@@ -70,7 +83,7 @@ def process_batch(csv_path: str = CSV_PATH):
             os.makedirs(out_dir, exist_ok=True)
             np.save(os.path.join(out_dir, f"{safe_name}_pose3d.npy"), result["pose_sequence_3d"])
             with open(os.path.join(out_dir, f"{safe_name}_biomechanics.json"), "w") as f:
-                json.dump(result["biomechanics"], f, indent=2)
+                json.dump(result["biomechanics"], f, indent=2, cls=NumpyEncoder)
 
             metadata["processed"].append({
                 "url": url,

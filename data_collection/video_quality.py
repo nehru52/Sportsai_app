@@ -16,7 +16,7 @@ import numpy as np
 from dataclasses import dataclass, field
 
 # Thresholds
-MIN_BLUR        = 80.0    # Laplacian variance
+MIN_BLUR        = 100.0   # Raised from 80 to reject more blurry videos
 MIN_BRIGHTNESS  = 35.0
 MAX_BRIGHTNESS  = 225.0
 MIN_HEIGHT      = 480

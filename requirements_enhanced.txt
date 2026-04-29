@@ -10,7 +10,7 @@ accelerate>=0.12.0
 # Computer Vision & Tracking
 opencv-python>=4.6.0
 ultralytics>=8.0.0  # YOLO for ByteTrack
-bytetrack>=0.0.1    # Multi-object tracking
+# bytetrack>=0.0.1    # Multi-object tracking (Handled by ultralytics)
 mediapipe>=0.9.0    # Pose estimation
 scipy>=1.8.0        # Signal processing for motion analysis
 
@@ -75,32 +75,32 @@ mlflow>=1.28.0      # ML experiment tracking
 wandb>=0.12.0       # Weights & Biases integration
 optuna>=2.10.0      # Hyperparameter optimization
 
-# Specialized Sports Analysis
-sport-analytics>=0.1.0  # Sports-specific analytics
-tracking-ml>=0.1.0      # Multi-object tracking utilities
+# Specialized Sports Analysis (Handled by internal data_collection modules)
+# sport-analytics>=0.1.0  
+# tracking-ml>=0.1.0      
 
 # Additional Utilities
-rich>=12.0.0        # Rich text and beautiful formatting
-typer>=0.6.0        # CLI framework
-click>=8.1.0        # Command line interface creation
+rich>=12.0.0        
+typer>=0.6.0        
+click>=8.1.0        
 
 # Performance Optimization
-numba>=0.56.0       # JIT compilation for performance
-pytorch-lightning>=1.7.0  # PyTorch training framework
+numba>=0.56.0       
+pytorch-lightning>=1.7.0  
 
 # Cloud & Deployment
-gunicorn>=20.1.0    # WSGI server
-docker>=5.0.0       # Docker integration
-kubernetes>=24.0.0  # Kubernetes deployment support
+gunicorn>=20.1.0    
+docker>=5.0.0       
+kubernetes>=24.0.0  
 
 # Security
-cryptography>=37.0.0  # Encryption and security
-passlib>=1.7.4      # Password hashing
-bcrypt>=3.2.2       # Password hashing
+cryptography>=37.0.0  
+passlib>=1.7.4      
+bcrypt>=3.2.2       
 
 # Documentation
-mkdocs>=1.4.0       # Documentation generation
-mkdocs-material>=8.3.0  # Material theme for MkDocs
+mkdocs>=1.4.0       
+mkdocs-material>=8.3.0  
 
 # Note: Some packages may require specific versions or additional setup
 # ByteTrack and TrOCR may need to be installed from source or specific repositories

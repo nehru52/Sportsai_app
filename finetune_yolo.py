@@ -122,6 +122,19 @@ def run_training(yaml_path: str):
     print()
 
     model = YOLO(YOLO_WEIGHTS)
+    
+    # Improvement 1 & 5: Custom Albumentations for bad camera angles and gym conditions
+    import albumentations as A
+    gym_aug = A.Compose([
+        A.Perspective(scale=(0.05, 0.15), p=0.4),
+        A.Rotate(limit=25, p=0.4),
+        A.HorizontalFlip(p=0.5),
+        A.MotionBlur(blur_limit=(3, 9), p=0.4),
+        A.RandomGamma(gamma_limit=(60, 140), p=0.5),
+        A.GaussNoise(var_limit=(10, 50), p=0.3),
+        A.ImageCompression(quality_lower=60, p=0.3),
+    ], bbox_params=A.BboxParams(format='yolo', label_fields=['class_labels']))
+
     results = model.train(
         data=yaml_path,
         epochs=EPOCHS,

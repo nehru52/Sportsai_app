@@ -1,0 +1,133 @@
+{
+  "video_id": "tmppicepzim",
+  "total_duration_seconds": 2.43,
+  "total_rallies": 0,
+  "total_spikes": 0,
+  "timeline": [
+    {
+      "time_seconds": 0.1,
+      "event_type": "set_change",
+      "metadata": {
+        "set_index": 0
+      }
+    }
+  ],
+  "player_drift_reports": {
+    "60": {
+      "sets_analysed": 1,
+      "jump_trend": "stable",
+      "arm_trend": "stable",
+      "fatigue_flag": false,
+      "per_set_data": [
+        {
+          "set_idx": 0,
+          "jump_height_mean": 0,
+          "arm_cock_mean": 642.8968505859375,
+          "vy_peak": 12.017757415771484
+        }
+      ]
+    },
+    "80": {
+      "sets_analysed": 1,
+      "jump_trend": "stable",
+      "arm_trend": "stable",
+      "fatigue_flag": false,
+      "per_set_data": [
+        {
+          "set_idx": 0,
+          "jump_height_mean": 0,
+          "arm_cock_mean": 246.82945251464844,
+          "vy_peak": 10.228836059570312
+        }
+      ]
+    },
+    "112": {
+      "sets_analysed": 1,
+      "jump_trend": "stable",
+      "arm_trend": "stable",
+      "fatigue_flag": false,
+      "per_set_data": [
+        {
+          "set_idx": 0,
+          "jump_height_mean": 0,
+          "arm_cock_mean": 306.7874755859375,
+          "vy_peak": 17.167884826660156
+        }
+      ]
+    },
+    "114": {
+      "sets_analysed": 0,
+      "error": "No data for track_id"
+    },
+    "127": {
+      "sets_analysed": 1,
+      "jump_trend": "stable",
+      "arm_trend": "stable",
+      "fatigue_flag": false,
+      "per_set_data": [
+        {
+          "set_idx": 0,
+          "jump_height_mean": 0,
+          "arm_cock_mean": 500.41680908203125,
+          "vy_peak": 0.0
+        }
+      ]
+    },
+    "129": {
+      "sets_analysed": 1,
+      "jump_trend": "stable",
+      "arm_trend": "stable",
+      "fatigue_flag": false,
+      "per_set_data": [
+        {
+          "set_idx": 0,
+          "jump_height_mean": 0,
+          "arm_cock_mean": 501.4911804199219,
+          "vy_peak": 4.827385902404785
+        }
+      ]
+    },
+    "146": {
+      "sets_analysed": 0,
+      "error": "No data for track_id"
+    },
+    "156": {
+      "sets_analysed": 1,
+      "jump_trend": "stable",
+      "arm_trend": "stable",
+      "fatigue_flag": false,
+      "per_set_data": [
+        {
+          "set_idx": 0,
+          "jump_height_mean": 0,
+          "arm_cock_mean": 252.11854553222656,
+          "vy_peak": 6.247199535369873
+        }
+      ]
+    },
+    "158": {
+      "sets_analysed": 1,
+      "jump_trend": "stable",
+      "arm_trend": "stable",
+      "fatigue_flag": false,
+      "per_set_data": [
+        {
+          "set_idx": 0,
+          "jump_height_mean": 0,
+          "arm_cock_mean": 92.03842163085938,
+          "vy_peak": 19.985570907592773
+        }
+      ]
+    }
+  },
+  "team_summary": {
+    "home": {
+      "spike_count": 0,
+      "avg_court_coverage": 0.65
+    },
+    "away": {
+      "spike_count": 0,
+      "avg_court_coverage": 0.58
+    }
+  }
+}

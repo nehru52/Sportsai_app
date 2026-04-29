@@ -1,0 +1,33 @@
+import sys
+import os
+
+# Add the data_collection path so the imports inside smart_analyser work
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'data_collection')))
+
+from smart_analyser import analyse_video_auto
+
+# UPDATE THIS PATH to point to exactly where your video is saved
+VIDEO_PATH = r"C:\path\to\your\YTDown.com_Shorts_volleyball-training-Spike_Media_xnX6X0PCD1o_001_720p.mp4"
+
+if not os.path.exists(VIDEO_PATH):
+    print(f"❌ Error: Could not find video at {VIDEO_PATH}")
+    sys.exit(1)
+
+print(f"🚀 Testing video: {VIDEO_PATH}")
+print("-" * 50)
+
+try:
+    result = analyse_video_auto(VIDEO_PATH)
+    
+    print("\n✅ --- FINAL TIMELINE RESULTS ---")
+    for seg in result.get("timeline", []):
+        print(f"Detected Technique : {seg.get('technique', 'Unknown').upper()}")
+        print(f"Confidence         : {seg.get('detection_confidence', 'N/A')}")
+        
+    print("\n✅ --- SUMMARY ---")
+    print(f"Overall Verdict: {result.get('summary', {}).get('overall_verdict', 'N/A')}")
+    
+except Exception as e:
+    import traceback
+    print(f"\n❌ Test failed with error:")
+    traceback.print_exc()

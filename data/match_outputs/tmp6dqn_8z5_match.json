@@ -1,0 +1,277 @@
+{
+  "video_id": "tmp6dqn_8z5",
+  "total_duration_seconds": 2.4,
+  "total_rallies": 14,
+  "total_spikes": 7,
+  "timeline": [
+    {
+      "time_seconds": 0.27,
+      "event_type": "set_change",
+      "metadata": {
+        "set_index": 0
+      }
+    },
+    {
+      "time_seconds": 0.97,
+      "event_type": "rally_start",
+      "metadata": {
+        "frame": 29,
+        "serving_team": "away"
+      }
+    },
+    {
+      "time_seconds": 0.97,
+      "event_type": "spike",
+      "metadata": {
+        "frame": 29,
+        "team": "away"
+      }
+    },
+    {
+      "time_seconds": 1.07,
+      "event_type": "rally_start",
+      "metadata": {
+        "frame": 32,
+        "serving_team": "away"
+      }
+    },
+    {
+      "time_seconds": 1.07,
+      "event_type": "spike",
+      "metadata": {
+        "frame": 32,
+        "team": "away"
+      }
+    },
+    {
+      "time_seconds": 1.1,
+      "event_type": "rally_start",
+      "metadata": {
+        "frame": 33,
+        "serving_team": "away"
+      }
+    },
+    {
+      "time_seconds": 1.2,
+      "event_type": "rally_start",
+      "metadata": {
+        "frame": 36,
+        "serving_team": "away"
+      }
+    },
+    {
+      "time_seconds": 1.2,
+      "event_type": "spike",
+      "metadata": {
+        "frame": 36,
+        "team": "away"
+      }
+    },
+    {
+      "time_seconds": 1.47,
+      "event_type": "rally_start",
+      "metadata": {
+        "frame": 44,
+        "serving_team": "away"
+      }
+    },
+    {
+      "time_seconds": 1.47,
+      "event_type": "spike",
+      "metadata": {
+        "frame": 44,
+        "team": "away"
+      }
+    },
+    {
+      "time_seconds": 1.5,
+      "event_type": "rally_start",
+      "metadata": {
+        "frame": 45,
+        "serving_team": "away"
+      }
+    },
+    {
+      "time_seconds": 1.53,
+      "event_type": "rally_start",
+      "metadata": {
+        "frame": 46,
+        "serving_team": "away"
+      }
+    },
+    {
+      "time_seconds": 1.53,
+      "event_type": "spike",
+      "metadata": {
+        "frame": 46,
+        "team": "away"
+      }
+    },
+    {
+      "time_seconds": 1.6,
+      "event_type": "rally_start",
+      "metadata": {
+        "frame": 48,
+        "serving_team": "away"
+      }
+    },
+    {
+      "time_seconds": 1.73,
+      "event_type": "rally_start",
+      "metadata": {
+        "frame": 52,
+        "serving_team": "away"
+      }
+    },
+    {
+      "time_seconds": 1.73,
+      "event_type": "spike",
+      "metadata": {
+        "frame": 52,
+        "team": "away"
+      }
+    },
+    {
+      "time_seconds": 1.77,
+      "event_type": "rally_start",
+      "metadata": {
+        "frame": 53,
+        "serving_team": "away"
+      }
+    },
+    {
+      "time_seconds": 1.77,
+      "event_type": "spike",
+      "metadata": {
+        "frame": 53,
+        "team": "away"
+      }
+    },
+    {
+      "time_seconds": 1.8,
+      "event_type": "rally_start",
+      "metadata": {
+        "frame": 54,
+        "serving_team": "away"
+      }
+    },
+    {
+      "time_seconds": 2.13,
+      "event_type": "rally_start",
+      "metadata": {
+        "frame": 64,
+        "serving_team": "away"
+      }
+    },
+    {
+      "time_seconds": 2.33,
+      "event_type": "rally_start",
+      "metadata": {
+        "frame": 70,
+        "serving_team": "away"
+      }
+    },
+    {
+      "time_seconds": 2.4,
+      "event_type": "rally_start",
+      "metadata": {
+        "frame": 72,
+        "serving_team": "away"
+      }
+    }
+  ],
+  "player_drift_reports": {
+    "1": {
+      "sets_analysed": 1,
+      "jump_trend": "stable",
+      "arm_trend": "stable",
+      "fatigue_flag": false,
+      "per_set_data": [
+        {
+          "set_idx": 0,
+          "jump_height_mean": 0,
+          "arm_cock_mean": 194.7588653564453,
+          "vy_peak": 8.488729476928711
+        }
+      ]
+    },
+    "2": {
+      "sets_analysed": 1,
+      "jump_trend": "stable",
+      "arm_trend": "stable",
+      "fatigue_flag": false,
+      "per_set_data": [
+        {
+          "set_idx": 0,
+          "jump_height_mean": 0.04247581213712692,
+          "arm_cock_mean": 398.13818359375,
+          "vy_peak": 8.49186897277832
+        }
+      ]
+    },
+    "16": {
+      "sets_analysed": 0,
+      "error": "No data for track_id"
+    },
+    "17": {
+      "sets_analysed": 0,
+      "error": "No data for track_id"
+    },
+    "29": {
+      "sets_analysed": 0,
+      "error": "No data for track_id"
+    },
+    "38": {
+      "sets_analysed": 1,
+      "jump_trend": "stable",
+      "arm_trend": "stable",
+      "fatigue_flag": false,
+      "per_set_data": [
+        {
+          "set_idx": 0,
+          "jump_height_mean": 0,
+          "arm_cock_mean": 354.4310607910156,
+          "vy_peak": 11.038766860961914
+        }
+      ]
+    },
+    "30": {
+      "sets_analysed": 1,
+      "jump_trend": "stable",
+      "arm_trend": "stable",
+      "fatigue_flag": false,
+      "per_set_data": [
+        {
+          "set_idx": 0,
+          "jump_height_mean": 0,
+          "arm_cock_mean": 234.164306640625,
+          "vy_peak": 7.281444072723389
+        }
+      ]
+    },
+    "56": {
+      "sets_analysed": 1,
+      "jump_trend": "stable",
+      "arm_trend": "stable",
+      "fatigue_flag": false,
+      "per_set_data": [
+        {
+          "set_idx": 0,
+          "jump_height_mean": 0,
+          "arm_cock_mean": 54.40925598144531,
+          "vy_peak": 9.957148551940918
+        }
+      ]
+    }
+  },
+  "team_summary": {
+    "home": {
+      "spike_count": 0,
+      "avg_court_coverage": 0.65
+    },
+    "away": {
+      "spike_count": 7,
+      "avg_court_coverage": 0.58
+    }
+  }
+}

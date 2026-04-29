@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .upload-box {
+            border: 2px dashed #ccc;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .upload-box:hover {
+            border-color: #666;
+            background: #f5f5f5;
+        }
+        #status {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+        }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>🏐 Upload Test</h1>
+    <p>This is a simple test to check if file upload is working.</p>
+    
+    <div class="upload-box" onclick="document.getElementById('fileInput').click()">
+        <h2>Click to select video</h2>
+        <p>Or drag and drop here</p>
+        <input type="file" id="fileInput" accept="video/*" style="display:none" />
+    </div>
+    
+    <div id="status">
+        <strong>Status:</strong> Waiting for file...
+    </div>
+    
+    <div id="details"></div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const status = document.getElementById('status');
+        const details = document.getElementById('details');
+        
+        console.log('Test page loaded');
+        console.log('File input element:', fileInput);
+        
+        fileInput.addEventListener('change', function(e) {
+            console.log('File input changed!', e);
+            
+            if (e.target.files && e.target.files[0]) {
+                const file = e.target.files[0];
+                console.log('File selected:', file);
+                
+                status.innerHTML = '<strong class="success">✅ File selected!</strong>';
+                details.innerHTML = `
+                    <h3>File Details:</h3>
+                    <ul>
+                        <li><strong>Name:</strong> ${file.name}</li>
+                        <li><strong>Size:</strong> ${(file.size / 1024 / 1024).toFixed(2)} MB</li>
+                        <li><strong>Type:</strong> ${file.type}</li>
+                    </ul>
+                    <p><strong>Backend API:</strong> http://localhost:8001</p>
+                    <p><strong>API Status:</strong> <span id="apiStatus">Checking...</span></p>
+                `;
+                
+                // Test API connection
+                fetch('http://localhost:8001/')
+                    .then(res => res.text())
+                    .then(data => {
+                        document.getElementById('apiStatus').innerHTML = '<span class="success">✅ Connected</span>';
+                        console.log('API response:', data);
+                    })
+                    .catch(err => {
+                        document.getElementById('apiStatus').innerHTML = '<span class="error">❌ Not connected: ' + err.message + '</span>';
+                        console.error('API error:', err);
+                    });
+            } else {
+                status.innerHTML = '<strong class="error">❌ No file selected</strong>';
+                console.log('No file in event');
+            }
+        });
+        
+        // Drag and drop
+        const uploadBox = document.querySelector('.upload-box');
+        
+        uploadBox.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            console.log('Drag over');
+        });
+        
+        uploadBox.addEventListener('drop', function(e) {
+            e.preventDefault();
+            console.log('Drop event', e);
+            
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                fileInput.files = e.dataTransfer.files;
+                fileInput.dispatchEvent(new Event('change'));
+            }
+        });
+    </script>
+</body>
+</html>

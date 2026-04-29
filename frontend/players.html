@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Players — SportsAI</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .players-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+      padding: 20px 0;
+    }
+    .player-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .player-card:hover {
+      border-color: var(--border2);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .player-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+    .id-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .role-badge {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .role-hitter  { background: rgba(255,45,78,0.1); color: var(--red); }
+    .role-setter  { background: rgba(77,140,255,0.1); color: var(--blue); }
+    .role-libero  { background: rgba(0,230,118,0.1); color: var(--green); }
+    .role-blocker { background: rgba(255,255,255,0.05); color: var(--muted); }
+
+    .score-large {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 42px;
+      font-weight: 900;
+      line-height: 1;
+      margin: 10px 0;
+    }
+    .score-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .flag-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 16px;
+    }
+    .card-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 24px;
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+    }
+    .compare-checkbox {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      accent-color: var(--red);
+    }
+    .compare-bar {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--raised);
+      padding: 12px 24px;
+      border-radius: 40px;
+      border: 1px solid var(--red);
+      display: none;
+      align-items: center;
+      gap: 20px;
+      z-index: 1000;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+    .filter-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .search-input {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: white;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-family: inherit;
+      min-width: 240px;
+    }
+    .heatmap-container {
+      margin-top: 15px;
+      display: none;
+      background: var(--surface);
+      padding: 10px;
+      border-radius: 8px;
+    }
+    .heatmap-canvas { width: 100%; border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Sports<em>AI</em><sup>BETA</sup></div>
+  <div class="nav-right">
+    <a class="nav-pill" href="index.html">Dashboard</a>
+    <a class="nav-pill active" href="players.html">Players</a>
+    <a class="nav-pill" href="match.html">Match Analysis</a>
+    <a class="nav-pill" href="progress.html">Progress</a>
+  </div>
+</nav>
+
+<section style="padding: 120px 20px 60px; max-width: 1200px; margin: 0 auto;">
+  <div class="hero-eyebrow">👥 Talent Discovery</div>
+  <h1 style="font-family: 'Barlow Condensed', sans-serif; font-size: 3rem; margin-bottom: 8px;">Athlete Roster</h1>
+  <p style="color: var(--muted); margin-bottom: 40px;">Aggregated biomechanical data for all tracked players across your matches.</p>
+
+  <div class="filter-bar">
+    <input type="text" class="search-input" id="playerSearch" placeholder="Search ID or Role..." oninput="filterPlayers()">
+    <div class="tech-section" style="margin-top: 0; border: none;">
+        <button class="tech-pill active" onclick="setRoleFilter('all', this)">All</button>
+        <button class="tech-pill" onclick="setRoleFilter('hitter', this)">Hitter</button>
+        <button class="tech-pill" onclick="setRoleFilter('setter', this)">Setter</button>
+        <button class="tech-pill" onclick="setRoleFilter('libero', this)">Libero</button>
+        <button class="tech-pill" onclick="setRoleFilter('blocker', this)">Blocker</button>
+    </div>
+  </div>
+
+  <div id="loading" class="spinner-wrap" style="padding: 60px 0;"><div class="spinner"></div></div>
+  <div id="noData" style="display:none; text-align: center; padding: 60px 0;">
+    <h3 style="color: var(--muted);">No player data found</h3>
+    <p>Run <code>pose_extractor.py</code> on match footage first.</p>
+  </div>
+
+  <div class="players-grid" id="playersGrid"></div>
+</section>
+
+<div class="compare-bar" id="compareBar">
+    <span id="compareText" style="font-size: 13px; font-weight: 600;">2 players selected</span>
+    <button class="btn btn-primary" style="padding: 10px 20px; font-size: 14px;" onclick="goToCompare()">
+        Compare Selected →
+    </button>
+</div>
+
+<script src="js/heatmap.js"></script>
+<script>
+    let allPlayers = [];
+    let selectedPlayers = [];
+    let currentRoleFilter = 'all';
+
+    async function loadPlayers() {
+        try {
+            const resp = await fetch('http://localhost:8000/api/players');
+            const data = await resp.json();
+            allPlayers = data.players;
+            renderPlayers(allPlayers);
+            document.getElementById('loading').style.display = 'none';
+        } catch (e) {
+            console.error(e);
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('noData').style.display = 'block';
+        }
+    }
+
+    function renderPlayers(players) {
+        const grid = document.getElementById('playersGrid');
+        grid.innerHTML = '';
+        
+        players.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'player-card';
+            card.innerHTML = `
+                <input type="checkbox" class="compare-checkbox" onchange="toggleCompare('${p.track_id}', this)">
+                <div class="player-header">
+                    <span class="id-badge">ID: ${p.track_id}</span>
+                    <span class="role-badge role-${p.role || 'blocker'}">${p.role || 'unknown'}</span>
+                </div>
+                <div class="score-label">FIVB Performance Score</div>
+                <div class="score-large">${p.fivb_score}</div>
+                <div class="flag-pills">
+                    ${p.recruiter_flags.slice(0,2).map(f => `<span class="badge badge-blue" style="font-size:9px;">${f}</span>`).join('')}
+                </div>
+                <div class="card-actions">
+                    <button class="btn-ghost" style="flex:1;" onclick="viewReport('${p.track_id}')">Full Report</button>
+                    <button class="btn-ghost" onclick="toggleHeatmap('${p.track_id}')">📍</button>
+                </div>
+                <div id="heatmap-${p.track_id}" class="heatmap-container">
+                    <canvas id="canvas-${p.track_id}" class="heatmap-canvas"></canvas>
+                    <div id="peak-${p.track_id}" style="font-size:10px; color:var(--muted); text-align:center; margin-top:5px;"></div>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function filterPlayers() {
+        const query = document.getElementById('playerSearch').value.toLowerCase();
+        let filtered = allPlayers.filter(p => 
+            p.track_id.toLowerCase().includes(query) || 
+            (p.role && p.role.toLowerCase().includes(query))
+        );
+        if (currentRoleFilter !== 'all') {
+            filtered = filtered.filter(p => p.role === currentRoleFilter);
+        }
+        renderPlayers(filtered);
+    }
+
+    function setRoleFilter(role, btn) {
+        currentRoleFilter = role;
+        document.querySelectorAll('.tech-pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        filterPlayers();
+    }
+
+    function toggleCompare(id, cb) {
+        if (cb.checked) selectedPlayers.push(id);
+        else selectedPlayers = selectedPlayers.filter(sid => sid !== id);
+        
+        const bar = document.getElementById('compareBar');
+        if (selectedPlayers.length === 2) {
+            bar.style.display = 'flex';
+            document.getElementById('compareText').innerText = `Comparing ${selectedPlayers[0]} vs ${selectedPlayers[1]}`;
+        } else {
+            bar.style.display = 'none';
+        }
+    }
+
+    function goToCompare() {
+        window.location.href = `compare.html?a=${selectedPlayers[0]}&b=${selectedPlayers[1]}`;
+    }
+
+    function viewReport(id) {
+        window.open(`http://localhost:8000/api/reports/${id}_report.html`, '_blank');
+    }
+
+    function toggleHeatmap(id) {
+        const cont = document.getElementById(`heatmap-${id}`);
+        if (cont.style.display === 'block') {
+            cont.style.display = 'none';
+        } else {
+            cont.style.display = 'block';
+            if (window.renderHeatmap) {
+                renderHeatmap(id);
+            }
+        }
+    }
+
+    window.onload = loadPlayers;
+</script>
+</body>
+</html>

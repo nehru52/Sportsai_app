@@ -1,9 +1,8 @@
 version: "2"
 authtoken: 2uPoutm0DDJjjBBZUBQDXevrgCp_Br352dgPhTPyw6DVYoYj
 tunnels:
-  frontend:
+  sportsai:
     proto: http
-    addr: 3000
-  backend:
-    proto: http
-    addr: 8001
+    addr: 8080
+    schemes:
+      - https

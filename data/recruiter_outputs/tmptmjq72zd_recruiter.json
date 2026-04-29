@@ -1,0 +1,208 @@
+{
+  "video_id": "tmptmjq72zd",
+  "players": {
+    "2": {
+      "role": "unknown",
+      "frames_analysed": 1,
+      "biomechanics": {},
+      "fivb_score": 40,
+      "recruiter_flags": [
+        "limited_jump_data",
+        "insufficient_data"
+      ],
+      "scoring_notes": [
+        "insufficient spike events for elbow scoring",
+        "insufficient jump events for height scoring"
+      ],
+      "jump_event_count": 0,
+      "spike_event_count": 0,
+      "normalised_scoring": false,
+      "performance_drift": {
+        "sets_analysed": 0,
+        "error": "No data for track_id"
+      },
+      "heatmap": {
+        "grid_rows": 6,
+        "grid_cols": 10,
+        "data": [
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        ],
+        "peak_zone": "front-left"
+      }
+    },
+    "4": {
+      "role": "unknown",
+      "frames_analysed": 2,
+      "biomechanics": {},
+      "fivb_score": 40,
+      "recruiter_flags": [
+        "limited_jump_data",
+        "insufficient_data"
+      ],
+      "scoring_notes": [
+        "insufficient spike events for elbow scoring",
+        "insufficient jump events for height scoring"
+      ],
+      "jump_event_count": 0,
+      "spike_event_count": 0,
+      "normalised_scoring": false,
+      "performance_drift": {
+        "sets_analysed": 0,
+        "error": "No data for track_id"
+      },
+      "heatmap": {
+        "grid_rows": 6,
+        "grid_cols": 10,
+        "data": [
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        ],
+        "peak_zone": "front-left"
+      }
+    },
+    "5": {
+      "role": "hitter",
+      "frames_analysed": 17,
+      "biomechanics": {
+        "avg_jump_height_px": 

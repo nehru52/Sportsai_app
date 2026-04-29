@@ -60,8 +60,7 @@ def process_job_async(job_id: str):
         # Run analysis
         result = analyse_video_auto(
             job["video_path"],
-            athlete_id=job["athlete_id"],
-            technique_hint=job["technique"]
+            athlete_id=job["athlete_id"]
         )
         
         update_job(

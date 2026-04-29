@@ -150,16 +150,26 @@
     </div>
 
     <div class="results-layout">
-      <!-- Video -->
+      <!-- Video / Tactical Map -->
       <div class="video-card">
         <video id="resultVideo" controls playsinline></video>
+        
+        <!-- New: Tactical Map Display -->
+        <div id="shotMapContainer" style="display:none; padding:10px; background:var(--card); border-radius:12px;">
+          <img id="shotMapImage" src="" alt="Tactical Shot Map" style="width:100%; border-radius:8px; border:1px solid var(--border);" />
+          <div style="text-align:center; padding:10px; font-size:12px; color:var(--muted);">
+            2D TACTICAL RECONSTRUCTION (Top-Down View)
+          </div>
+        </div>
+
         <div class="video-footer">
           <div class="vf-item"><div class="vf-label">Score</div><div class="vf-value" id="mScore">—</div></div>
           <div class="vf-item"><div class="vf-label">Technique</div><div class="vf-value" id="mTech2">—</div></div>
           <div class="vf-item"><div class="vf-label">Time</div><div class="vf-value" id="mTime2">—</div></div>
         </div>
         <div class="video-actions">
-          <!-- Download button removed - videos now play inline only -->
+           <button class="btn-pill" id="btnShowVideo" onclick="setView('video')" style="display:none">🎬 Video</button>
+           <button class="btn-pill" id="btnShowMap" onclick="setView('map')" style="display:none">🗺️ Map</button>
         </div>
       </div>
 

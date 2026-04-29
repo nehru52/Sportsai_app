@@ -23,6 +23,11 @@ EPOCHS    = 50
 LR        = 1e-4
 DEVICE    = "cuda" if torch.cuda.is_available() else "cpu"
 
+# Improvement 4: Configurable loss weights
+MPJPE_WEIGHT      = 0.3
+SMOOTHNESS_WEIGHT = 0.4
+BONE_WEIGHT       = 0.3
+
 # Temperature monitoring settings
 TEMP_CHECK_INTERVAL = 30  # seconds
 TEMP_PAUSE_THRESHOLD = 80  # °C - pause if above
@@ -163,16 +168,35 @@ def reprojection_loss(pred3d, orig2d_norm):
     return nn.functional.mse_loss(pred2d, orig2d_norm)
 
 
-def bone_length_loss(pred3d):
-    loss = 0.0
+def bone_consistency_loss(pred3d):
+    """
+    Improvement 4: Compute expected bone lengths from first frame 
+    and penalize deviations across sequence.
+    """
+    # Expected lengths from frame 0
+    first_frame = pred3d[:, 0]
+    expected_lengths = []
     for i, j in BONES:
-        bone = pred3d[:, :, i] - pred3d[:, :, j]
-        length = torch.norm(bone, dim=2)
-        loss += length.var(dim=1).mean()
+        bone = first_frame[:, i] - first_frame[:, j]
+        expected_lengths.append(torch.norm(bone, dim=1))
+    
+    loss = 0.0
+    for idx, (i, j) in enumerate(BONES):
+        bone = pred3d[:, :] - pred3d[:, :] # All frames
+        # Actually bone is pred3d[:, :, i] - pred3d[:, :, j]
+        # Let's fix the indexing
+        bone_vec = pred3d[:, :, i] - pred3d[:, :, j]
+        lengths = torch.norm(bone_vec, dim=2)
+        target = expected_lengths[idx].unsqueeze(1) # [Batch, 1]
+        loss += nn.functional.mse_loss(lengths, target.expand_as(lengths))
+        
     return loss / len(BONES)
 
 
 def smoothness_loss(pred3d):
+    """
+    Improvement 4: Mean of squared differences between consecutive predicted 3D joint positions.
+    """
     diff = pred3d[:, 1:] - pred3d[:, :-1]
     return (diff ** 2).mean()
 
@@ -245,9 +269,9 @@ def main():
             orig2d_norm[:,:,:,1] = orig2d_norm[:,:,:,1] / 360.0 - 1.0
 
             loss = (
-                reprojection_loss(pred, orig2d_norm) * 1.0 +
-                bone_length_loss(pred)               * 0.5 +
-                smoothness_loss(pred)                * 0.1
+                reprojection_loss(pred, orig2d_norm) * MPJPE_WEIGHT +
+                bone_consistency_loss(pred)          * BONE_WEIGHT +
+                smoothness_loss(pred)                * SMOOTHNESS_WEIGHT
             )
 
             optimizer.zero_grad()

@@ -3,7 +3,9 @@
 
 class SportsAIEnhanced {
   constructor() {
-    this.apiBaseUrl = 'http://localhost:8000';
+    this.apiBaseUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? (window.location.port === '8080' ? '/api' : 'http://localhost:8080/api')
+      : (window.location.origin + '/api');
     this.currentAnalysis = null;
     this.activeJobId = null;
     this.pollInterval = null;
@@ -47,20 +49,33 @@ class SportsAIEnhanced {
   }
 
   async submitComprehensiveAnalysis(formData) {
+    console.log('--- STARTING COMPREHENSIVE UPLOAD ---');
+    console.log('Target API:', `${this.apiBaseUrl}/analyse/auto`);
+    
     try {
-      this.showLoading('Submitting comprehensive analysis...');
+      this.showLoading('Uploading and starting analysis...');
       
-      const response = await fetch(`${this.apiBaseUrl}/analyse/comprehensive`, {
+      const response = await fetch(`${this.apiBaseUrl}/analyse/auto?output=json`, {
         method: 'POST',
-        body: formData
+        body: formData,
+        headers: { 'ngrok-skip-browser-warning': 'true' }
       });
       
-      if (!response.ok) throw new Error('Analysis submission failed');
+      console.log('Response Status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Server Error Detail:', errorText);
+        throw new Error(`Server returned ${response.status}: ${errorText.substring(0, 100)}`);
+      }
       
       const data = await response.json();
+      console.log('Analysis Result Received:', data);
       this.handleAnalysisResult(data);
       
     } catch (error) {
+      console.error('CRITICAL UI ERROR:', error);
+      alert('❌ ANALYSIS FAILED TO START:\n' + error.message);
       this.showError('Analysis submission failed: ' + error.message);
     } finally {
       this.hideLoading();
@@ -90,6 +105,31 @@ class SportsAIEnhanced {
     } finally {
       this.hideLoading();
     }
+  }
+
+  // UI Feedback Methods
+  showLoading(message) {
+    const overlay = document.getElementById('loadingOverlay');
+    const msg = overlay?.querySelector('.loading-message');
+    if (overlay && msg) {
+      msg.textContent = message;
+      overlay.classList.remove('hidden');
+    }
+  }
+
+  hideLoading() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) overlay.classList.add('hidden');
+  }
+
+  showSuccess(message) {
+    console.log('SUCCESS:', message);
+    alert('✅ ' + message); // Simple fallback for now
+  }
+
+  showError(message) {
+    console.error('ERROR:', message);
+    alert('❌ ' + message);
   }
 
   async checkJobStatus(jobId) {
@@ -849,6 +889,27 @@ class SportsAIEnhanced {
     }
   }
 
+  setView(view) {
+    const vid = document.getElementById('resultVideo');
+    const map = document.getElementById('shotMapContainer');
+    const btnVid = document.getElementById('btnShowVideo');
+    const btnMap = document.getElementById('btnShowMap');
+
+    if (!vid || !map) return;
+
+    if (view === 'video') {
+      vid.style.display = 'block';
+      map.style.display = 'none';
+      if (btnVid) btnVid.style.opacity = '1';
+      if (btnMap) btnMap.style.opacity = '0.5';
+    } else {
+      vid.style.display = 'none';
+      map.style.display = 'block';
+      if (btnVid) btnVid.style.opacity = '0.5';
+      if (btnMap) btnMap.style.opacity = '1';
+    }
+  }
+
   displayPostMatchResults(data) {
     // Update three-layer states
     if (data.layer_1_tactical) {
@@ -880,6 +941,20 @@ class SportsAIEnhanced {
     if (data.multi_player_tracking) {
       this.updateCourtVisualization(data.multi_player_tracking);
     }
+
+    // Update shot map
+    if (data.shot_map_url) {
+        const mapImg = document.getElementById('shotMapImage');
+        const btnMap = document.getElementById('btnShowMap');
+        const btnVid = document.getElementById('btnShowVideo');
+        
+        if (mapImg) {
+            mapImg.src = data.shot_map_url;
+            if (btnMap) btnMap.style.display = 'inline-block';
+            if (btnVid) btnVid.style.display = 'inline-block';
+            this.setView('map'); // Default to map for tactical reports
+        }
+    }
     
     // Update benchmark visualization
     if (data.biomechanical_analysis?.elite_comparisons) {
@@ -899,8 +974,90 @@ class SportsAIEnhanced {
   }
 
   handleAnalysisResult(data) {
+    console.log('Handling analysis result:', data);
     this.currentAnalysis = data;
-    this.displayPostMatchResults(data);
+    
+    // Check if this is the simple auto analysis format
+    if (data.segments || data.summary) {
+      this.displayAutoAnalysisResults(data);
+    } else {
+      // Three-layer format
+      this.displayPostMatchResults(data);
+    }
+  }
+  
+  displayAutoAnalysisResults(data) {
+    console.log('Displaying auto analysis results');
+    
+    // Show success message
+    this.showSuccess('Analysis completed successfully!');
+    
+    // Display summary if available
+    if (data.summary) {
+      const summary = data.summary;
+      let summaryHTML = `
+        <div style="background: #2a2a2a; padding: 20px; border-radius: 10px; margin: 20px 0;">
+          <h3 style="color: #4CAF50; margin-top: 0;">📊 Analysis Summary</h3>
+          <p><strong>Overall Verdict:</strong> ${summary.overall_verdict || 'N/A'}</p>
+          <p><strong>Score:</strong> ${summary.metrics_good || 0}/${summary.metrics_total || 0} metrics good</p>
+          <p><strong>Top Priority:</strong> ${summary.top_priority || 'N/A'}</p>
+          <p><strong>Top Strength:</strong> ${summary.top_strength || 'N/A'}</p>
+        </div>
+      `;
+      
+      // Find a place to display this
+      const resultsContainer = document.querySelector('.integration-display') || document.querySelector('.container');
+      if (resultsContainer) {
+        const summaryDiv = document.createElement('div');
+        summaryDiv.innerHTML = summaryHTML;
+        resultsContainer.appendChild(summaryDiv);
+      }
+    }
+    
+    // Display segments
+    if (data.segments && data.segments.length > 0) {
+      console.log(`Found ${data.segments.length} segments`);
+      
+      let segmentsHTML = `
+        <div style="background: #2a2a2a; padding: 20px; border-radius: 10px; margin: 20px 0;">
+          <h3 style="color: #4CAF50; margin-top: 0;">🎯 Detected Techniques</h3>
+      `;
+      
+      data.segments.forEach((seg, idx) => {
+        const analysis = seg.analysis || {};
+        segmentsHTML += `
+          <div style="background: #1a1a1a; padding: 15px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #4CAF50;">
+            <h4 style="margin-top: 0; color: #fff;">${idx + 1}. ${seg.technique.toUpperCase()}</h4>
+            <p><strong>Time:</strong> ${seg.start_time?.toFixed(1)}s - ${seg.end_time?.toFixed(1)}s</p>
+            <p><strong>Verdict:</strong> ${analysis.verdict || 'N/A'}</p>
+            <p><strong>Score:</strong> ${analysis.score || 'N/A'}</p>
+            ${analysis.coaching?.headline ? `<p><strong>Coaching:</strong> ${analysis.coaching.headline}</p>` : ''}
+          </div>
+        `;
+      });
+      
+      segmentsHTML += '</div>';
+      
+      const resultsContainer = document.querySelector('.integration-display') || document.querySelector('.container');
+      if (resultsContainer) {
+        const segmentsDiv = document.createElement('div');
+        segmentsDiv.innerHTML = segmentsHTML;
+        resultsContainer.appendChild(segmentsDiv);
+      }
+    }
+    
+    // Display timeline
+    if (data.timeline && data.timeline.length > 0) {
+      console.log(`Timeline has ${data.timeline.length} events`);
+    }
+    
+    // Scroll to results
+    setTimeout(() => {
+      const resultsContainer = document.querySelector('.integration-display');
+      if (resultsContainer) {
+        resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 500);
   }
 
   // Modal Controls

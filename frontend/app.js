@@ -1,7 +1,8 @@
-// Use ngrok backend for public URL with async processing (no timeout issues!)
-const API = window.location.hostname === 'localhost' 
-  ? 'http://localhost:8001' 
-  : 'https://2a54-82-11-179-110.ngrok-free.app';
+// Detect the base URL automatically. If we are running through the combined web server (port 8080), 
+// the API is at /api. If we are running standalone, we use the fallback.
+const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? (window.location.port === '8080' ? '/api' : 'http://localhost:8080/api')
+  : (window.location.origin + '/api'); 
 console.log('Using API:', API);
 let selectedFile = null;
 let selectedTech = 'spike';  // Default to spike
@@ -12,11 +13,11 @@ function scrollToUpload() {
   document.getElementById('uploadSection').scrollIntoView({ behavior: 'smooth' });
 }
 
-// ── Technique pills ───────────────────────────────────────────────────────────
-// Wait for DOM to be fully loaded
+// ── DOM Ready - Setup all event listeners ────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('DOM loaded, setting up technique buttons...');
+  console.log('DOM loaded, setting up event listeners...');
   
+  // ── Technique pills ─────────────────────────────────────────────────────────
   const techButtons = document.querySelectorAll('.tech-pill');
   console.log('Found', techButtons.length, 'technique buttons');
   
@@ -40,19 +41,33 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log('Selected technique updated to:', selectedTech);
     });
   });
-});
 
-// ── File handling ─────────────────────────────────────────────────────────────
-document.getElementById('fileInput').addEventListener('change', e => {
-  if (e.target.files[0]) handleFile(e.target.files[0]);
-});
+  // ── File handling ───────────────────────────────────────────────────────────
+  const fileInput = document.getElementById('fileInput');
+  const uploadZone = document.getElementById('uploadZone');
+  
+  if (fileInput) {
+    console.log('Setting up file input listener');
+    fileInput.addEventListener('change', e => {
+      console.log('File input changed', e.target.files);
+      if (e.target.files[0]) handleFile(e.target.files[0]);
+    });
+  } else {
+    console.error('fileInput element not found!');
+  }
 
-const zone = document.getElementById('uploadZone');
-zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
-zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-zone.addEventListener('drop', e => {
-  e.preventDefault(); zone.classList.remove('drag-over');
-  if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+  if (uploadZone) {
+    console.log('Setting up upload zone listeners');
+    uploadZone.addEventListener('dragover',  e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+    uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+    uploadZone.addEventListener('drop', e => {
+      e.preventDefault(); uploadZone.classList.remove('drag-over');
+      console.log('File dropped', e.dataTransfer.files);
+      if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+    });
+  } else {
+    console.error('uploadZone element not found!');
+  }
 });
 
 function handleFile(file) {
@@ -76,12 +91,60 @@ function resetUpload() {
   document.getElementById('errorBox').classList.remove('show');
 }
 
+// ── View Toggle ──────────────────────────────────────────────────────────────
+function setView(view) {
+  const vid = document.getElementById('resultVideo');
+  const map = document.getElementById('shotMapContainer');
+  const btnVid = document.getElementById('btnShowVideo');
+  const btnMap = document.getElementById('btnShowMap');
+
+  if (view === 'video') {
+    vid.style.display = 'block';
+    map.style.display = 'none';
+    btnVid.style.opacity = '1';
+    btnMap.style.opacity = '0.5';
+  } else {
+    vid.style.display = 'none';
+    map.style.display = 'block';
+    btnVid.style.opacity = '0.5';
+    btnMap.style.opacity = '1';
+  }
+}
+
 // ── Analysis ──────────────────────────────────────────────────────────────────
 async function startAnalysis() {
   if (!selectedFile) return;
   
   console.log('Starting analysis with technique:', selectedTech);
   
+  // Customise progress steps for Team/Match
+  if (selectedTech === 'team' || selectedTech === 'match') {
+    const steps = [
+      'Detecting court & corners',
+      'Multi-player tracking (ByteTrack)',
+      'Jersey recognition (TrOCR)',
+      'Warping to 2D court map',
+      'Generating team heatmaps',
+      'Finalizing tactical report'
+    ];
+    document.querySelectorAll('.steps li').forEach((li, i) => {
+      li.innerHTML = `<span class="step-icon">${i+1}</span> ${steps[i]}`;
+    });
+  } else {
+    // Reset to default steps
+    const steps = [
+      'Checking video quality',
+      'Detecting technique & timing',
+      'Extracting 3D pose skeleton',
+      'Comparing to elite athletes',
+      'Generating AI coaching',
+      'Rendering annotated video'
+    ];
+    document.querySelectorAll('.steps li').forEach((li, i) => {
+      li.innerHTML = `<span class="step-icon">${i+1}</span> ${steps[i]}`;
+    });
+  }
+
   startTime = Date.now();
   showSection('progress');
   animateSteps();
@@ -92,7 +155,11 @@ async function startAnalysis() {
   // Team tracking mode
   if (selectedTech === 'team') {
     try {
-      const res = await fetch(`${API}/visualise/tracking`, { method: 'POST', body: form });
+      const res = await fetch(`${API}/visualise/tracking`, { 
+        method: 'POST', 
+        body: form,
+        headers: { 'ngrok-skip-browser-warning': 'true' }
+      });
       if (!res.ok) { showError('Team tracking failed — make sure multiple players are visible'); return; }
       const blob = URL.createObjectURL(await res.blob());
       const players = res.headers.get('X-Players-Detected') || '?';
@@ -224,86 +291,6 @@ async function startAnalysis() {
   } catch (err) {
     console.error('Analysis error:', err);
     showError(`Connection error: ${err.message}. Make sure the backend is running.`);
-  }
-}
-
-  try {
-    // Step 1: get full JSON analysis (coaching data, metrics, timeline)
-    const technique = `&technique=${selectedTech}`;
-    console.log('API call 1 - JSON:', `${API}/analyse/auto?output=json${technique}`);
-    
-    const jsonRes = await fetch(`${API}/analyse/auto?output=json${technique}`, {
-      method: 'POST', body: form
-    });
-
-    if (!jsonRes.ok) {
-      const err = await jsonRes.json().catch(() => ({}));
-      const msg = err?.detail?.quality?.issues?.[0] || err?.detail?.error || err?.detail || 'Analysis failed';
-      showError(typeof msg === 'string' ? msg : JSON.stringify(msg));
-      return;
-    }
-
-    const data = await jsonRes.json();
-    console.log('Analysis result:', data);
-
-    if (data.bad_video_advice) { showError(data.bad_video_advice); return; }
-
-    const seg = (data.segments || []).find(s => s.analysis);
-    if (!seg) {
-      showError('No technique detected. Make sure the athlete is clearly visible performing a volleyball technique, with a side-on camera angle.');
-      return;
-    }
-
-    console.log('Segment technique:', seg.technique);
-
-    // Step 2: get annotated video
-    const form2 = new FormData();
-    form2.append('video', selectedFile);
-    console.log('API call 2 - Video:', `${API}/analyse/auto?output=video${technique}`);
-    
-    const vidRes = await fetch(`${API}/analyse/auto?output=video${technique}`, {
-      method: 'POST', body: form2
-    });
-
-    let videoUrl = null;
-    console.log('Video response status:', vidRes.status);
-    console.log('Video response content-type:', vidRes.headers.get('content-type'));
-    
-    if (vidRes.ok && (vidRes.headers.get('content-type') || '').includes('video')) {
-      const blob = await vidRes.blob();
-      console.log('Video blob size:', blob.size, 'bytes');
-      videoUrl = URL.createObjectURL(blob);
-      console.log('Video URL created:', videoUrl);
-    } else {
-      console.warn('Video response not OK or wrong content-type');
-    }
-
-    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1) + 's';
-
-    // Complete all animation steps immediately
-    completeAllSteps();
-    
-    // Small delay to show completion before showing results
-    setTimeout(() => {
-      showResults({
-        videoUrl,
-        verdict:   seg.analysis.verdict,
-        score:     seg.analysis.score,
-        technique: seg.technique,
-        coaching:  seg.analysis.coaching || {},
-        metrics:   seg.analysis.metrics  || {},
-        elapsed,
-      });
-    }, 500);
-
-  } catch (err) {
-    console.error('Analysis error:', err);
-    console.error('Error details:', {
-      name: err.name,
-      message: err.message,
-      stack: err.stack
-    });
-    showError(`Connection error: ${err.message}. Make sure the backend is running on port 8001.`);
   }
 }
 
@@ -524,7 +511,23 @@ function showMatchResults(data, elapsed) {
   document.getElementById('mTech2').textContent = 'Match';
   document.getElementById('mTime2').textContent = elapsed;
 
-  document.getElementById('resultVideo').style.display = 'none';
+  // Handle Shot Map / Video Toggling
+  const vid = document.getElementById('resultVideo');
+  const mapImg = document.getElementById('shotMapImage');
+  const mapBtn = document.getElementById('btnShowMap');
+  const vidBtn = document.getElementById('btnShowVideo');
+
+  if (data.shot_map_url) {
+    mapImg.src = data.shot_map_url;
+    document.getElementById('btnShowMap').style.display = 'inline-block';
+    document.getElementById('btnShowVideo').style.display = 'inline-block';
+    setView('map'); // Default to map for match results
+  } else {
+    vid.style.display = 'block';
+    document.getElementById('shotMapContainer').style.display = 'none';
+    document.getElementById('btnShowMap').style.display = 'none';
+    document.getElementById('btnShowVideo').style.display = 'none';
+  }
 
   const col = document.getElementById('coachingCol');
   col.innerHTML = '';

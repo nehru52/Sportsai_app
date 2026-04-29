@@ -52,16 +52,22 @@ def _draw_skeleton(
         if i >= len(kp) or j >= len(kp):
             continue
         p1, p2 = tuple(kp[i]), tuple(kp[j])
-        if any(c <= 0 for c in p1) or any(c <= 0 for c in p2):
+        if (p1[0] == 0 and p1[1] == 0) or (p2[0] == 0 and p2[1] == 0):
             continue
         color = color_override or (RED if (i in bad_joints or j in bad_joints) else GREEN)
         cv2.line(overlay, p1, p2, color, BONE_THICKNESS)
 
     for idx, (x, y) in enumerate(kp):
-        if x <= 0 and y <= 0:
+        if x == 0 and y == 0:
             continue
         color = color_override or (RED if idx in bad_joints else GREEN)
+        # Draw black outline first (larger radius)
+        cv2.circle(overlay, (x, y), JOINT_RADIUS + 2, BLACK, -1)
+        # Draw colored joint on top
         cv2.circle(overlay, (x, y), JOINT_RADIUS, color, -1)
+        # Draw white center dot for extra visibility
+        if JOINT_RADIUS >= 4:
+            cv2.circle(overlay, (x, y), max(1, JOINT_RADIUS - 3), WHITE, -1)
 
     if alpha < 1.0:
         cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
@@ -131,6 +137,7 @@ def render_annotated_video(
     report: dict,
     feedback: dict,
     elite_reference: np.ndarray | None = None,  # (17, 3) single elite frame
+    pose_seq_2d: np.ndarray | None = None,  # (T, 17, 2) raw pixel coords for drawing
 ) -> dict:
     """
     Render the athlete's video with:
@@ -160,6 +167,9 @@ def render_annotated_video(
     bad_joints   = _bad_joints_for_metrics(bad_metrics)
     peak_frame   = _find_peak_bad_frame(pose_seq, bad_metrics, biomechanics)
 
+    # Use 2D pixel coords if available (more accurate than 3D denormalized)
+    draw_seq = pose_seq_2d if pose_seq_2d is not None else pose_seq
+
     # Build HUD image (static, drawn once)
     hud = _build_hud(report, feedback, hud_width, height)
 
@@ -170,8 +180,8 @@ def render_annotated_video(
             break
 
         # Draw skeleton if we have pose data for this frame
-        if frame_idx < len(pose_seq):
-            kp = pose_seq[frame_idx]
+        if frame_idx < len(draw_seq):
+            kp = draw_seq[frame_idx]
 
             # Elite ghost first (behind athlete)
             if elite_reference is not None:
