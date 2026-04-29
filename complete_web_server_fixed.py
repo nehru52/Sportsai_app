@@ -384,6 +384,8 @@ def create_default_landing_page():
         function displayResults(data) {
             result.style.display = 'block';
             
+            console.log('Analysis result:', data); // Debug log
+            
             if (data.bad_video_advice) {
                 result.innerHTML = `
                     <h3 style="color: #FFC107;">⚠️ Video Issue</h3>
@@ -392,7 +394,13 @@ def create_default_landing_page():
                 return;
             }
             
-            if (!data.segments || data.segments.length === 0) {
+            const summary = data.summary || {};
+            const segments = data.segments || [];
+            
+            // Check if we have any analyzed segments
+            const analyzedSegments = segments.filter(s => s.analysis);
+            
+            if (segments.length === 0) {
                 result.innerHTML = `
                     <h3 style="color: #FFC107;">⚠️ No Techniques Detected</h3>
                     <p>No volleyball techniques were found in this video. Make sure the athlete is clearly visible performing a technique.</p>
@@ -400,42 +408,69 @@ def create_default_landing_page():
                 return;
             }
             
-            const summary = data.summary || {};
-            const segments = data.segments || [];
+            if (analyzedSegments.length === 0) {
+                result.innerHTML = `
+                    <h3 style="color: #FFC107;">⚠️ Techniques Detected But Not Analyzed</h3>
+                    <p>Found: ${summary.techniques_detected ? summary.techniques_detected.join(', ') : 'unknown'}</p>
+                    <p>These techniques were detected but could not be fully analyzed. This may be due to video quality or technique visibility.</p>
+                `;
+                return;
+            }
             
             let html = '<h3>✅ Analysis Complete</h3>';
             
             // Overall verdict
             if (summary.overall_verdict) {
                 const verdictClass = summary.overall_verdict === 'ELITE' ? 'status-elite' :
-                                   summary.overall_verdict === 'GOOD' ? 'status-good' : 'status-needs-work';
+                                   summary.overall_verdict === 'GOOD' || summary.overall_verdict === 'DEVELOPING' ? 'status-good' : 'status-needs-work';
                 html += `<span class="status-badge ${verdictClass}">${summary.overall_verdict}</span>`;
             }
             
             // Techniques detected
-            if (summary.techniques_detected) {
-                html += `<p><strong>Techniques:</strong> ${summary.techniques_detected.join(', ')}</p>`;
+            if (summary.techniques_detected && summary.techniques_detected.length > 0) {
+                html += `<p><strong>Techniques Detected:</strong> ${summary.techniques_detected.join(', ').toUpperCase()}</p>`;
             }
             
-            // Confidence
-            if (data.average_confidence) {
-                html += `<p><strong>Pose Confidence:</strong> ${(data.average_confidence * 100).toFixed(1)}%</p>`;
+            // Score
+            if (summary.metrics_good !== undefined && summary.metrics_total !== undefined) {
+                html += `<p><strong>Score:</strong> ${summary.metrics_good}/${summary.metrics_total} metrics good (${Math.round(summary.metrics_good / summary.metrics_total * 100)}%)</p>`;
             }
             
-            // Segments
-            html += '<h4>Detected Segments:</h4>';
-            segments.forEach((seg, i) => {
-                if (seg.analysis) {
-                    html += `
-                        <div style="margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 5px;">
-                            <strong>${seg.technique.toUpperCase()}</strong> 
-                            (${seg.start_time} - ${seg.end_time})
-                            <br>
-                            Verdict: ${seg.analysis.verdict} | Score: ${seg.analysis.score}
-                        </div>
-                    `;
-                }
+            // Segments with analysis
+            html += '<h4>Analysis Results:</h4>';
+            analyzedSegments.forEach((seg, i) => {
+                const analysis = seg.analysis;
+                const verdictColor = analysis.verdict === 'ELITE' ? '#4CAF50' :
+                                   analysis.verdict === 'GOOD' || analysis.verdict === 'DEVELOPING' ? '#FFC107' : '#FF5722';
+                
+                html += `
+                    <div style="margin: 15px 0; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 10px; border-left: 4px solid ${verdictColor};">
+                        <h4 style="margin: 0 0 10px 0;">${seg.technique.toUpperCase()}</h4>
+                        <p><strong>Verdict:</strong> <span style="color: ${verdictColor};">${analysis.verdict}</span></p>
+                        <p><strong>Score:</strong> ${analysis.score}</p>
+                        <p><strong>Confidence:</strong> ${(analysis.confidence * 100).toFixed(1)}%</p>
+                        ${analysis.coaching && analysis.coaching.headline ? `
+                            <div style="margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 5px;">
+                                <p style="margin: 0;"><strong>💡 Coaching:</strong></p>
+                                <p style="margin: 5px 0 0 0;">${analysis.coaching.headline}</p>
+                                ${analysis.coaching.next_session_focus ? `<p style="margin: 5px 0 0 0;"><strong>Focus:</strong> ${analysis.coaching.next_session_focus}</p>` : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
             });
+            
+            // Top strength and priority
+            if (summary.top_strength || summary.top_priority) {
+                html += '<div style="margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px;">';
+                if (summary.top_strength) {
+                    html += `<p><strong>✅ Top Strength:</strong> ${summary.top_strength.replace(/_/g, ' ')}</p>`;
+                }
+                if (summary.top_priority) {
+                    html += `<p><strong>⚠️ Priority to Improve:</strong> ${summary.top_priority.replace(/_/g, ' ')}</p>`;
+                }
+                html += '</div>';
+            }
             
             result.innerHTML = html;
         }
