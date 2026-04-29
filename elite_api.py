@@ -2,17 +2,18 @@
 Elite Olympic-Level API Endpoints
 Enhanced endpoints for Olympic-grade volleyball analysis
 """
-from fastapi import FastAPI, File, HTTPException, UploadFile, Query
+from fastapi import FastAPI, File, HTTPException, UploadFile, Query, Body
 from typing import Optional, List
 import sys
 import os
 
 # Add the data_collection path to sys.path
-sys.path.insert(0, "C:/sportsai-backend/data_collection")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(BASE_DIR, "data_collection"))
 
-from elite_integration import analyze_video_elite_level, integrate_elite_analysis
 from elite_biomechanics import get_elite_benchmark, detect_position_from_movement
 from elite_coach_feedback import generate_elite_coaching_feedback
+from smart_analyser import analyse_video_auto
 
 app = FastAPI(title="SportsAI Elite Volleyball Analysis API - Olympic Grade")
 
@@ -50,39 +51,14 @@ async def analyse_elite(
         buffer.write(await video.read())
     
     try:
-        # Load session history if athlete_id provided
-        session_history = None
-        if athlete_id:
-            from progress_tracker import load_history
-            session_history = load_history(athlete_id, technique)
-        
-        # Perform elite-level analysis
-        result = analyze_video_elite_level(
-            tmp_path,
-            technique,
-            athlete_id=athlete_id,
-            session_history=session_history,
-            tournament_context=tournament_context
-        )
-        
-        # Add analysis metadata
-        result["analysis_metadata"] = {
-            "analysis_level": "Olympic Elite",
-            "biomechanical_standards": "FIVB Level II + Open Spike Kinematics",
-            "timing_standards": "Olympic competition windows",
-            "position_standards": "2014 FIVB World Championship data",
-            "coaching_standards": "Volleyball Canada HP Operations Manual",
-            "analysis_features": {
-                "position_detection": include_position_analysis,
-                "temporal_analysis": include_temporal_analysis,
-                "training_program": include_training_program,
-                "competition_assessment": True
-            }
-        }
-        
+        # Use smart_analyser's automatic pipeline with Physics-Based Fallback
+        print(f"[ELITE API] Routing to smart_analyser.analyse_video_auto for {technique}...")
+        result = analyse_video_auto(tmp_path, athlete_id=athlete_id)
         return result
         
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(500, f"Elite analysis failed: {str(e)}")
     finally:
         # Clean up temp file
@@ -92,7 +68,7 @@ async def analyse_elite(
 @app.post("/analyse/position")
 async def analyse_position(
     video: UploadFile = File(...),
-    technique_counts: dict = Query(..., description="Dictionary with technique counts: {'spike': 25, 'block': 30, 'serve': 15}"),
+    technique_counts: dict = Body(..., description="Dictionary with technique counts: {'spike': 25, 'block': 30, 'serve': 15}"),
     include_benchmarks: bool = Query(True, description="Include position-specific elite benchmarks"),
 ):
     """
@@ -287,3 +263,10 @@ def get_temporal_constraints(technique: str) -> dict:
             temporal_data[metric] = data
     
     return temporal_data
+
+if __name__ == "__main__":
+    import uvicorn
+    print("🚀 Starting Elite Olympic-Level API...")
+    print("🌐 URL: http://localhost:8000")
+    print("📚 Docs: http://localhost:8000/docs")
+    uvicorn.run(app, host="0.0.0.0", port=8000)
